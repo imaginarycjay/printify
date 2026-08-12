@@ -20,3 +20,15 @@ This file logs all completed tasks, steps, and key state changes. The agent must
 - **Key State Changes:**
   - Added new workflow rule file `.agents/AGENTS.md`.
   - Added Git skill files.
+
+---
+
+## [2026-08-12 14:14:00] Add Active Skill Inspection and Installation Rules
+- **Request:** Add rules to verify installed skills at the start of every session/task and search/install unfamiliar skills.
+- **Status:** Success
+- **Steps Taken:**
+  - Updated `.agents/AGENTS.md` to add `Active Skill Verification & Installation` rules.
+- **Verification & Outcome:**
+  - Verified structure of `.agents/AGENTS.md` file.
+- **Key State Changes:**
+  - Updated `.agents/AGENTS.md` with new AI instructions.
