@@ -12,6 +12,15 @@ class PrintServiceCatalog
     public static function all(): array
     {
         return [
+            'web_builder' => [
+                'key' => 'web_builder',
+                'name' => 'Web Builder',
+                'description' => 'Storefront visual editor to customize layout, themes, banners, and customer experience',
+                'icon' => 'globe-alt',
+                'gradient' => 'from-violet-500 via-purple-600 to-indigo-700',
+                'badge_color' => 'bg-violet-500/20 text-violet-300 border-violet-500/30',
+                'is_preinstalled' => true,
+            ],
             'thesis_binding' => [
                 'key' => 'thesis_binding',
                 'name' => 'Hardbound / Softbound Thesis Binding',
@@ -80,9 +89,27 @@ class PrintServiceCatalog
     }
 
     /**
+     * Keys of pre-installed apps that cannot be removed by shop owners.
+     *
+     * @return array<int, string>
+     */
+    public static function preinstalledKeys(): array
+    {
+        return ['web_builder'];
+    }
+
+    /**
+     * Check if a service key is pre-installed.
+     */
+    public static function isPreinstalled(string $key): bool
+    {
+        return in_array($key, static::preinstalledKeys(), true);
+    }
+
+    /**
      * Get details for a specific service key.
      *
-     * @return array{key: string, name: string, description: string, icon: string, gradient: string, badge_color: string}|null
+     * @return array{key: string, name: string, description: string, icon: string, gradient: string, badge_color: string, is_preinstalled?: bool}|null
      */
     public static function find(string $key): ?array
     {

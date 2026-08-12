@@ -12,6 +12,11 @@ new class extends Component {
 
     public function toggleServiceStatus(string $serviceKey): void
     {
+        if (PrintServiceCatalog::isPreinstalled($serviceKey)) {
+            $this->dispatch('toast', message: 'Pre-installed system apps cannot be removed.');
+            return;
+        }
+
         $user = auth()->user();
         if (! $user || ! $user->printShop) {
             return;
@@ -58,8 +63,9 @@ new class extends Component {
         $shop = $user?->printShop;
         $catalog = PrintServiceCatalog::all();
 
-        // Installed services
-        $activeServiceKeys = $shop ? $shop->services()->where('is_active', true)->pluck('service_key')->toArray() : [];
+        // Installed services (always includes pre-installed core apps like web_builder)
+        $dbActiveKeys = $shop ? $shop->services()->where('is_active', true)->pluck('service_key')->toArray() : [];
+        $activeServiceKeys = array_values(array_unique(array_merge(PrintServiceCatalog::preinstalledKeys(), $dbActiveKeys)));
 
         // Filter by search query
         $installedApps = collect($catalog)->filter(function ($item) use ($activeServiceKeys) {
@@ -140,18 +146,34 @@ new class extends Component {
         <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-6 pt-4 max-w-4xl mx-auto">
             <!-- Installed Service App Tiles -->
             @foreach ($installedApps as $app)
-                <div class="group flex flex-col items-center text-center space-y-2.5 cursor-pointer">
+                @php
+                    $isPreinstalled = !empty($app['is_preinstalled']);
+                    $route = $app['key'] === 'web_builder' ? route('owner.web-builder') : null;
+                @endphp
+                @if ($route)
+                    <a href="{{ $route }}" wire:navigate class="group flex flex-col items-center text-center space-y-2.5 cursor-pointer">
+                @else
+                    <div class="group flex flex-col items-center text-center space-y-2.5 cursor-pointer">
+                @endif
                     <!-- Squircle Container -->
                     <div class="size-20 sm:size-24 rounded-3xl bg-gradient-to-br {{ $app['gradient'] }} flex items-center justify-center text-white shadow-xl shadow-stone-950/40 group-hover:scale-105 group-hover:shadow-amber-500/20 transition-all duration-300 relative border border-white/10">
                         <flux:icon name="{{ $app['icon'] }}" class="size-10 sm:size-11 stroke-[1.5]" />
-                        <span class="absolute top-2 right-2 size-2.5 rounded-full bg-emerald-400 ring-2 ring-stone-950"></span>
+                        @if ($isPreinstalled)
+                            <span class="absolute top-2 right-2 px-1.5 py-0.5 rounded-md bg-violet-400 text-stone-950 text-[9px] font-black uppercase shadow tracking-wider">CORE</span>
+                        @else
+                            <span class="absolute top-2 right-2 size-2.5 rounded-full bg-emerald-400 ring-2 ring-stone-950"></span>
+                        @endif
                     </div>
 
                     <!-- App Title -->
                     <span class="text-xs sm:text-sm font-bold text-stone-200 group-hover:text-amber-400 transition-colors line-clamp-2 leading-tight px-1">
                         {{ $app['name'] }}
                     </span>
-                </div>
+                @if ($route)
+                    </a>
+                @else
+                    </div>
+                @endif
             @endforeach
 
             <!-- Special "+ More Services" App Tile -->
@@ -211,6 +233,7 @@ new class extends Component {
                     @foreach ($catalog as $key => $service)
                         @php
                             $isInstalled = in_array($key, $activeServiceKeys, true);
+                            $isPreinstalled = PrintServiceCatalog::isPreinstalled($key);
                         @endphp
                         <div class="flex items-start justify-between p-4 rounded-2xl border border-stone-800 bg-stone-950/60 gap-3">
                             <div class="flex items-start gap-3">
@@ -218,17 +241,28 @@ new class extends Component {
                                     <flux:icon name="{{ $service['icon'] }}" class="size-5" />
                                 </div>
                                 <div class="space-y-1">
-                                    <h4 class="text-xs font-bold text-white">{{ $service['name'] }}</h4>
+                                    <div class="flex items-center gap-2">
+                                        <h4 class="text-xs font-bold text-white">{{ $service['name'] }}</h4>
+                                        @if ($isPreinstalled)
+                                            <span class="px-1.5 py-0.5 rounded text-[9px] font-extrabold bg-violet-500/20 text-violet-300 border border-violet-500/30">Pre-installed</span>
+                                        @endif
+                                    </div>
                                     <p class="text-[10px] text-stone-400 leading-relaxed">{{ $service['description'] }}</p>
                                 </div>
                             </div>
 
-                            <button
-                                wire:click="toggleServiceStatus('{{ $key }}')"
-                                class="shrink-0 px-3 py-1.5 rounded-xl text-xs font-bold transition-all {{ $isInstalled ? 'bg-red-500/10 border border-red-500/30 text-red-400 hover:bg-red-500/20' : 'bg-amber-500 hover:bg-amber-400 text-stone-950 shadow-md shadow-amber-500/20' }}"
-                            >
-                                {{ $isInstalled ? 'Remove' : 'Install' }}
-                            </button>
+                            @if ($isPreinstalled)
+                                <span class="shrink-0 px-3 py-1.5 rounded-xl text-xs font-bold bg-stone-900 border border-stone-800 text-stone-500 cursor-not-allowed select-none">
+                                    Pre-installed
+                                </span>
+                            @else
+                                <button
+                                    wire:click="toggleServiceStatus('{{ $key }}')"
+                                    class="shrink-0 px-3 py-1.5 rounded-xl text-xs font-bold transition-all {{ $isInstalled ? 'bg-red-500/10 border border-red-500/30 text-red-400 hover:bg-red-500/20' : 'bg-amber-500 hover:bg-amber-400 text-stone-950 shadow-md shadow-amber-500/20' }}"
+                                >
+                                    {{ $isInstalled ? 'Remove' : 'Install' }}
+                                </button>
+                            @endif
                         </div>
                     @endforeach
                 </div>

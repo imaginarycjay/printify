@@ -49,6 +49,10 @@ new class extends Component {
 
     public function toggleService(string $key): void
     {
+        if (PrintServiceCatalog::isPreinstalled($key)) {
+            return;
+        }
+
         if (in_array($key, $this->selected_services, true)) {
             $this->selected_services = array_values(array_filter(
                 $this->selected_services,
@@ -191,15 +195,16 @@ new class extends Component {
                         </div>
                     @enderror
 
-                    <!-- 8 MVP Service Cards Grid -->
+                    <!-- Service Cards Grid -->
                     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 pt-2">
                         @foreach (App\Services\PrintServiceCatalog::all() as $key => $service)
                             @php
-                                $isSelected = in_array($key, $selected_services, true);
+                                $isPreinstalled = App\Services\PrintServiceCatalog::isPreinstalled($key);
+                                $isSelected = $isPreinstalled || in_array($key, $selected_services, true);
                             @endphp
                             <div
-                                wire:click="toggleService('{{ $key }}')"
-                                class="group relative flex flex-col justify-between p-4 rounded-2xl border transition-all duration-200 cursor-pointer select-none {{ $isSelected ? 'border-amber-500 bg-amber-500/10 shadow-lg shadow-amber-500/10 ring-1 ring-amber-500' : 'border-stone-800 bg-stone-900/60 hover:border-stone-700 hover:bg-stone-800/60' }}"
+                                @if (! $isPreinstalled) wire:click="toggleService('{{ $key }}')" @endif
+                                class="group relative flex flex-col justify-between p-4 rounded-2xl border transition-all duration-200 cursor-pointer select-none {{ $isSelected ? 'border-amber-500 bg-amber-500/10 shadow-lg shadow-amber-500/10 ring-1 ring-amber-500' : 'border-stone-800 bg-stone-900/60 hover:border-stone-700 hover:bg-stone-800/60' }} {{ $isPreinstalled ? 'cursor-default' : '' }}"
                             >
                                 <div class="flex items-start justify-between mb-3">
                                     <!-- Squircle Icon Box -->
@@ -207,10 +212,14 @@ new class extends Component {
                                         <flux:icon name="{{ $service['icon'] }}" class="size-6" />
                                     </div>
 
-                                    <!-- Checkmark Pill -->
-                                    <div class="size-6 rounded-full flex items-center justify-center transition-colors {{ $isSelected ? 'bg-amber-500 text-stone-950' : 'bg-stone-800 border border-stone-700 text-transparent' }}">
-                                        <flux:icon name="check" class="size-3.5 stroke-[3]" />
-                                    </div>
+                                    @if ($isPreinstalled)
+                                        <span class="px-2 py-0.5 rounded text-[9px] font-extrabold bg-violet-500/20 text-violet-300 border border-violet-500/30">Pre-installed</span>
+                                    @else
+                                        <!-- Checkmark Pill -->
+                                        <div class="size-6 rounded-full flex items-center justify-center transition-colors {{ $isSelected ? 'bg-amber-500 text-stone-950' : 'bg-stone-800 border border-stone-700 text-transparent' }}">
+                                            <flux:icon name="check" class="size-3.5 stroke-[3]" />
+                                        </div>
+                                    @endif
                                 </div>
 
                                 <div class="space-y-1">

@@ -32,3 +32,22 @@ This file logs all completed tasks, steps, and key state changes. The agent must
   - Verified structure of `.agents/AGENTS.md` file.
 - **Key State Changes:**
   - Updated `.agents/AGENTS.md` with new AI instructions.
+
+---
+
+## [2026-08-12 15:14:00] Add Web Builder Pre-installed App & Icon to Admin Dashboard
+- **Request:** Add pre-installed Web Builder app to admin dashboard App Launcher and App Store, non-removable by admin.
+- **Status:** Success
+- **Steps Taken:**
+  - Added `web_builder` to `App\Services\PrintServiceCatalog` with pre-installed helpers (`isPreinstalled()`, `preinstalledKeys()`).
+  - Updated `App\Models\PrintShop::hasService()` to always treat pre-installed apps as active.
+  - Updated `resources/views/pages/owner/⚡owner-dashboard.blade.php` to show Web Builder squircle icon on launcher grid with `CORE` badge, routing to Web Builder workspace, and locked "Pre-installed" badge in "+ More Services" App Store.
+  - Updated `resources/views/pages/owner/⚡owner-wizard.blade.php` to display pre-installed status during initial setup.
+  - Created `resources/views/pages/owner/⚡web-builder.blade.php` Livewire page component workspace with real-time storefront customizer controls and live customer preview frame.
+  - Registered route `owner/web-builder` in `routes/web.php`.
+  - Added unit and feature test coverage in `tests/Feature/WebBuilderAppTest.php`.
+- **Verification & Outcome:**
+  - Ran `composer test` (Pint + PHPStan level 7 + Pest): 43 tests passed, 123 assertions, 0 errors.
+- **Key State Changes:**
+  - Registered new route `owner/web-builder`.
+  - Created view `⚡web-builder.blade.php` and test `WebBuilderAppTest.php`.

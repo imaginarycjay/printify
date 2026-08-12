@@ -14,11 +14,12 @@ class BusinessOwnerWizardTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_print_service_catalog_contains_the_8_mvp_services(): void
+    public function test_print_service_catalog_contains_all_services_including_web_builder(): void
     {
         $services = PrintServiceCatalog::all();
 
-        $this->assertCount(8, $services);
+        $this->assertCount(9, $services);
+        $this->assertArrayHasKey('web_builder', $services);
         $this->assertArrayHasKey('thesis_binding', $services);
         $this->assertArrayHasKey('document_printing', $services);
         $this->assertArrayHasKey('tarpaulin', $services);
@@ -27,6 +28,7 @@ class BusinessOwnerWizardTest extends TestCase
         $this->assertArrayHasKey('trophy', $services);
         $this->assertArrayHasKey('mug', $services);
         $this->assertArrayHasKey('sticker', $services);
+        $this->assertTrue(PrintServiceCatalog::isPreinstalled('web_builder'));
     }
 
     public function test_business_owner_can_complete_setup_wizard(): void

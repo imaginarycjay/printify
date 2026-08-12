@@ -8,6 +8,7 @@ Route::view('/', 'welcome')->name('home');
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::view('dashboard', 'dashboard')->name('dashboard');
     Route::livewire('owner/setup', 'pages::owner.⚡owner-wizard')->name('owner.wizard');
+    Route::livewire('owner/web-builder', 'pages::owner.⚡web-builder')->name('owner.web-builder');
 });
 
 if (app()->isLocal()) {

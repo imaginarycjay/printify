@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Services\PrintServiceCatalog;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -56,6 +57,10 @@ class PrintShop extends Model
      */
     public function hasService(string $serviceKey): bool
     {
+        if (PrintServiceCatalog::isPreinstalled($serviceKey)) {
+            return true;
+        }
+
         return $this->services()
             ->where('service_key', $serviceKey)
             ->where('is_active', true)
