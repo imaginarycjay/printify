@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Support\Carbon;
 
 /**
@@ -50,6 +51,26 @@ class PrintShop extends Model
     public function services(): HasMany
     {
         return $this->hasMany(ShopService::class);
+    }
+
+    /**
+     * Get the inventory items for the print shop.
+     *
+     * @return HasMany<InventoryItem, $this>
+     */
+    public function inventoryItems(): HasMany
+    {
+        return $this->hasMany(InventoryItem::class);
+    }
+
+    /**
+     * Get the thesis binding configuration for the print shop.
+     *
+     * @return HasOne<ThesisBindingConfig, $this>
+     */
+    public function thesisBindingConfig(): HasOne
+    {
+        return $this->hasOne(ThesisBindingConfig::class);
     }
 
     /**

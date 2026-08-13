@@ -4,6 +4,8 @@ namespace Tests\Feature\Settings;
 
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Storage;
 use Livewire\Livewire;
 use Tests\TestCase;
 
@@ -85,5 +87,30 @@ class ProfileUpdateTest extends TestCase
         $response->assertHasErrors(['password']);
 
         $this->assertNotNull($user->fresh());
+    }
+
+    public function test_user_can_upload_and_remove_avatar(): void
+    {
+        Storage::fake('public');
+        $user = User::factory()->create();
+        $this->actingAs($user);
+
+        $file = UploadedFile::fake()->create('avatar.jpg', 100, 'image/jpeg');
+
+        Livewire::test('pages::settings.profile')
+            ->set('avatarUpload', $file)
+            ->call('updateProfileInformation')
+            ->assertHasNoErrors();
+
+        $user->refresh();
+        $this->assertNotNull($user->avatar);
+        Storage::disk('public')->assertExists($user->avatar);
+
+        Livewire::test('pages::settings.profile')
+            ->call('removeAvatar')
+            ->assertHasNoErrors();
+
+        $user->refresh();
+        $this->assertNull($user->avatar);
     }
 }

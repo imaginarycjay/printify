@@ -53,7 +53,7 @@ new class extends Component {
     }
 }; ?>
 
-<div class="min-h-screen bg-stone-950 text-stone-100 font-sans antialiased flex flex-col justify-between p-4 sm:p-8 relative overflow-x-hidden selection:bg-amber-500 selection:text-white">
+<div class="h-screen w-screen overflow-y-auto no-scrollbar bg-stone-950 text-stone-100 font-sans antialiased flex flex-col justify-between p-4 sm:px-8 sm:py-4 relative selection:bg-amber-500 selection:text-white">
     <!-- Ambient Background Glow -->
     <div class="absolute -top-40 left-1/2 -translate-x-1/2 size-[600px] rounded-full bg-amber-500/10 blur-[140px] pointer-events-none"></div>
     <div class="absolute -bottom-40 right-10 size-[500px] rounded-full bg-indigo-500/10 blur-[140px] pointer-events-none"></div>
@@ -78,7 +78,7 @@ new class extends Component {
     @endphp
 
     <!-- App Launcher Top Navigation Bar -->
-    <header class="w-full max-w-6xl mx-auto flex items-center justify-between py-4 border-b border-stone-800/80 relative z-20">
+    <header class="w-full max-w-6xl mx-auto flex items-center justify-between py-2 sm:py-3 border-b border-stone-800/80 relative z-20">
         <div class="flex items-center gap-3">
             <span class="flex size-10 items-center justify-center rounded-xl bg-gradient-to-br from-amber-400 to-amber-600 text-stone-950 font-bold shadow-md shadow-amber-500/20">
                 <x-app-logo-icon class="size-6 fill-current" />
@@ -98,13 +98,35 @@ new class extends Component {
                 Re-run Setup Wizard
             </a>
 
-            <!-- User Menu Badge -->
-            <div class="flex items-center gap-2 bg-stone-900 border border-stone-800 rounded-full py-1 px-3">
-                <span class="size-6 rounded-full bg-amber-500 text-stone-950 text-xs font-extrabold flex items-center justify-center">
-                    {{ $user?->initials() }}
-                </span>
-                <span class="text-xs font-semibold text-stone-200 hidden sm:inline">{{ $user?->name }}</span>
-            </div>
+            <!-- Profile Settings Link -->
+            <a
+                href="{{ route('profile.edit') }}"
+                wire:navigate
+                class="group flex items-center gap-2.5 bg-stone-900 border border-stone-800 hover:border-amber-500/50 hover:bg-stone-800/80 rounded-full py-1 px-3 transition-all duration-200 cursor-pointer shadow-md shadow-stone-950/50"
+            >
+                @if ($user?->avatarUrl())
+                    <img src="{{ $user->avatarUrl() }}" alt="{{ $user->name }}" class="size-6 rounded-full object-cover border border-amber-500/50 shadow-sm" />
+                @else
+                    <span class="size-6 rounded-full bg-gradient-to-br from-amber-400 to-amber-600 text-stone-950 text-xs font-extrabold flex items-center justify-center shadow-sm">
+                        {{ $user?->initials() }}
+                    </span>
+                @endif
+                <span class="text-xs font-bold text-stone-200 group-hover:text-amber-300 hidden sm:inline transition-colors duration-200">{{ $user?->name }}</span>
+                <flux:icon name="cog-6-tooth" class="size-3.5 text-stone-400 group-hover:text-amber-400 group-hover:rotate-45 transition-all duration-300" />
+            </a>
+
+            <!-- Log Out Button -->
+            <form method="POST" action="{{ route('logout') }}" class="inline-flex items-center">
+                @csrf
+                <button
+                    type="submit"
+                    title="Log Out"
+                    class="group flex items-center gap-1.5 bg-stone-900 border border-stone-800 hover:border-red-500/50 hover:bg-red-500/10 text-red-400 hover:text-red-300 rounded-full py-1 px-3 transition-all duration-200 cursor-pointer shadow-md shadow-stone-950/50"
+                >
+                    <flux:icon name="arrow-right-start-on-rectangle" class="size-3.5 text-red-400 group-hover:scale-110 transition-transform duration-200" />
+                    <span class="text-xs font-bold hidden sm:inline">Log Out</span>
+                </button>
+            </form>
         </div>
     </header>
 
@@ -148,7 +170,11 @@ new class extends Component {
             @foreach ($installedApps as $app)
                 @php
                     $isPreinstalled = !empty($app['is_preinstalled']);
-                    $route = $app['key'] === 'web_builder' ? route('owner.web-builder') : null;
+                    $route = match ($app['key']) {
+                        'web_builder' => route('owner.web-builder'),
+                        'thesis_binding' => route('owner.thesis-binding'),
+                        default => null,
+                    };
                 @endphp
                 @if ($route)
                     <a href="{{ $route }}" wire:navigate class="group flex flex-col items-center text-center space-y-2.5 cursor-pointer">

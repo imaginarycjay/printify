@@ -6,9 +6,10 @@ use Illuminate\Support\Facades\Route;
 Route::view('/', 'welcome')->name('home');
 
 Route::middleware(['auth', 'verified'])->group(function () {
-    Route::view('dashboard', 'dashboard')->name('dashboard');
+    Route::livewire('dashboard', 'pages::⚡dashboard')->name('dashboard');
     Route::livewire('owner/setup', 'pages::owner.⚡owner-wizard')->name('owner.wizard');
     Route::livewire('owner/web-builder', 'pages::owner.⚡web-builder')->name('owner.web-builder');
+    Route::livewire('owner/thesis-binding', 'pages::owner.⚡thesis-binding')->name('owner.thesis-binding');
 });
 
 if (app()->isLocal()) {

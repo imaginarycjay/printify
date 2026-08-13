@@ -40,6 +40,11 @@ new #[Title('Security settings')] class extends Component {
     #[Locked]
     public string $deletingPasskeyName = '';
 
+    public function rendering(mixed $view): void
+    {
+        $view->layout('layouts.blank');
+    }
+
     /**
      * Mount the component.
      */
@@ -167,8 +172,6 @@ new #[Title('Security settings')] class extends Component {
 }; ?>
 
 <section class="w-full">
-    @include('partials.settings-heading')
-
     <flux:heading class="sr-only">{{ __('Security settings') }}</flux:heading>
 
     <x-pages::settings.layout :heading="__('Update password')" :subheading="__('Ensure your account is using a long, random password to stay secure')">

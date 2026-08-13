@@ -4,6 +4,11 @@ use App\Models\PrintShop;
 use Livewire\Component;
 
 new class extends Component {
+    public function rendering(mixed $view): void
+    {
+        $view->layout('layouts.blank');
+    }
+
     public string $storefront_title = '';
 
     public string $tagline = 'Fast, high-quality printing & binding services for students and professionals.';
