@@ -171,6 +171,7 @@ new class extends Component {
                 @php
                     $isPreinstalled = !empty($app['is_preinstalled']);
                     $route = match ($app['key']) {
+                        'inventory_hub' => route('owner.inventory-hub'),
                         'web_builder' => route('owner.web-builder'),
                         'thesis_binding' => route('owner.thesis-binding'),
                         default => null,

@@ -242,3 +242,120 @@ This file logs all completed tasks, steps, and key state changes. The agent must
 - **Key State Changes:**
   - Added Log Out button to header navigation bar in `⚡owner-dashboard.blade.php`.
 
+---
+
+## [2026-08-23 15:22:00] Central Pre-Installed Inventory Hub App & Thesis Binding Refactoring
+- **Request:** Build a dedicated, central pre-installed Inventory Hub app for the shop owner to manage all raw materials, ready-to-sell products/add-ons, stock movements, and burn rates, while refactoring the Thesis Binding module to formulate its Bill of Materials (BOM) recipes and link ready-to-buy products.
+- **Status:** Success
+- **Steps Taken:**
+  - Added migration `2026_08_23_151000_add_fields_to_inventory_items_table` (`item_type`, `service_tag`, `unit_cost`, `selling_price`, `supplier_name`).
+  - Added migration `2026_08_23_151001_create_stock_movements_table` (`inventory_item_id`, `movement_type`, `quantity`, `previous_stock`, `resulting_stock`, `reference_note`, `logged_by`).
+  - Updated model `App\Models\InventoryItem` with new fillables, casts, constants, status helpers (`isLowStock()`, `isOutOfStock()`, `stockStatus()`), relationships (`stockMovements()`), and scopes (`rawMaterials()`, `readyToSell()`, `lowStock()`, `forService()`).
+  - Created model `App\Models\StockMovement` with relationships to `InventoryItem` and `User`.
+  - Updated `App\Services\PrintServiceCatalog` to register `inventory_hub` as a pre-installed CORE app.
+  - Registered route `owner/inventory` in `routes/web.php`.
+  - Built Livewire 4 full-page workspace component `resources/views/pages/owner/⚡inventory-hub.blade.php` with:
+    - Overview & Analytics (material valuation, retail asset potential, 7-day moving average burn rate velocity, safety stock alerts).
+    - Materials & Products Catalog (filter by classification, category, service tag, stock status; search by name/SKU/supplier; live stock-in, edit, and delete actions).
+    - Stock Movements Audit Log (complete history of deliveries, job deductions, and scrap adjustments).
+    - 1-Click Purchase Order (PO) / Restock Summary (calculates exact shortage replenishment quantities and generates 1-click copyable supplier order text).
+  - Updated `resources/views/pages/owner/⚡owner-dashboard.blade.php` to include `inventory_hub` route matching on the App Launcher grid.
+  - Refactored `resources/views/pages/owner/⚡thesis-binding.blade.php` BOM & Inventory tab with:
+    - Central Inventory Hub shortcut link.
+    - BOM material recipe selector linked directly to shop raw materials.
+    - Related Ready-to-Buy Thesis Add-on Products showcase card.
+  - Added comprehensive automated test coverage in `tests/Feature/InventoryHubAppTest.php` and updated `tests/Feature/BusinessOwnerWizardTest.php`.
+- **Verification & Outcome:**
+  - Ran `composer test` (Pint + PHPStan Level 7 + Pest): 56 tests passed, 167 assertions, 0 errors.
+- **Key State Changes:**
+  - Added `inventory_items` columns and created `stock_movements` table.
+  - Created `App\Models\StockMovement` model and updated `App\Models\InventoryItem`.
+  - Registered `inventory_hub` core service in `PrintServiceCatalog` and `routes/web.php`.
+  - Created `resources/views/pages/owner/⚡inventory-hub.blade.php` and `tests/Feature/InventoryHubAppTest.php`.
+
+---
+
+## [2026-08-23 15:48:00] Customer Ordering & Checkout Experience (Option A)
+- **Request:** Implement Option A from the backlog: complete customer ordering wizard, dynamic price estimation, manuscript PDF upload, GCash checkout, and live 5-stage progress tracking.
+- **Status:** Success
+- **Steps Taken:**
+  - Created migrations `2026_08_23_160000_create_orders_table` and `2026_08_23_160001_create_order_items_table`.
+  - Created models `App\Models\Order` and `App\Models\OrderItem`, and updated `PrintShop` and `User` relationships.
+  - Built Livewire 4 customer ordering wizard `resources/views/pages/customer/⚡thesis-order-wizard.blade.php` with 3 steps:
+    1. Specifications & Upload (Hardbound/Softbound base rates, B&W and color page sliders, real-time inventory stock checks on cover colors, dynamic cover fields, PDF manuscript uploader, retail add-ons, rush delivery).
+    2. Review & GCash Payment Checkout (Shop QR, account details with copy button, 13-digit reference number input, payment proof upload).
+    3. Order Confirmation (Tracking code and committed completion deadline).
+  - Redesigned `resources/views/pages/customer/⚡customer-dashboard.blade.php` with:
+    - Available Printing Services catalog tab.
+    - My Active Orders tab with 5-stage visual progress stepper (*Order Placed*, *Verified Paid*, *Printing & Binding*, *Quality Check*, *Ready for Pickup*) and digital receipt modal.
+  - Registered route `order/thesis-binding` in `routes/web.php`.
+  - Created comprehensive feature tests in `tests/Feature/CustomerThesisOrderTest.php`.
+- **Verification & Outcome:**
+  - Ran `composer test` (Pint + PHPStan Level 7 + Pest): 60 tests passed, 179 assertions, 0 errors.
+- **Key State Changes:**
+  - Created `orders` and `order_items` tables.
+  - Created `Order` and `OrderItem` models.
+  - Created `⚡thesis-order-wizard.blade.php` and registered route `customer.order-thesis`.
+  - Upgraded `⚡customer-dashboard.blade.php`.
+
+---
+
+## [2026-08-23 16:01:00] Mobile Responsiveness & Natural Scrolling Fix
+- **Request:** Fix scrolling lock issue and ensure complete mobile responsiveness for customer ordering flow.
+- **Status:** Success
+- **Steps Taken:**
+  - Diagnosed `resources/views/layouts/blank.blade.php` having `h-screen overflow-hidden` on `<body>`, which was locking the entire document viewport height and blocking mobile touch dragging / standard scrolling.
+  - Changed `<body>` in `layouts/blank.blade.php` to `min-h-screen w-full overflow-x-hidden`.
+  - Replaced `w-screen overflow-y-auto` root wrappers in `⚡thesis-order-wizard.blade.php` and `⚡customer-dashboard.blade.php` with `min-h-screen w-full` for standard responsive window scrolling.
+  - Enhanced mobile touch layout:
+    - Compact breadcrumbs stepper in ordering wizard with adaptive labels.
+    - Responsive 5-stage progress stepper in customer dashboard for small smartphone screens.
+- **Verification & Outcome:**
+  - Ran `composer test` (Pint + PHPStan Level 7 + Pest): 60 tests passed, 179 assertions, 0 errors.
+- **Key State Changes:**
+  - Updated `resources/views/layouts/blank.blade.php`, `⚡thesis-order-wizard.blade.php`, and `⚡customer-dashboard.blade.php`.
+
+---
+
+## [2026-08-23 16:06:00] Softbound Conditional UI & Cover Foil Stamping Isolation
+- **Request:** Grey out and disable Section 3 (Cover Colors & Hot Foil Stamping) when Softbound / Bookbinding is selected, since softbound uses clear acetate front sheets and does not utilize hot foil stamping dies.
+- **Status:** Success
+- **Steps Taken:**
+  - Updated `resources/views/pages/customer/⚡thesis-order-wizard.blade.php`:
+    - Section 3: When `binding_type === 'hardbound'`, shows full interactive leatherette color and hot foil stamping options. When `binding_type === 'softbound'`, displays a greyed-out informative banner explaining that Softbound uses clear PVC acetate front + cardstock backing.
+    - Section 4: Dynamic hot foil stamping cover fields (Title, Researchers, Course, School Year) are only shown and required for Hardbound orders.
+    - `proceedToCheckout()` validation: Tailored rules so Softbound only requires manuscript PDF and page counts, defaulting cover to standard acetate/cardstock without forcing leatherette color or stamping fields.
+  - Added feature test in `tests/Feature/CustomerThesisOrderTest.php`: `test_softbound_order_greys_out_cover_colors_and_succeeds()`.
+- **Verification & Outcome:**
+  - Ran `composer test` (Pint + PHPStan Level 7 + Pest): 61 tests passed, 184 assertions, 0 errors.
+- **Key State Changes:**
+  - Updated `⚡thesis-order-wizard.blade.php` and `CustomerThesisOrderTest.php`.
+
+---
+
+## [2026-08-23 16:20:00] Cover & Binding Only ("Dala ang Papel") Mode for Customer & Admin
+- **Request:** Support "Cover & Binding Only" workflow where customers bring their own pre-printed/arranged paper to the shop, paying only for the hardbound cover and gold/silver foil stamping with ₱0.00 page print charges, while retaining Section 4 (Cover Text & Reference PDF upload) for accurate foil stamping and digital double-checking.
+- **Status:** Success
+- **Steps Taken:**
+  - Added migration `2026_08_23_162000_add_fulfillment_mode_to_orders_and_configs`:
+    - `thesis_binding_configs`: `allow_customer_supplied_paper` (bool, default true), `hardbound_cover_only_price` (decimal 10,2, default 300.00).
+    - `order_items`: `fulfillment_type` ('full_package' | 'cover_only'), `is_paper_received` (bool, default false), `estimated_spine_thickness_mm` (decimal 5,2).
+  - Updated models `ThesisBindingConfig` and `OrderItem` with new properties, casts, and helper methods (`isCoverOnly()`, `isFullPackage()`).
+  - Updated Owner Workspace `resources/views/pages/owner/⚡thesis-binding.blade.php`:
+    - Added toggle for *"Allow Pre-Printed Customer Pages (Cover-Only Binding)"* and input for *"Base Hardbound Cover & Binding Only Price (₱)"*.
+    - Updated live price simulator with package mode switcher (`Full Print & Bind` vs `Cover Only`).
+  - Updated Customer Ordering Wizard `resources/views/pages/customer/⚡thesis-order-wizard.blade.php`:
+    - Added Service Fulfillment Mode Switcher (`📄 Full Package` vs `📦 Cover & Binding Only (Dala ang Papel)`).
+    - In Cover-Only Mode: Calculates printing charges as ₱0.00, calculates dynamic spine thickness indicator (`~X.X mm`), preserves Section 4 for Hot Foil Stamping fields & digital reference PDF upload (for double checking and spine sizing), and shows clear walk-in paper drop-off instructions.
+    - Updated `OrderItem::create()` to pass `fulfillment_type`, `estimated_spine_thickness_mm`, and `is_paper_received`.
+  - Updated Customer Portal `resources/views/pages/customer/⚡customer-dashboard.blade.php`:
+    - Added `📦 Cover Only` badge and `Paper Drop-off Needed` / `Paper In Shop` intake status indicators on active orders and digital receipts.
+  - Added automated tests in `tests/Feature/CustomerThesisOrderTest.php`:
+    - `test_customer_can_place_cover_only_binding_order_with_zero_print_cost()`
+    - `test_owner_can_configure_cover_only_pricing_and_availability()`
+- **Verification & Outcome:**
+  - Ran `composer test` (Pint + PHPStan Level 7 + Pest): 63 tests passed, 194 assertions, 0 errors.
+- **Key State Changes:**
+  - Migrated `thesis_binding_configs` and `order_items` tables with fulfillment columns.
+  - Updated `ThesisBindingConfig` and `OrderItem` models.
+  - Updated `⚡thesis-binding.blade.php`, `⚡thesis-order-wizard.blade.php`, `⚡customer-dashboard.blade.php`, and `CustomerThesisOrderTest.php`.

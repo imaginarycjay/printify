@@ -18,7 +18,8 @@ class BusinessOwnerWizardTest extends TestCase
     {
         $services = PrintServiceCatalog::all();
 
-        $this->assertCount(9, $services);
+        $this->assertCount(10, $services);
+        $this->assertArrayHasKey('inventory_hub', $services);
         $this->assertArrayHasKey('web_builder', $services);
         $this->assertArrayHasKey('thesis_binding', $services);
         $this->assertArrayHasKey('document_printing', $services);
@@ -28,6 +29,7 @@ class BusinessOwnerWizardTest extends TestCase
         $this->assertArrayHasKey('trophy', $services);
         $this->assertArrayHasKey('mug', $services);
         $this->assertArrayHasKey('sticker', $services);
+        $this->assertTrue(PrintServiceCatalog::isPreinstalled('inventory_hub'));
         $this->assertTrue(PrintServiceCatalog::isPreinstalled('web_builder'));
     }
 

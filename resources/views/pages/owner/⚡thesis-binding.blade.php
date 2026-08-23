@@ -23,11 +23,14 @@ new class extends Component {
     public bool $is_active = true;
     public float $hardbound_base_price = 350.00;
     public float $softbound_base_price = 150.00;
+    public bool $allow_customer_supplied_paper = true;
+    public float $hardbound_cover_only_price = 300.00;
     public float $page_price_bw = 1.50;
     public float $page_price_color = 5.00;
     public float $rush_fee = 150.00;
 
     // Price Estimator Preview
+    public string $test_fulfillment_type = 'full_package'; // 'full_package' or 'cover_only'
     public string $test_binding_type = 'hardbound';
     public int $test_bw_pages = 80;
     public int $test_color_pages = 20;
@@ -116,6 +119,8 @@ new class extends Component {
         $this->is_active = $config->is_active;
         $this->hardbound_base_price = (float) $config->hardbound_base_price;
         $this->softbound_base_price = (float) $config->softbound_base_price;
+        $this->allow_customer_supplied_paper = (bool) ($config->allow_customer_supplied_paper ?? true);
+        $this->hardbound_cover_only_price = (float) ($config->hardbound_cover_only_price ?? 300.00);
         $this->page_price_bw = (float) $config->page_price_bw;
         $this->page_price_color = (float) $config->page_price_color;
         $this->rush_fee = (float) $config->rush_fee;
@@ -172,6 +177,7 @@ new class extends Component {
         $this->validate([
             'hardbound_base_price' => ['required', 'numeric', 'min:0'],
             'softbound_base_price' => ['required', 'numeric', 'min:0'],
+            'hardbound_cover_only_price' => ['required', 'numeric', 'min:0'],
             'page_price_bw' => ['required', 'numeric', 'min:0'],
             'page_price_color' => ['required', 'numeric', 'min:0'],
             'rush_fee' => ['required', 'numeric', 'min:0'],
@@ -183,6 +189,8 @@ new class extends Component {
                 'is_active' => $this->is_active,
                 'hardbound_base_price' => $this->hardbound_base_price,
                 'softbound_base_price' => $this->softbound_base_price,
+                'allow_customer_supplied_paper' => $this->allow_customer_supplied_paper,
+                'hardbound_cover_only_price' => $this->hardbound_cover_only_price,
                 'page_price_bw' => $this->page_price_bw,
                 'page_price_color' => $this->page_price_color,
                 'rush_fee' => $this->rush_fee,
@@ -409,14 +417,20 @@ new class extends Component {
     @php
         $user = auth()->user();
         $shop = $user?->printShop;
-        $inventoryList = $shop ? $shop->inventoryItems()->orderBy('name')->get() : collect();
+        $inventoryList = $shop ? $shop->inventoryItems()->forService('thesis_binding')->orderBy('name')->get() : collect();
+        if ($inventoryList->isEmpty() && $shop) {
+            $inventoryList = $shop->inventoryItems()->orderBy('name')->get();
+        }
+        $addOnsList = $shop ? $shop->inventoryItems()->readyToSell()->forService('thesis_binding')->orderBy('name')->get() : collect();
         $configModel = $shop ? $shop->thesisBindingConfig : null;
         $bomList = $configModel ? $configModel->bomItems()->with('inventoryItem')->get() : collect();
 
         // Live estimate preview calculations
-        $baseSelected = $this->test_binding_type === 'hardbound' ? $this->hardbound_base_price : $this->softbound_base_price;
-        $bwTotal = $this->test_bw_pages * $this->page_price_bw;
-        $colorTotal = $this->test_color_pages * $this->page_price_color;
+        $baseSelected = $this->test_fulfillment_type === 'cover_only'
+            ? $this->hardbound_cover_only_price
+            : ($this->test_binding_type === 'hardbound' ? $this->hardbound_base_price : $this->softbound_base_price);
+        $bwTotal = $this->test_fulfillment_type === 'cover_only' ? 0.0 : ($this->test_bw_pages * $this->page_price_bw);
+        $colorTotal = $this->test_fulfillment_type === 'cover_only' ? 0.0 : ($this->test_color_pages * $this->page_price_color);
         $rushFeeTotal = $this->test_is_rush ? $this->rush_fee : 0.0;
         $estimatedTotalPrice = $baseSelected + $bwTotal + $colorTotal + $rushFeeTotal;
     @endphp
@@ -517,6 +531,11 @@ new class extends Component {
                         <span>App Launcher Hub</span>
                     </a>
 
+                    <a href="{{ route('owner.inventory-hub') }}" wire:navigate class="flex items-center gap-3 px-3.5 py-2 rounded-xl text-xs font-semibold text-stone-400 hover:text-white hover:bg-stone-800/60 transition-all">
+                        <flux:icon name="archive-box" class="size-4 text-emerald-400" />
+                        <span>Central Inventory Hub</span>
+                    </a>
+
                     <a href="{{ route('owner.web-builder') }}" wire:navigate class="flex items-center gap-3 px-3.5 py-2 rounded-xl text-xs font-semibold text-stone-400 hover:text-white hover:bg-stone-800/60 transition-all">
                         <flux:icon name="globe-alt" class="size-4 text-violet-400" />
                         <span>Storefront Web Builder</span>
@@ -590,6 +609,7 @@ new class extends Component {
                         <span class="text-[10px] font-extrabold text-stone-400 uppercase tracking-wider">System Apps</span>
                         <nav class="space-y-1">
                             <a href="{{ route('dashboard') }}" wire:navigate class="block px-3 py-2 text-xs text-stone-400 hover:text-white">App Launcher</a>
+                            <a href="{{ route('owner.inventory-hub') }}" wire:navigate class="block px-3 py-2 text-xs text-stone-400 hover:text-white">Inventory Hub</a>
                             <a href="{{ route('owner.web-builder') }}" wire:navigate class="block px-3 py-2 text-xs text-stone-400 hover:text-white">Web Builder</a>
                         </nav>
                     </div>
@@ -726,6 +746,34 @@ new class extends Component {
                             </div>
                         </div>
 
+                        <!-- Customer Supplied Paper (Cover-Only) Mode -->
+                        <div class="p-4 rounded-2xl bg-stone-950 border border-stone-800 space-y-4">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <span class="text-xs font-bold text-white block">Allow Pre-Printed Customer Pages (Cover-Only Binding)</span>
+                                    <span class="text-[10px] text-stone-400">Accept jobs where students already printed their pages and only pay for hardbound cover & stamping</span>
+                                </div>
+                                <input wire:model.live="allow_customer_supplied_paper" type="checkbox" class="rounded accent-amber-500 size-5 cursor-pointer" />
+                            </div>
+
+                            @if ($allow_customer_supplied_paper)
+                                <div class="space-y-1.5 pt-2 border-t border-stone-800/80">
+                                    <label class="text-xs font-bold text-amber-400">Base Hardbound Cover & Binding Only Price (₱)</label>
+                                    <div class="relative max-w-xs">
+                                        <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center text-stone-500 font-bold text-xs">₱</span>
+                                        <input
+                                            wire:model="hardbound_cover_only_price"
+                                            type="number"
+                                            step="0.50"
+                                            min="0"
+                                            class="w-full pl-8 pr-4 py-2.5 rounded-xl bg-stone-900 border border-stone-700 text-stone-100 text-sm focus:border-amber-500 focus:outline-none font-bold"
+                                        />
+                                    </div>
+                                    <p class="text-[10px] text-stone-500">Fixed rate when paper printing is ₱0.00</p>
+                                </div>
+                            @endif
+                        </div>
+
                         <!-- Rush Order Fee -->
                         <div class="space-y-1.5 border-t border-stone-800/80 pt-4">
                             <label class="text-xs font-bold text-stone-300">Rush Order Express Fee (₱)</label>
@@ -763,45 +811,73 @@ new class extends Component {
                             </div>
                         </div>
 
-                        <!-- Test Binding Type -->
+                        <!-- Test Mode -->
                         <div class="space-y-1">
-                            <label class="text-[11px] font-bold text-stone-300">Binding Type</label>
+                            <label class="text-[11px] font-bold text-stone-300">Package Mode</label>
                             <div class="grid grid-cols-2 gap-2">
                                 <button
                                     type="button"
-                                    wire:click="$set('test_binding_type', 'hardbound')"
-                                    class="py-1.5 rounded-lg text-xs font-bold transition-all {{ $test_binding_type === 'hardbound' ? 'bg-amber-500 text-stone-950' : 'bg-stone-900 text-stone-400 border border-stone-800' }}"
+                                    wire:click="$set('test_fulfillment_type', 'full_package')"
+                                    class="py-1.5 rounded-lg text-[10px] font-bold transition-all {{ $test_fulfillment_type === 'full_package' ? 'bg-amber-500 text-stone-950' : 'bg-stone-900 text-stone-400 border border-stone-800' }}"
                                 >
-                                    Hardbound
+                                    Full Print & Bind
                                 </button>
                                 <button
                                     type="button"
-                                    wire:click="$set('test_binding_type', 'softbound')"
-                                    class="py-1.5 rounded-lg text-xs font-bold transition-all {{ $test_binding_type === 'softbound' ? 'bg-amber-500 text-stone-950' : 'bg-stone-900 text-stone-400 border border-stone-800' }}"
+                                    wire:click="$set('test_fulfillment_type', 'cover_only')"
+                                    class="py-1.5 rounded-lg text-[10px] font-bold transition-all {{ $test_fulfillment_type === 'cover_only' ? 'bg-amber-500 text-stone-950' : 'bg-stone-900 text-stone-400 border border-stone-800' }}"
                                 >
-                                    Softbound
+                                    Cover Only
                                 </button>
                             </div>
                         </div>
 
-                        <!-- Page Sliders -->
-                        <div class="space-y-3 pt-2">
+                        @if ($test_fulfillment_type === 'full_package')
+                            <!-- Test Binding Type -->
                             <div class="space-y-1">
-                                <div class="flex justify-between text-xs">
-                                    <span class="text-stone-400">B&W Pages:</span>
-                                    <span class="font-bold text-white">{{ $test_bw_pages }} pages</span>
+                                <label class="text-[11px] font-bold text-stone-300">Binding Type</label>
+                                <div class="grid grid-cols-2 gap-2">
+                                    <button
+                                        type="button"
+                                        wire:click="$set('test_binding_type', 'hardbound')"
+                                        class="py-1.5 rounded-lg text-xs font-bold transition-all {{ $test_binding_type === 'hardbound' ? 'bg-amber-500 text-stone-950' : 'bg-stone-900 text-stone-400 border border-stone-800' }}"
+                                    >
+                                        Hardbound
+                                    </button>
+                                    <button
+                                        type="button"
+                                        wire:click="$set('test_binding_type', 'softbound')"
+                                        class="py-1.5 rounded-lg text-xs font-bold transition-all {{ $test_binding_type === 'softbound' ? 'bg-amber-500 text-stone-950' : 'bg-stone-900 text-stone-400 border border-stone-800' }}"
+                                    >
+                                        Softbound
+                                    </button>
                                 </div>
-                                <input wire:model.live="test_bw_pages" type="range" min="0" max="300" class="w-full accent-amber-500 bg-stone-950" />
                             </div>
 
-                            <div class="space-y-1">
-                                <div class="flex justify-between text-xs">
-                                    <span class="text-stone-400">Colored Pages:</span>
-                                    <span class="font-bold text-amber-400">{{ $test_color_pages }} pages</span>
+                            <!-- Page Sliders -->
+                            <div class="space-y-3 pt-2">
+                                <div class="space-y-1">
+                                    <div class="flex justify-between text-xs">
+                                        <span class="text-stone-400">B&W Pages:</span>
+                                        <span class="font-bold text-white">{{ $test_bw_pages }} pages</span>
+                                    </div>
+                                    <input wire:model.live="test_bw_pages" type="range" min="0" max="300" class="w-full accent-amber-500 bg-stone-950" />
                                 </div>
-                                <input wire:model.live="test_color_pages" type="range" min="0" max="200" class="w-full accent-amber-500 bg-stone-950" />
+
+                                <div class="space-y-1">
+                                    <div class="flex justify-between text-xs">
+                                        <span class="text-stone-400">Colored Pages:</span>
+                                        <span class="font-bold text-amber-400">{{ $test_color_pages }} pages</span>
+                                    </div>
+                                    <input wire:model.live="test_color_pages" type="range" min="0" max="200" class="w-full accent-amber-500 bg-stone-950" />
+                                </div>
                             </div>
-                        </div>
+                        @else
+                            <div class="p-3 rounded-xl bg-stone-950 border border-stone-800 text-[11px] text-stone-400 space-y-1">
+                                <div class="text-amber-400 font-bold">📦 Customer-Supplied Pages</div>
+                                <p>Pages printed elsewhere. Printing charges are <strong>₱0.00</strong>. Base cover & stamping applied.</p>
+                            </div>
+                        @endif
 
                         <!-- Rush Checkbox -->
                         <div class="flex items-center gap-2 pt-2">
@@ -813,17 +889,19 @@ new class extends Component {
                     <!-- Breakdown Box -->
                     <div class="rounded-2xl bg-stone-950 p-4 border border-stone-800/80 space-y-2">
                         <div class="flex justify-between text-[11px] text-stone-400">
-                            <span>Base {{ ucfirst($test_binding_type) }}:</span>
+                            <span>Base {{ $test_fulfillment_type === 'cover_only' ? 'Cover Only' : ucfirst($test_binding_type) }}:</span>
                             <span class="text-stone-200">₱{{ number_format($baseSelected, 2) }}</span>
                         </div>
-                        <div class="flex justify-between text-[11px] text-stone-400">
-                            <span>B&W Pages ({{ $test_bw_pages }} &times; ₱{{ number_format($page_price_bw, 2) }}):</span>
-                            <span class="text-stone-200">₱{{ number_format($bwTotal, 2) }}</span>
-                        </div>
-                        <div class="flex justify-between text-[11px] text-stone-400">
-                            <span>Color Pages ({{ $test_color_pages }} &times; ₱{{ number_format($page_price_color, 2) }}):</span>
-                            <span class="text-stone-200">₱{{ number_format($colorTotal, 2) }}</span>
-                        </div>
+                        @if ($test_fulfillment_type === 'full_package')
+                            <div class="flex justify-between text-[11px] text-stone-400">
+                                <span>B&W Pages ({{ $test_bw_pages }} &times; ₱{{ number_format($page_price_bw, 2) }}):</span>
+                                <span class="text-stone-200">₱{{ number_format($bwTotal, 2) }}</span>
+                            </div>
+                            <div class="flex justify-between text-[11px] text-stone-400">
+                                <span>Color Pages ({{ $test_color_pages }} &times; ₱{{ number_format($page_price_color, 2) }}):</span>
+                                <span class="text-stone-200">₱{{ number_format($colorTotal, 2) }}</span>
+                            </div>
+                        @endif
                         @if ($test_is_rush)
                             <div class="flex justify-between text-[11px] text-amber-400">
                                 <span>Rush Fee:</span>
@@ -961,11 +1039,17 @@ new class extends Component {
                 <!-- Header Banner & Automated Deduction Switch -->
                 <div class="rounded-3xl border border-stone-800 bg-stone-900/80 p-6 sm:p-8 space-y-4 shadow-xl backdrop-blur-md flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                     <div>
-                        <h3 class="text-base font-extrabold text-white flex items-center gap-2">
-                            <flux:icon name="cube" class="size-5 text-amber-400" />
-                            Bill of Materials (BOM) & Inventory Integration
-                        </h3>
-                        <p class="text-xs text-stone-400">Link raw materials (Chipboard, Leatherette, Glue) from shop inventory to automatically record usage when completed</p>
+                        <div class="flex items-center gap-3">
+                            <h3 class="text-base font-extrabold text-white flex items-center gap-2">
+                                <flux:icon name="cube" class="size-5 text-amber-400" />
+                                Bill of Materials (BOM) & Recipe Formulation
+                            </h3>
+                            <a href="{{ route('owner.inventory-hub') }}" wire:navigate class="px-2.5 py-1 rounded-lg bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 text-[11px] font-bold hover:bg-emerald-500/20 transition-all flex items-center gap-1">
+                                <flux:icon name="archive-box" class="size-3.5" />
+                                <span>Central Inventory Hub</span>
+                            </a>
+                        </div>
+                        <p class="text-xs text-stone-400 mt-1">Select raw materials from Central Inventory to formulate exact consumption recipes per book copy</p>
                     </div>
 
                     <!-- Automated Deduction Toggle -->
@@ -1089,6 +1173,53 @@ new class extends Component {
                                 @endforeach
                             </tbody>
                         </table>
+                    @endif
+                </div>
+
+                <!-- Related Ready-to-Buy Thesis Add-on Products -->
+                <div class="rounded-3xl border border-stone-800 bg-stone-900/80 p-6 sm:p-8 space-y-4 shadow-xl backdrop-blur-md">
+                    <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
+                        <div>
+                            <h4 class="text-xs font-extrabold text-stone-300 uppercase tracking-wider flex items-center gap-2">
+                                <flux:icon name="tag" class="size-4 text-cyan-400" />
+                                Related Ready-to-Buy Thesis Add-ons
+                            </h4>
+                            <p class="text-[11px] text-stone-400">Retail products (certificate holders, plastic covers, CD pockets) offered to thesis binding clients</p>
+                        </div>
+                        <a href="{{ route('owner.inventory-hub') }}" wire:navigate class="text-xs font-bold text-emerald-400 hover:text-emerald-300 flex items-center gap-1">
+                            <span>Manage in Central Inventory Hub</span>
+                            <flux:icon name="arrow-right" class="size-3" />
+                        </a>
+                    </div>
+
+                    @if ($addOnsList->isEmpty())
+                        <div class="p-6 text-center text-xs text-stone-500 border border-dashed border-stone-800 rounded-2xl">
+                            No ready-to-sell add-on products currently tagged for Thesis Binding. You can add items in the Central Inventory Hub under 'Ready-to-Sell' with Service: Thesis Binding.
+                        </div>
+                    @else
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                            @foreach ($addOnsList as $addon)
+                                <div class="p-4 rounded-2xl bg-stone-950/70 border border-stone-800/80 space-y-2">
+                                    <div class="flex items-start justify-between gap-2">
+                                        <div class="space-y-0.5">
+                                            <div class="text-xs font-bold text-white leading-tight">{{ $addon->name }}</div>
+                                            <div class="text-[10px] text-stone-500 font-mono">{{ $addon->sku ?? 'NO-SKU' }}</div>
+                                        </div>
+                                        @if ($addon->isOutOfStock())
+                                            <span class="px-2 py-0.5 rounded-full text-[9px] font-extrabold bg-red-500/20 text-red-400 border border-red-500/30 shrink-0">Out of Stock</span>
+                                        @elseif ($addon->isLowStock())
+                                            <span class="px-2 py-0.5 rounded-full text-[9px] font-extrabold bg-amber-500/20 text-amber-400 border border-amber-500/30 shrink-0">Low ({{ $addon->stock_qty }})</span>
+                                        @else
+                                            <span class="px-2 py-0.5 rounded-full text-[9px] font-extrabold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 shrink-0">{{ $addon->stock_qty }} {{ $addon->unit }}</span>
+                                        @endif
+                                    </div>
+                                    <div class="flex justify-between items-center text-xs pt-1 border-t border-stone-800/60">
+                                        <span class="text-stone-500 text-[11px]">Cost: ₱{{ number_format($addon->unit_cost, 2) }}</span>
+                                        <strong class="text-cyan-300">Sell: ₱{{ number_format($addon->selling_price ?? 0, 2) }}</strong>
+                                    </div>
+                                </div>
+                            @endforeach
+                        </div>
                     @endif
                 </div>
             </div>

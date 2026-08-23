@@ -9,7 +9,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::livewire('dashboard', 'pages::⚡dashboard')->name('dashboard');
     Route::livewire('owner/setup', 'pages::owner.⚡owner-wizard')->name('owner.wizard');
     Route::livewire('owner/web-builder', 'pages::owner.⚡web-builder')->name('owner.web-builder');
+    Route::livewire('owner/inventory', 'pages::owner.⚡inventory-hub')->name('owner.inventory-hub');
     Route::livewire('owner/thesis-binding', 'pages::owner.⚡thesis-binding')->name('owner.thesis-binding');
+    Route::livewire('order/thesis-binding', 'pages::customer.⚡thesis-order-wizard')->name('customer.order-thesis');
 });
 
 if (app()->isLocal()) {

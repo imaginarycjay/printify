@@ -1,0 +1,189 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Attributes\Fillable;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Carbon;
+
+/**
+ * @property int $id
+ * @property string $order_number
+ * @property int $print_shop_id
+ * @property int $customer_id
+ * @property string $service_key
+ * @property string $order_status
+ * @property string $payment_status
+ * @property float $subtotal_amount
+ * @property float $rush_fee_amount
+ * @property float $total_amount
+ * @property bool $is_rush
+ * @property Carbon|null $target_completion_date
+ * @property string|null $payment_proof_path
+ * @property string|null $payment_reference_no
+ * @property Carbon|null $payment_verified_at
+ * @property int|null $payment_verified_by
+ * @property string|null $rejection_reason
+ * @property Carbon|null $created_at
+ * @property Carbon|null $updated_at
+ */
+#[Fillable([
+    'order_number',
+    'print_shop_id',
+    'customer_id',
+    'service_key',
+    'order_status',
+    'payment_status',
+    'subtotal_amount',
+    'rush_fee_amount',
+    'total_amount',
+    'is_rush',
+    'target_completion_date',
+    'payment_proof_path',
+    'payment_reference_no',
+    'payment_verified_at',
+    'payment_verified_by',
+    'rejection_reason',
+])]
+class Order extends Model
+{
+    // Order Lifecycle Statuses
+    public const STATUS_PENDING_PAYMENT = 'pending_payment';
+
+    public const STATUS_IN_QUEUE = 'in_queue';
+
+    public const STATUS_IN_PRODUCTION = 'in_production';
+
+    public const STATUS_QUALITY_CHECK = 'quality_check';
+
+    public const STATUS_READY_FOR_PICKUP = 'ready_for_pickup';
+
+    public const STATUS_COMPLETED = 'completed';
+
+    public const STATUS_CANCELLED = 'cancelled';
+
+    // Payment Statuses
+    public const PAYMENT_UNPAID = 'unpaid';
+
+    public const PAYMENT_PENDING_VERIFICATION = 'pending_verification';
+
+    public const PAYMENT_VERIFIED_PAID = 'verified_paid';
+
+    public const PAYMENT_REJECTED = 'rejected';
+
+    /**
+     * Get the attributes that should be cast.
+     *
+     * @return array<string, string>
+     */
+    protected function casts(): array
+    {
+        return [
+            'subtotal_amount' => 'float',
+            'rush_fee_amount' => 'float',
+            'total_amount' => 'float',
+            'is_rush' => 'boolean',
+            'target_completion_date' => 'date',
+            'payment_verified_at' => 'datetime',
+        ];
+    }
+
+    /**
+     * Customer who placed the order.
+     *
+     * @return BelongsTo<User, $this>
+     */
+    public function customer(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'customer_id');
+    }
+
+    /**
+     * Print shop fulfilling the order.
+     *
+     * @return BelongsTo<PrintShop, $this>
+     */
+    public function printShop(): BelongsTo
+    {
+        return $this->belongsTo(PrintShop::class);
+    }
+
+    /**
+     * Line items within this order.
+     *
+     * @return HasMany<OrderItem, $this>
+     */
+    public function items(): HasMany
+    {
+        return $this->hasMany(OrderItem::class);
+    }
+
+    /**
+     * User who verified the payment.
+     *
+     * @return BelongsTo<User, $this>
+     */
+    public function verifiedBy(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'payment_verified_by');
+    }
+
+    /**
+     * Generate unique sequential order number (e.g. ORD-2026-0001).
+     */
+    public static function generateOrderNumber(): string
+    {
+        $year = date('Y');
+        $lastOrder = static::whereYear('created_at', $year)->latest('id')->first();
+        $nextNum = $lastOrder ? ((int) substr($lastOrder->order_number, -4)) + 1 : 1;
+
+        return sprintf('ORD-%s-%04d', $year, $nextNum);
+    }
+
+    /**
+     * Get the 1-indexed stage number (1 to 5) for the customer progress stepper.
+     */
+    public function currentStageIndex(): int
+    {
+        return match ($this->order_status) {
+            self::STATUS_PENDING_PAYMENT => 1,
+            self::STATUS_IN_QUEUE => 2,
+            self::STATUS_IN_PRODUCTION => 3,
+            self::STATUS_QUALITY_CHECK => 4,
+            self::STATUS_READY_FOR_PICKUP, self::STATUS_COMPLETED => 5,
+            default => 1,
+        };
+    }
+
+    /**
+     * Get user-friendly status badge styling classes.
+     */
+    public function statusBadgeColor(): string
+    {
+        return match ($this->order_status) {
+            self::STATUS_PENDING_PAYMENT => 'bg-amber-500/15 text-amber-400 border-amber-500/30',
+            self::STATUS_IN_QUEUE => 'bg-blue-500/15 text-blue-400 border-blue-500/30',
+            self::STATUS_IN_PRODUCTION => 'bg-purple-500/15 text-purple-400 border-purple-500/30',
+            self::STATUS_QUALITY_CHECK => 'bg-cyan-500/15 text-cyan-400 border-cyan-500/30',
+            self::STATUS_READY_FOR_PICKUP => 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40',
+            self::STATUS_COMPLETED => 'bg-emerald-500/15 text-emerald-400 border-emerald-500/30',
+            self::STATUS_CANCELLED => 'bg-red-500/15 text-red-400 border-red-500/30',
+            default => 'bg-stone-500/15 text-stone-400 border-stone-500/30',
+        };
+    }
+
+    /**
+     * Get user-friendly payment status badge styling classes.
+     */
+    public function paymentStatusBadgeColor(): string
+    {
+        return match ($this->payment_status) {
+            self::PAYMENT_VERIFIED_PAID => 'bg-emerald-500/15 text-emerald-400 border-emerald-500/30',
+            self::PAYMENT_PENDING_VERIFICATION => 'bg-amber-500/15 text-amber-400 border-amber-500/30',
+            self::PAYMENT_REJECTED => 'bg-red-500/15 text-red-400 border-red-500/30',
+            default => 'bg-stone-500/15 text-stone-400 border-stone-500/30',
+        };
+    }
+}

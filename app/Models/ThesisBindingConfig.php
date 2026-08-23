@@ -26,6 +26,8 @@ use Illuminate\Support\Carbon;
  * @property int $rush_lead_time_days
  * @property bool $require_pdf_upload
  * @property array<int, string>|null $custom_cover_fields
+ * @property bool $allow_customer_supplied_paper
+ * @property float $hardbound_cover_only_price
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
  */
@@ -34,6 +36,8 @@ use Illuminate\Support\Carbon;
     'is_active',
     'hardbound_base_price',
     'softbound_base_price',
+    'allow_customer_supplied_paper',
+    'hardbound_cover_only_price',
     'page_price_bw',
     'page_price_color',
     'rush_fee',
@@ -60,6 +64,8 @@ class ThesisBindingConfig extends Model
             'is_active' => 'boolean',
             'hardbound_base_price' => 'float',
             'softbound_base_price' => 'float',
+            'allow_customer_supplied_paper' => 'boolean',
+            'hardbound_cover_only_price' => 'float',
             'page_price_bw' => 'float',
             'page_price_color' => 'float',
             'rush_fee' => 'float',

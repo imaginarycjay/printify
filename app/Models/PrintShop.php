@@ -74,6 +74,16 @@ class PrintShop extends Model
     }
 
     /**
+     * Get the orders placed with this print shop.
+     *
+     * @return HasMany<Order, $this>
+     */
+    public function orders(): HasMany
+    {
+        return $this->hasMany(Order::class)->latest();
+    }
+
+    /**
      * Check if the shop has an active service by key.
      */
     public function hasService(string $serviceKey): bool

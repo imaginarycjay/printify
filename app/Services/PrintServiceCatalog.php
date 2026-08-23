@@ -7,11 +7,20 @@ class PrintServiceCatalog
     /**
      * Get all available MVP services in the catalog.
      *
-     * @return array<string, array{key: string, name: string, description: string, icon: string, gradient: string, badge_color: string}>
+     * @return array<string, array{key: string, name: string, description: string, icon: string, gradient: string, badge_color: string, is_preinstalled?: bool}>
      */
     public static function all(): array
     {
         return [
+            'inventory_hub' => [
+                'key' => 'inventory_hub',
+                'name' => 'Inventory Hub',
+                'description' => 'Central raw materials, ready-to-buy products, real-time burn rates, and restock orders',
+                'icon' => 'archive-box',
+                'gradient' => 'from-emerald-500 via-teal-600 to-cyan-700',
+                'badge_color' => 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30',
+                'is_preinstalled' => true,
+            ],
             'web_builder' => [
                 'key' => 'web_builder',
                 'name' => 'Web Builder',
@@ -95,7 +104,7 @@ class PrintServiceCatalog
      */
     public static function preinstalledKeys(): array
     {
-        return ['web_builder'];
+        return ['inventory_hub', 'web_builder'];
     }
 
     /**
