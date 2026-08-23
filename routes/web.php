@@ -13,6 +13,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::prefix('owner')->name('owner.')->group(function () {
         Route::livewire('dashboard', 'pages::owner.⚡owner-dashboard')->name('dashboard');
         Route::livewire('setup', 'pages::owner.⚡owner-wizard')->name('wizard');
+        Route::livewire('analytics', 'pages::owner.⚡analytics-hub')->name('analytics-hub');
         Route::livewire('web-builder', 'pages::owner.⚡web-builder')->name('web-builder');
         Route::livewire('inventory', 'pages::owner.⚡inventory-hub')->name('inventory-hub');
         Route::livewire('thesis-binding', 'pages::owner.⚡thesis-binding')->name('thesis-binding');

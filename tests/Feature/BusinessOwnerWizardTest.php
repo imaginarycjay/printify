@@ -18,7 +18,8 @@ class BusinessOwnerWizardTest extends TestCase
     {
         $services = PrintServiceCatalog::all();
 
-        $this->assertCount(11, $services);
+        $this->assertCount(12, $services);
+        $this->assertArrayHasKey('analytics_hub', $services);
         $this->assertArrayHasKey('inventory_hub', $services);
         $this->assertArrayHasKey('production_hub', $services);
         $this->assertArrayHasKey('web_builder', $services);

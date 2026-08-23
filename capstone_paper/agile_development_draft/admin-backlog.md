@@ -134,10 +134,41 @@ This backlog details all Epics, User Stories, and Acceptance Criteria for the Bu
 
 ## Epic 5: Business Intelligence & Profit Margin Analytics (`EPIC-ADM-5`)
 
-### Story ADM-5.1: Material Cost vs Gross Profit Margin Tracking
-- **User Story:** *As a Business Owner, I want to see the estimated material cost vs selling price for each job order, so that I can monitor profitability per service.*
-- **Priority:** `MEDIUM` | **Points:** 5 | **Status:** `PLANNED`
+### Story ADM-5.1: Central Sales & Cashflow Executive Analytics Hub
+- **User Story:** *As a Business Owner, I want a dedicated central analytics hub in my App Launcher, so that I can monitor overall shop revenue, cashflow, and transaction volumes in real time.*
+- **Priority:** `HIGH` | **Points:** 5 | **Status:** `IN PROGRESS`
 - **Acceptance Criteria:**
-  - [ ] System calculates total material cost from BOM unit prices.
-  - [ ] Dashboard displays Gross Margin: $\text{Selling Price} - \text{Material Cost}$.
-  - [ ] Monthly / weekly gross revenue and estimated material cost summary charts.
+  - [ ] App Launcher includes pre-installed "Sales & Financial Analytics" core application.
+  - [ ] Dashboard aggregates total gross sales from paid/verified customer orders.
+  - [ ] Live stats pill on main dashboard displays today's revenue.
+
+### Story ADM-5.2: Multi-Timeframe Cashflow & Order Trendline Graphs
+- **User Story:** *As a Business Owner, I want interactive revenue and order timeline charts with period filters (Today, 7D, 30D, YTD, All Time), so that I can visualize peak production days and sales trends.*
+- **Priority:** `MEDIUM` | **Points:** 5 | **Status:** `IN PROGRESS`
+- **Acceptance Criteria:**
+  - [ ] Filter controls dynamically re-render SVG revenue timeline and order volume charts.
+  - [ ] Tooltip points display daily revenue figures and order counts.
+
+### Story ADM-5.3: Automated BOM Material Cost & Net Profit Margin Analysis
+- **User Story:** *As a Business Owner, I want to see estimated raw material expenses and recorded spoilage losses deducted from gross sales, so that I know my true net profit and margin percentage.*
+- **Priority:** `HIGH` | **Points:** 8 | **Status:** `IN PROGRESS`
+- **Acceptance Criteria:**
+  - [ ] Computes exact consumed BOM raw material cost based on inventory unit prices.
+  - [ ] Deducts recorded material spoilage/wastage losses from gross profit.
+  - [ ] Displays Net Profit (₱) and Profit Margin % prominently.
+
+### Story ADM-5.4: Service Product Mix & Fulfillment Distribution Analytics
+- **User Story:** *As a Business Owner, I want to see breakdowns of Full Package vs Cover-Only orders, Hardbound vs Softbound, and leatherette cover color popularity, so that I can optimize inventory purchasing.*
+- **Priority:** `MEDIUM` | **Points:** 5 | **Status:** `IN PROGRESS`
+- **Acceptance Criteria:**
+  - [ ] Visual progress distribution for Full Package vs Cover-Only ("Dala ang Papel").
+  - [ ] Ratio breakdown for Hardbound vs Softbound thesis options.
+  - [ ] Cover color leaderboard ranking most requested colors.
+
+### Story ADM-5.5: 1-Click Financial Transaction Ledger & CSV Export
+- **User Story:** *As a Business Owner, I want a complete transaction ledger table with 1-click CSV download, so that I can export sales records for accounting and external bookkeeping.*
+- **Priority:** `MEDIUM` | **Points:** 3 | **Status:** `IN PROGRESS`
+- **Acceptance Criteria:**
+  - [ ] Searchable, filtered transaction ledger table.
+  - [ ] 1-Click "Download CSV" generates a standard formatted financial spreadsheet.
+

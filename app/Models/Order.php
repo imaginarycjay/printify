@@ -96,6 +96,8 @@ class Order extends Model
 
     public const PAYMENT_VERIFIED_PAID = 'verified_paid';
 
+    public const PAYMENT_PAID = 'verified_paid';
+
     public const PAYMENT_REJECTED = 'rejected';
 
     /**

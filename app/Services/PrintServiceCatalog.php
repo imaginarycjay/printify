@@ -12,6 +12,15 @@ class PrintServiceCatalog
     public static function all(): array
     {
         return [
+            'analytics_hub' => [
+                'key' => 'analytics_hub',
+                'name' => 'Sales & Financial Analytics',
+                'description' => 'Real-time cashflow, gross profit margins, product mix breakdown, and financial reporting',
+                'icon' => 'chart-bar-square',
+                'gradient' => 'from-amber-500 via-orange-500 to-yellow-600',
+                'badge_color' => 'bg-amber-500/20 text-amber-300 border-amber-500/30',
+                'is_preinstalled' => true,
+            ],
             'inventory_hub' => [
                 'key' => 'inventory_hub',
                 'name' => 'Inventory Hub',
@@ -113,7 +122,7 @@ class PrintServiceCatalog
      */
     public static function preinstalledKeys(): array
     {
-        return ['inventory_hub', 'production_hub', 'web_builder'];
+        return ['analytics_hub', 'inventory_hub', 'production_hub', 'web_builder'];
     }
 
     /**

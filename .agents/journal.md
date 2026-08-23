@@ -425,5 +425,74 @@ This file logs all completed tasks, steps, and key state changes. The agent must
 - **Key State Changes:**
   - Updated `⚡customer-dashboard.blade.php`.
 
+---
+
+## [2026-08-23 23:30:00] Central Sales & Financial Analytics Hub Implementation (Option A)
+- **Request:** Implement a central executive analytics command center for the Business Owner to monitor sales, cashflow, BOM net profit margins ($\text{Revenue} - \text{BOM Costs} - \text{Spoilage Loss}$), multi-timeframe SVG trendline graphs, service mix breakdown with drilldown filters, and CSV financial ledger exports. Align with Capstone paper Module 6 and Epic 5.
+- **Status:** Success
+- **Steps Taken:**
+  - Updated Capstone Agile docs:
+    - `capstone_paper/agile_development_draft/lean-prd.md`: Expanded Module 6 with mathematical formula definitions for Net Profit and Profit Margin %.
+    - `capstone_paper/agile_development_draft/admin-backlog.md`: Added detailed stories ADM-5.1 to ADM-5.5 under `EPIC-ADM-5`.
+  - Registered `analytics_hub` in `app/Services/PrintServiceCatalog.php` as a pre-installed core system application.
+  - Added route `owner/analytics` (`owner.analytics-hub`) in `routes/web.php`.
+  - Created `app/Services/SalesAnalyticsService.php`:
+    - `getMetrics()`: Computes gross sales, BOM consumed raw material cost, recorded spoilage loss, net profit, and profit margin %.
+    - `getTimelineData()`: Computes daily cashflow peaks and order volumes for SVG graphs.
+    - `getProductMix()`: Computes Full Package vs Cover-Only, Hardbound vs Softbound, and top leatherette colors.
+    - `generateCsvExport()`: Generates downloadable sales transaction CSV file.
+  - Created `resources/views/pages/owner/⚡analytics-hub.blade.php`:
+    - Full-screen dark canvas with `layouts.blank`.
+    - Period switcher (Today, 7D, 30D, YTD, All Time) + Service & Mode drilldown filters.
+    - 4 Executive KPI cards (Gross Revenue, Net Profit with Margin %, AOV, Spoilage Loss).
+    - Interactive SVG Timeline graph with tooltips.
+    - Product Mix & Leatherette Color popularity cards.
+    - Filterable Financial Ledger table with 1-click CSV download.
+  - Updated `⚡owner-dashboard.blade.php`:
+    - Connected `analytics_hub` tile to `route('owner.analytics-hub')`.
+    - Added top live sales strip (`Today: ₱X,XXX.XX • X active jobs • Analytics Hub ->`).
+  - Added feature test suite `tests/Feature/SalesAnalyticsHubTest.php` (5 tests).
+- **Verification & Outcome:**
+  - Ran `vendor/bin/pint --format agent`: Passed.
+  - Ran `composer types:check` (PHPStan Level 7): **0 errors**.
+  - Ran `php artisan test --compact`: **80 tests passed, 252 assertions, 0 errors**.
+- **Key State Changes:**
+  - Created `SalesAnalyticsService.php`, `⚡analytics-hub.blade.php`, `SalesAnalyticsHubTest.php`.
+  - Updated `PrintServiceCatalog.php`, `routes/web.php`, `⚡owner-dashboard.blade.php`, `lean-prd.md`, `admin-backlog.md`, `BusinessOwnerWizardTest.php`.
+
+---
+
+## [2026-08-23 23:43:00] Business Owner Dashboard Full-Screen Layout Fix
+- **Request:** Remove starter sidebar and grey margin frame around `/owner/dashboard` and wizard to provide full-width dark canvas across owner portals.
+- **Status:** Success
+- **Steps Taken:**
+  - Added `rendering()` method with `$view->layout('layouts.blank')` to `resources/views/pages/owner/⚡owner-dashboard.blade.php` and `resources/views/pages/owner/⚡owner-wizard.blade.php`.
+  - Verified all 16 Livewire full-page views now consistently use `layouts.blank`.
+  - Ran linting, type-checking, and full test suite.
+- **Verification & Outcome:**
+  - `composer types:check` (PHPStan Level 7): 0 errors.
+  - `php artisan test --compact`: **80 passed (252 assertions, 0 errors)**.
+- **Key State Changes:**
+  - Updated `⚡owner-dashboard.blade.php` and `⚡owner-wizard.blade.php`.
+
+---
+
+## [2026-08-23 23:51:00] Order Payment Status Constant Fix
+- **Request:** Fix internal 500 error on `/owner/analytics` (`Undefined constant App\Models\Order::PAYMENT_PAID`).
+- **Status:** Success
+- **Steps Taken:**
+  - Added `PAYMENT_PAID = 'verified_paid'` constant alias to `app/Models/Order.php`.
+  - Updated `resources/views/pages/owner/⚡analytics-hub.blade.php` to use `Order::PAYMENT_VERIFIED_PAID`.
+  - Ran linting, type-checking, and full test suite.
+- **Verification & Outcome:**
+  - `vendor/bin/pint --format agent`: Passed.
+  - `composer types:check` (PHPStan Level 7): 0 errors.
+  - `php artisan test --compact`: **80 passed (252 assertions, 0 errors)**.
+- **Key State Changes:**
+  - Updated `app/Models/Order.php` and `resources/views/pages/owner/⚡analytics-hub.blade.php`.
+
+
+
+
 
 

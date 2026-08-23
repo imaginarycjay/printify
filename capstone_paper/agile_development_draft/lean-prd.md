@@ -113,9 +113,13 @@ graph TD
 - **Data-Driven Restock Alerts:** When $S_i \le \text{Reorder Level } (R_i)$ or $D_i \le \text{Supplier Lead Time}$, the system triggers high-visibility restock alert banners on the Admin Dashboard.
 - **1-Click Purchase Order (PO) / Restock Summary Generator:** Generates a formatted replenishment summary listing item SKUs, required reorder quantities, and supplier details ready for export or communication.
 
-### Module 6: Business Intelligence & Profitability Analytics
-- **Estimated Material Cost vs Selling Price:** Uses BOM unit costs to calculate the exact material expense per order, revealing gross profit margins:
-  $$\text{Gross Profit} = \text{Order Selling Price} - \text{Total BOM Material Cost}$$
+### Module 6: Executive Sales & Profitability Analytics Hub
+- **Estimated Material Cost vs Selling Price & Profit Margins:** Uses real-time Bill of Materials (BOM) unit costs to calculate the exact raw material expense consumed per job order, deducting recorded spoilage waste loss to reveal authentic shop profitability:
+  $$\text{Net Gross Profit} = \text{Gross Sales Revenue} - \sum (\text{BOM Item Unit Cost} \times \text{Quantity Consumed}) - \text{Spoilage Loss}$$
+  $$\text{Gross Profit Margin } (\%) = \left( \frac{\text{Net Gross Profit}}{\text{Gross Sales Revenue}} \right) \times 100\%$$
+- **Interactive Multi-Timeframe Cashflow Graphs:** Dynamic SVG trendlines visualizing daily, weekly, and monthly revenue velocity and order volume distribution.
+- **Service Product Mix & Fulfillment Analysis:** Real-time breakdown comparing Full Package vs Customer Pre-Printed Paper (Cover-Only) conversion, Hardbound vs Softbound adoption, and cover color popularity.
+- **Financial Ledger & 1-Click CSV Export:** Comprehensive chronological ledger of all customer transactions with instant CSV export for accounting, bookkeeping, and business reporting.
 - **Capacity & Bottleneck Tracking:** Displays daily machine utilization, staff task throughput, and peak order intake periods.
 
 ---

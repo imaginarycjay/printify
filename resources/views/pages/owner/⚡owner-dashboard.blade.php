@@ -6,6 +6,11 @@ use App\Services\PrintServiceCatalog;
 use Livewire\Component;
 
 new class extends Component {
+    public function rendering(mixed $view): void
+    {
+        $view->layout('layouts.blank');
+    }
+
     public string $search = '';
 
     public bool $show_more_services_modal = false;
@@ -133,7 +138,7 @@ new class extends Component {
     <!-- Main App Launcher Body -->
     <main class="w-full max-w-5xl mx-auto my-auto py-10 relative z-20 space-y-8">
         <!-- Main App Launcher Title & Stats -->
-        <div class="text-center space-y-2">
+        <div class="text-center space-y-3">
             <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-400 text-xs font-semibold uppercase tracking-wider">
                 <flux:icon name="squares-2x2" class="size-3.5" />
                 Printify App Launcher
@@ -142,6 +147,35 @@ new class extends Component {
             <p class="text-xs sm:text-sm text-stone-400">
                 {{ count($activeServiceKeys) }} active printing applications available in your shop
             </p>
+
+            <!-- Quick Financial Analytics Strip -->
+            @php
+                $todaySales = \App\Models\Order::where('print_shop_id', $shop->id ?? 0)
+                    ->whereDate('created_at', \Illuminate\Support\Carbon::today())
+                    ->whereNotIn('payment_status', [\App\Models\Order::PAYMENT_REJECTED, 'cancelled'])
+                    ->sum('total_amount');
+                $pendingOrders = \App\Models\Order::where('print_shop_id', $shop->id ?? 0)
+                    ->whereNotIn('order_status', [\App\Models\Order::STATUS_COMPLETED, \App\Models\Order::STATUS_CANCELLED])
+                    ->count();
+            @endphp
+            <div class="pt-1">
+                <a 
+                    href="{{ route('owner.analytics-hub') }}" 
+                    wire:navigate 
+                    class="inline-flex items-center gap-3 px-4 py-2 rounded-2xl bg-stone-900/90 border border-stone-800 hover:border-amber-500/50 transition-all text-xs text-stone-300 hover:text-white shadow-md group"
+                >
+                    <span class="flex items-center gap-1 text-emerald-400 font-bold">
+                        <span class="size-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                        Today: ₱{{ number_format($todaySales, 2) }}
+                    </span>
+                    <span class="text-stone-600">&bull;</span>
+                    <span class="text-stone-400 font-medium">{{ $pendingOrders }} active floor jobs</span>
+                    <span class="text-stone-600">&bull;</span>
+                    <span class="text-amber-400 font-bold group-hover:underline flex items-center gap-1">
+                        Analytics Hub &rarr;
+                    </span>
+                </a>
+            </div>
         </div>
 
         <!-- Center Search Filter Input Bar -->
@@ -171,6 +205,7 @@ new class extends Component {
                 @php
                     $isPreinstalled = !empty($app['is_preinstalled']);
                     $route = match ($app['key']) {
+                        'analytics_hub' => route('owner.analytics-hub'),
                         'inventory_hub' => route('owner.inventory-hub'),
                         'production_hub' => route('staff.production-hub'),
                         'web_builder' => route('owner.web-builder'),
