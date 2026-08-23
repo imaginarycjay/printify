@@ -21,6 +21,15 @@ class PrintServiceCatalog
                 'badge_color' => 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30',
                 'is_preinstalled' => true,
             ],
+            'production_hub' => [
+                'key' => 'production_hub',
+                'name' => 'Shop Floor & Production Queue',
+                'description' => 'Digital job queue, machine scheduling, 1-click stage advancement, and BOM consumption',
+                'icon' => 'queue-list',
+                'gradient' => 'from-amber-500 via-orange-600 to-amber-700',
+                'badge_color' => 'bg-amber-500/20 text-amber-300 border-amber-500/30',
+                'is_preinstalled' => true,
+            ],
             'web_builder' => [
                 'key' => 'web_builder',
                 'name' => 'Web Builder',
@@ -104,7 +113,7 @@ class PrintServiceCatalog
      */
     public static function preinstalledKeys(): array
     {
-        return ['inventory_hub', 'web_builder'];
+        return ['inventory_hub', 'production_hub', 'web_builder'];
     }
 
     /**

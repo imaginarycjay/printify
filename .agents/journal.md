@@ -359,3 +359,71 @@ This file logs all completed tasks, steps, and key state changes. The agent must
   - Migrated `thesis_binding_configs` and `order_items` tables with fulfillment columns.
   - Updated `ThesisBindingConfig` and `OrderItem` models.
   - Updated `⚡thesis-binding.blade.php`, `⚡thesis-order-wizard.blade.php`, `⚡customer-dashboard.blade.php`, and `CustomerThesisOrderTest.php`.
+
+---
+
+## [2026-08-23 21:50:00] Production Staff Operations Hub & Queue System
+- **Request:** Implement the Production Staff Side (Epic 1 to Epic 4) based on the Capstone Agile backlogs: Interactive Production Queue (Kanban & List), Physical Paper Intake Tracker ("Dala ang Papel"), Digital Job Ticket Inspection, 1-Click Stage Advancement, Machine / Workstation Assignment, Automated BOM Inventory Consumption (`InventoryDeductionService`), and Spoilage Logging.
+- **Status:** Success
+- **Steps Taken:**
+  - Created migration `2026_08_23_170000_add_production_fields_to_orders_table`:
+    - Added `assigned_staff_id`, `assigned_machine`, `production_stage`, `production_started_at`, `production_completed_at`, `staff_notes` to `orders` table.
+  - Updated `app/Models/Order.php`:
+    - Added production fillable attributes, datetime casts, relationships, and stage helpers (`advanceStage()`, `stepBackStage()`, `stageLabel()`, `isPaperIntakePending()`).
+  - Created `app/Services/InventoryDeductionService.php`:
+    - `deductForOrder()`: Deducts raw materials according to BOM recipes or smart category matches upon order completion; skips paper deductions for Cover-Only orders.
+    - `recordSpoilage()`: Logs operator material wastage with `movement_type = spoilage_waste`.
+  - Built `resources/views/pages/staff/⚡staff-dashboard.blade.php`:
+    - Top floor KPI metrics (Active Jobs, Rush Jobs, Pending Paper Drops, Ready for Pickup).
+    - 5-Stage Kanban Board (`Queue` -> `Printing` -> `Binding & Stamping` -> `QC` -> `Ready for Pickup`) and Tabular List view switcher.
+    - 1-Click Counter Paper Intake button (`markPaperReceived()`).
+    - Digital Job Ticket modal with full print specs, foil metadata with 1-click clipboard helpers, spine thickness (mm), PDF download, equipment assignment, and operator notes.
+    - Material Spoilage Logging modal.
+    - Quality Inspection Step-Back modal.
+  - Registered `production_hub` as a pre-installed core app in `PrintServiceCatalog`, linked route in `routes/web.php` and `⚡owner-dashboard.blade.php`.
+  - Added test suite `tests/Feature/ProductionStaffQueueTest.php` with 8 comprehensive tests covering queue views, stage advancements, paper intake, BOM deductions, cover-only zero-paper rules, and spoilage reporting.
+- **Verification & Outcome:**
+  - Ran `composer test` (Pint + PHPStan Level 7 + Pest): **71 tests passed, 223 assertions, 0 errors**.
+- **Key State Changes:**
+  - Migrated `orders` table with production fields.
+  - Created `InventoryDeductionService.php` and `ProductionStaffQueueTest.php`.
+  - Updated `Order.php`, `PrintServiceCatalog.php`, `⚡staff-dashboard.blade.php`, `⚡owner-dashboard.blade.php`, `web.php`, and `BusinessOwnerWizardTest.php`.
+
+---
+
+## [2026-08-23 22:22:00] Role-Scoped Routing Architecture & Header Navigation Fix
+- **Request:** Structure application routes cleanly by actor persona (`/owner/dashboard`, `/staff/dashboard`, `/customer/dashboard`), make `/dashboard` an SSO dispatcher, remove irrelevant App Launcher button for staff users, and provide a direct working Log Out button and profile link.
+- **Status:** Success
+- **Steps Taken:**
+  - Refactored `routes/web.php` into role-prefixed route groups:
+    - `/owner/*` (`owner.dashboard`, `owner.wizard`, `owner.web-builder`, `owner.inventory-hub`, `owner.thesis-binding`).
+    - `/staff/*` (`staff.dashboard`, `staff.production-hub`).
+    - `/customer/*` (`customer.dashboard`, `customer.order-thesis`).
+  - Updated `resources/views/pages/⚡dashboard.blade.php` to immediately redirect authenticated users to their role-specific dashboard based on `role` and onboarding setup status.
+  - Updated `resources/views/pages/staff/⚡staff-dashboard.blade.php`:
+    - Only show `"Back to App Launcher"` if the user is a `business_owner`.
+    - Added dedicated Profile Settings link (`profile.edit`).
+    - Added direct **Log Out** button (`<form method="POST" action="{{ route('logout') }}">`).
+  - Updated `tests/Feature/DashboardTest.php` to assert role-specific redirects and view rendering.
+- **Verification & Outcome:**
+  - Ran `composer test` (Pint + PHPStan Level 7 + Pest): **75 tests passed, 233 assertions, 0 errors**.
+- **Key State Changes:**
+  - Updated `routes/web.php`, `⚡dashboard.blade.php`, `⚡staff-dashboard.blade.php`, and `DashboardTest.php`.
+
+---
+
+## [2026-08-23 22:45:00] Customer Dashboard Full-Screen Layout Fix
+- **Request:** Remove the default starter kit sidebar and grey wrapper around `customer/dashboard` to give the customer storefront a sleek, full-screen canvas.
+- **Status:** Success
+- **Steps Taken:**
+  - Added `rendering()` method with `$view->layout('layouts.blank')` to `resources/views/pages/customer/⚡customer-dashboard.blade.php`.
+  - Ran linting, type-checking, and full Pest test suite.
+- **Verification & Outcome:**
+  - `composer lint:check` (Pint): Passed.
+  - `composer types:check` (PHPStan Level 7): 0 errors.
+  - `php artisan test --compact`: **75 passed (233 assertions)**.
+- **Key State Changes:**
+  - Updated `⚡customer-dashboard.blade.php`.
+
+
+

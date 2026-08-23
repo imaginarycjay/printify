@@ -2,11 +2,11 @@
 
 namespace App\Models;
 
+use Carbon\CarbonInterface;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Support\Carbon;
 
 /**
  * @property int $id
@@ -20,14 +20,20 @@ use Illuminate\Support\Carbon;
  * @property float $rush_fee_amount
  * @property float $total_amount
  * @property bool $is_rush
- * @property Carbon|null $target_completion_date
+ * @property CarbonInterface|null $target_completion_date
  * @property string|null $payment_proof_path
  * @property string|null $payment_reference_no
- * @property Carbon|null $payment_verified_at
+ * @property CarbonInterface|null $payment_verified_at
  * @property int|null $payment_verified_by
+ * @property int|null $assigned_staff_id
+ * @property string|null $assigned_machine
+ * @property string $production_stage
+ * @property CarbonInterface|null $production_started_at
+ * @property CarbonInterface|null $production_completed_at
+ * @property string|null $staff_notes
  * @property string|null $rejection_reason
- * @property Carbon|null $created_at
- * @property Carbon|null $updated_at
+ * @property CarbonInterface|null $created_at
+ * @property CarbonInterface|null $updated_at
  */
 #[Fillable([
     'order_number',
@@ -45,6 +51,12 @@ use Illuminate\Support\Carbon;
     'payment_reference_no',
     'payment_verified_at',
     'payment_verified_by',
+    'assigned_staff_id',
+    'assigned_machine',
+    'production_stage',
+    'production_started_at',
+    'production_completed_at',
+    'staff_notes',
     'rejection_reason',
 ])]
 class Order extends Model
@@ -63,6 +75,19 @@ class Order extends Model
     public const STATUS_COMPLETED = 'completed';
 
     public const STATUS_CANCELLED = 'cancelled';
+
+    // Production Specific Sub-Stages
+    public const STAGE_QUEUE = 'queue';
+
+    public const STAGE_PRINTING = 'printing';
+
+    public const STAGE_BINDING = 'binding';
+
+    public const STAGE_QUALITY_CHECK = 'quality_check';
+
+    public const STAGE_READY_FOR_PICKUP = 'ready_for_pickup';
+
+    public const STAGE_COMPLETED = 'completed';
 
     // Payment Statuses
     public const PAYMENT_UNPAID = 'unpaid';
@@ -87,6 +112,8 @@ class Order extends Model
             'is_rush' => 'boolean',
             'target_completion_date' => 'date',
             'payment_verified_at' => 'datetime',
+            'production_started_at' => 'datetime',
+            'production_completed_at' => 'datetime',
         ];
     }
 
@@ -131,6 +158,16 @@ class Order extends Model
     }
 
     /**
+     * Production staff member assigned to the order.
+     *
+     * @return BelongsTo<User, $this>
+     */
+    public function assignedStaff(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'assigned_staff_id');
+    }
+
+    /**
      * Generate unique sequential order number (e.g. ORD-2026-0001).
      */
     public static function generateOrderNumber(): string
@@ -143,10 +180,133 @@ class Order extends Model
     }
 
     /**
+     * Check if physical paper intake is pending for Cover-Only order.
+     */
+    public function isPaperIntakePending(): bool
+    {
+        $item = $this->items->first();
+
+        return $item && $item->isCoverOnly() && ! $item->is_paper_received;
+    }
+
+    /**
+     * Advance order to the next logical production stage.
+     */
+    public function advanceStage(?int $staffId = null, ?string $machine = null): void
+    {
+        $current = $this->production_stage ?? self::STAGE_QUEUE;
+
+        if ($staffId) {
+            $this->assigned_staff_id = $staffId;
+        }
+        if ($machine) {
+            $this->assigned_machine = $machine;
+        }
+
+        switch ($current) {
+            case self::STAGE_QUEUE:
+                $this->production_stage = self::STAGE_PRINTING;
+                $this->order_status = self::STATUS_IN_PRODUCTION;
+                $this->production_started_at = $this->production_started_at ?? now();
+                break;
+
+            case self::STAGE_PRINTING:
+                $this->production_stage = self::STAGE_BINDING;
+                $this->order_status = self::STATUS_IN_PRODUCTION;
+                break;
+
+            case self::STAGE_BINDING:
+                $this->production_stage = self::STAGE_QUALITY_CHECK;
+                $this->order_status = self::STATUS_QUALITY_CHECK;
+                break;
+
+            case self::STAGE_QUALITY_CHECK:
+                $this->production_stage = self::STAGE_READY_FOR_PICKUP;
+                $this->order_status = self::STATUS_READY_FOR_PICKUP;
+                $this->production_completed_at = now();
+                break;
+
+            case self::STAGE_READY_FOR_PICKUP:
+                $this->production_stage = self::STAGE_COMPLETED;
+                $this->order_status = self::STATUS_COMPLETED;
+                break;
+        }
+
+        $this->save();
+    }
+
+    /**
+     * Step back to the previous production stage (e.g. if QC fails).
+     */
+    public function stepBackStage(?string $reason = null): void
+    {
+        $current = $this->production_stage ?? self::STAGE_QUEUE;
+
+        if ($reason) {
+            $this->staff_notes = ($this->staff_notes ? $this->staff_notes."\n" : '').'['.now()->format('M d, H:i').'] QC Rejection: '.$reason;
+        }
+
+        switch ($current) {
+            case self::STAGE_COMPLETED:
+                $this->production_stage = self::STAGE_READY_FOR_PICKUP;
+                $this->order_status = self::STATUS_READY_FOR_PICKUP;
+                break;
+
+            case self::STAGE_READY_FOR_PICKUP:
+                $this->production_stage = self::STAGE_QUALITY_CHECK;
+                $this->order_status = self::STATUS_QUALITY_CHECK;
+                break;
+
+            case self::STAGE_QUALITY_CHECK:
+                $this->production_stage = self::STAGE_BINDING;
+                $this->order_status = self::STATUS_IN_PRODUCTION;
+                break;
+
+            case self::STAGE_BINDING:
+                $this->production_stage = self::STAGE_PRINTING;
+                $this->order_status = self::STATUS_IN_PRODUCTION;
+                break;
+
+            case self::STAGE_PRINTING:
+                $this->production_stage = self::STAGE_QUEUE;
+                $this->order_status = self::STATUS_IN_QUEUE;
+                break;
+        }
+
+        $this->save();
+    }
+
+    /**
+     * Human-readable label for production stage.
+     */
+    public function stageLabel(): string
+    {
+        return match ($this->production_stage) {
+            self::STAGE_PRINTING => 'Printing in Progress',
+            self::STAGE_BINDING => 'Cover Assembly & Stamping',
+            self::STAGE_QUALITY_CHECK => 'Quality Inspection (QC)',
+            self::STAGE_READY_FOR_PICKUP => 'Ready for Pickup',
+            self::STAGE_COMPLETED => 'Order Completed',
+            default => 'Queued for Production',
+        };
+    }
+
+    /**
      * Get the 1-indexed stage number (1 to 5) for the customer progress stepper.
      */
     public function currentStageIndex(): int
     {
+        // Check fine-grained production stage if available
+        if ($this->production_stage) {
+            return match ($this->production_stage) {
+                self::STAGE_QUEUE => 2,
+                self::STAGE_PRINTING, self::STAGE_BINDING => 3,
+                self::STAGE_QUALITY_CHECK => 4,
+                self::STAGE_READY_FOR_PICKUP, self::STAGE_COMPLETED => 5,
+                default => 2,
+            };
+        }
+
         return match ($this->order_status) {
             self::STATUS_PENDING_PAYMENT => 1,
             self::STATUS_IN_QUEUE => 2,

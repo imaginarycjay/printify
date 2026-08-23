@@ -46,6 +46,15 @@ This backlog details all Epics, User Stories, and Acceptance Criteria for the Bu
   - [x] Admin sets `standard_lead_time_days` (e.g., 4 days) and `rush_lead_time_days` (e.g., 1 day).
   - [ ] System automatically calculates earliest completion date on the customer checkout calendar.
 
+### Story ADM-1.5: Pre-Printed Paper & Cover-Only Binding Configuration
+- **User Story:** *As a Business Owner, I want to enable or disable accepting customer-supplied pre-printed pages ("Dala ang Papel") and set a dedicated base price for Cover-Only hardbound binding, so that students can avail of cheaper binding services while maintaining shop profit margins.*
+- **Priority:** `HIGH` | **Points:** 5 | **Status:** `IMPLEMENTED`
+- **Acceptance Criteria:**
+  - [x] Admin can toggle `allow_customer_supplied_paper` on/off in the Pricing configuration tab.
+  - [x] Admin can set the `hardbound_cover_only_price` (e.g., ₱300.00 base).
+  - [x] Admin Live Price Simulator includes a toggle for `Full Package` vs `Cover Only` to preview customer checkout pricing in real time.
+
+
 ---
 
 ## Epic 2: Manual Payment Verification & Order Intake (`EPIC-ADM-2`)

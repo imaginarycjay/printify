@@ -6,6 +6,11 @@ use App\Services\PrintServiceCatalog;
 use Livewire\Component;
 
 new class extends Component {
+    public function rendering(mixed $view): void
+    {
+        $view->layout('layouts.blank');
+    }
+
     public string $active_tab = 'services'; // 'services' or 'orders'
     public ?int $viewing_order_id = null;
 

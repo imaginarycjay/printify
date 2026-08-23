@@ -35,10 +35,20 @@ This backlog outlines all Epics, User Stories, and Acceptance Criteria for the C
 
 ### Story CUS-2.2: Dynamic Cover Metadata Form Input
 - **User Story:** *As a Customer, I want to fill in the required thesis cover fields (Thesis Title, Researchers, Course/Degree, School Year) directly on the form, so that the shop has accurate information for hot foil stamping without manual errors.*
-- **Priority:** `HIGH` | **Points:** 3 | **Status:** `PLANNED`
+- **Priority:** `HIGH` | **Points:** 3 | **Status:** `COMPLETED`
 - **Acceptance Criteria:**
-  - [ ] Form dynamically displays all custom fields defined by the shop administrator.
-  - [ ] Inputs are validated before allowing the customer to proceed to file upload and checkout.
+  - [x] Form dynamically displays all custom fields defined by the shop administrator.
+  - [x] Inputs are validated before allowing the customer to proceed to file upload and checkout.
+
+### Story CUS-2.3: Cover & Binding Only ("Dala ang Papel") Mode
+- **User Story:** *As a Customer who already printed and collated my thesis pages, I want to order only the hardbound cover, foil stamping, and binding without paying for page printing charges, so that I can save money while getting a professional book cover.*
+- **Priority:** `CRITICAL` | **Points:** 5 | **Status:** `COMPLETED`
+- **Acceptance Criteria:**
+  - [x] Wizard provides a mode toggle: `📄 Full Package (Print & Bind)` vs `📦 Cover & Binding Only (Dala ang Papel)`.
+  - [x] When Cover-Only is selected, page printing charges are set to **₱0.00**, applying only the base hardbound cover fee.
+  - [x] Customer inputs total pre-printed page count, dynamically calculating estimated spine thickness ($\text{pages} \times 0.1\text{mm}$) for chipboard sizing.
+  - [x] Foil stamping text fields and digital reference PDF upload remain active for double-checking and spine alignment.
+  - [x] Checkout displays clear walk-in paper drop-off instructions with tracking code.
 
 ---
 

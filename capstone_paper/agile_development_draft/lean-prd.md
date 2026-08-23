@@ -80,6 +80,9 @@ graph TD
 
 ### Module 2: Customer Ordering & Self-Service Intake Portal (Customer-Facing)
 - **Interactive Price Quotation Calculator:** Real-time preview of total order cost dynamically calculated as the customer adjusts page counts (B/W vs Color), binding type (Hardbound vs Softbound), paper size, foil selection, and rush priority.
+- **Service Fulfillment Modes (Full Package vs Cover-Only):**
+  - *Full Package:* Full printing and binding of uploaded manuscript document.
+  - *Cover & Binding Only ("Dala ang Papel"):* Customer supplies their own pre-printed, collated page block. System sets printing charges to ₱0.00, applies only the base hardbound cover fee, computes exact spine thickness ($\text{pages} \times 0.1\text{mm}$), retains foil stamping inputs and digital reference PDF upload, and generates walk-in counter intake instructions.
 - **Digital Asset & Document Submission:** Secure upload of print-ready PDF files and thesis cover assets with client-side and server-side MIME-type validation.
 - **Dynamic Metadata Form Input:** Customer fills out the custom fields defined by the shop admin for foil stamping and book spine layout.
 - **Estimated Completion Date & Capacity Slot Reservation:** System provides a guaranteed completion date based on current daily quota availability and selected lead time.
@@ -93,13 +96,15 @@ graph TD
 ### Module 4: Digital Job Scheduling & Production Queue (Staff-Facing)
 - **Visual Production Kanban / Queue Board:** Organizes active jobs into sequential production stages:
   $$\text{Pending Queue} \longrightarrow \text{Document Printing} \longrightarrow \text{Cover & Binding} \longrightarrow \text{Quality Check (QC)} \longrightarrow \text{Ready for Pickup / Delivered}$$
+- **Physical Paper Intake Tracker:** 1-Click confirmation button for Cover-Only orders when student drops off physical printed sheets at the shop counter (`is_paper_received = true`).
 - **Job Ticket Detail View:** Production staff can view exact customer specifications, download raw PDF files, review cover metadata, and inspect special printing instructions.
 - **Task & Machine Allocation:** Allows assignment of specific staff members and equipment/workstations (e.g., Laser Printer 1, Heavy Duty Binding Press) to active jobs.
 - **Visual Turnaround & SLA Monitoring:** Color-coded urgency indicators (Normal, Warning, Urgent/Rush) based on due date proximity.
 
 ### Module 5: Automated Inventory Replenishment & Real-Time Burn Rate Engine
 - **Bill of Materials (BOM) Recipe Mapping:** Links each printing service variant to its constituent raw inventory items:
-  - *Example (1 Hardbound Thesis):* 1 pc Chipboard (2mm) + 1 sheet Leatherette Cover + $N$ sheets A4 80gsm Paper + 1 unit Binding Glue + 0.1 roll Stamping Foil.
+  - *Example (1 Hardbound Thesis - Full Package):* 1 pc Chipboard (2mm) + 1 sheet Leatherette Cover + $N$ sheets A4 80gsm Paper + 1 unit Binding Glue + 0.1 roll Stamping Foil.
+  - *Example (1 Hardbound Thesis - Cover Only):* 1 pc Chipboard (2mm) + 1 sheet Leatherette Cover + 0 sheets Paper + 1 unit Binding Glue + 0.1 roll Stamping Foil.
 - **Automated Material Deduction Trigger:** Upon advancing an order through production or marking it completed, the system automatically deducts corresponding material quantities from the digital inventory.
 - **Real-Time Consumption Velocity (Burn Rate):** Computes material depletion speed over an active observation window (e.g., past 7 days) based on actual completed job volume:
   $$\text{Daily Burn Rate } (B_i) = \frac{\sum \text{Quantity of Material } i \text{ consumed in past } N \text{ days}}{N \text{ days}}$$
@@ -186,6 +191,8 @@ erDiagram
 | `is_active` | BOOLEAN | Module availability toggle |
 | `hardbound_base_price` | DECIMAL(10,2) | Base price for hardbound compilation |
 | `softbound_base_price` | DECIMAL(10,2) | Base price for softbound compilation |
+| `allow_customer_supplied_paper` | BOOLEAN | Toggle for Cover-Only pre-printed paper mode |
+| `hardbound_cover_only_price` | DECIMAL(10,2) | Base fee for cover-only hardbound binding |
 | `page_price_bw` | DECIMAL(10,2) | Price per black & white printed page |
 | `page_price_color` | DECIMAL(10,2) | Price per colored printed page |
 | `rush_fee` | DECIMAL(10,2) | Additional fee for expedited processing |
@@ -211,7 +218,7 @@ erDiagram
 | `unit` | VARCHAR(50) | Usage unit (e.g. `sheets`, `pcs`) |
 | `created_at`, `updated_at` | TIMESTAMP | Audit timestamps |
 
-#### 6. `orders` (NEW Planned Table)
+#### 6. `orders` (Existing & Enhanced Table)
 | Column | Type | Description |
 | :--- | :--- | :--- |
 | `id` | BIGINT PK | Order ID |
@@ -230,15 +237,24 @@ erDiagram
 | `payment_reference_no` | VARCHAR(100) NULL | Customer-entered transaction reference |
 | `payment_verified_at` | TIMESTAMP NULL | Verification timestamp |
 | `payment_verified_by` | BIGINT FK -> users NULL | Admin who approved payment |
+| `assigned_staff_id` | BIGINT FK -> users NULL | Staff assigned to execute job |
+| `assigned_machine` | VARCHAR(100) NULL | Machine/workstation assigned |
+| `production_stage` | VARCHAR(50) | `queue`, `printing`, `binding`, `quality_check`, `ready_for_pickup`, `completed` |
+| `production_started_at`| TIMESTAMP NULL | Start timestamp of physical work |
+| `production_completed_at`| TIMESTAMP NULL| Completion timestamp |
+| `staff_notes` | TEXT NULL | Internal operator comments or QA logs |
 | `rejection_reason` | TEXT NULL | Admin feedback on rejected receipts |
 | `created_at`, `updated_at` | TIMESTAMP | Audit timestamps |
 
-#### 7. `order_items` (NEW Planned Table)
+#### 7. `order_items` (Existing & Enhanced Table)
 | Column | Type | Description |
 | :--- | :--- | :--- |
 | `id` | BIGINT PK | Order line item ID |
 | `order_id` | BIGINT FK -> orders | Parent order |
 | `binding_type` | VARCHAR(50) | `hardbound`, `softbound`, `standard` |
+| `fulfillment_type` | VARCHAR(50) | `full_package` (print & bind) or `cover_only` (customer supplied pages) |
+| `is_paper_received` | BOOLEAN | Counter intake status for cover-only orders |
+| `estimated_spine_thickness_mm` | DECIMAL(5,2) | Calculated spine thickness for chipboard sizing |
 | `bw_pages_count` | INT | Number of black & white pages |
 | `color_pages_count` | INT | Number of colored pages |
 | `total_pages_count` | INT | Total page volume |
@@ -247,6 +263,7 @@ erDiagram
 | `paper_size` | VARCHAR(50) | Chosen paper size (`A4`, `Letter`, `Legal`) |
 | `copies_count` | INT DEFAULT 1 | Number of book/item copies |
 | **`custom_fields_data`** | **JSON / JSONB** | Customer responses to dynamic cover metadata fields |
+| `selected_addons` | JSON / JSONB NULL | Attached retail accessory items |
 | `document_file_path` | VARCHAR(255) NULL | Stored PDF file path |
 | `document_original_name`| VARCHAR(255) NULL | Original uploaded filename |
 | `unit_price` | DECIMAL(10,2) | Price per single copy |
