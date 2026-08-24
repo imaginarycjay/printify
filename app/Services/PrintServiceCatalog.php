@@ -142,4 +142,21 @@ class PrintServiceCatalog
     {
         return static::all()[$key] ?? null;
     }
+
+    /**
+     * Get all customer-orderable print services (excluding administrative core hubs).
+     *
+     * @return array<string, array{key: string, name: string, description: string, icon: string, gradient: string, badge_color: string}>
+     */
+    public static function customerServices(): array
+    {
+        /** @var array<string, array{key: string, name: string, description: string, icon: string, gradient: string, badge_color: string}> $services */
+        $services = array_filter(
+            static::all(),
+            fn (array $s, string $key): bool => ! static::isPreinstalled($key),
+            ARRAY_FILTER_USE_BOTH
+        );
+
+        return $services;
+    }
 }

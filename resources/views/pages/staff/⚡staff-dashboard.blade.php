@@ -19,7 +19,8 @@ new #[Title('Production Operations Hub')] class extends Component {
     }
 
     public string $searchQuery = '';
-    public string $selectedFilter = 'all'; // all, rush_only, cover_only, full_package, hardbound, softbound
+    public string $selectedService = 'all'; // all, thesis_binding, document_printing
+    public string $selectedFilter = 'all'; // all, rush_only, cover_only, full_package, hardbound, softbound, ring_bind, folder, staple, loose
     public string $selectedView = 'kanban'; // kanban, list
 
     // Job Ticket Modal
@@ -67,6 +68,10 @@ new #[Title('Production Operations Hub')] class extends Component {
             ->with(['customer', 'items', 'assignedStaff'])
             ->latest('created_at');
 
+        if ($this->selectedService !== 'all') {
+            $query->where('service_key', $this->selectedService);
+        }
+
         if ($this->selectedFilter === 'rush_only') {
             $query->where('is_rush', true);
         } elseif ($this->selectedFilter === 'cover_only') {
@@ -77,6 +82,14 @@ new #[Title('Production Operations Hub')] class extends Component {
             $query->whereHas('items', fn ($q) => $q->where('binding_type', 'hardbound'));
         } elseif ($this->selectedFilter === 'softbound') {
             $query->whereHas('items', fn ($q) => $q->where('binding_type', 'softbound'));
+        } elseif ($this->selectedFilter === 'ring_bind') {
+            $query->whereHas('items', fn ($q) => $q->where('custom_fields_data->finishing_type', 'ring_bind'));
+        } elseif ($this->selectedFilter === 'folder') {
+            $query->whereHas('items', fn ($q) => $q->where('custom_fields_data->finishing_type', 'folder'));
+        } elseif ($this->selectedFilter === 'staple') {
+            $query->whereHas('items', fn ($q) => $q->where('custom_fields_data->finishing_type', 'staple'));
+        } elseif ($this->selectedFilter === 'loose') {
+            $query->whereHas('items', fn ($q) => $q->where('custom_fields_data->finishing_type', 'loose'));
         }
 
         if (trim($this->searchQuery) !== '') {
@@ -213,6 +226,27 @@ new #[Title('Production Operations Hub')] class extends Component {
         }
 
         $this->showJobTicketModal = false;
+    }
+
+    /**
+     * Verify payment directly from staff counter floor.
+     */
+    public function verifyPayment(int $orderId): void
+    {
+        $order = Order::find($orderId);
+        if ($order) {
+            $order->update([
+                'payment_status' => Order::PAYMENT_VERIFIED_PAID,
+                'payment_verified_at' => now(),
+                'payment_verified_by' => auth()->id(),
+            ]);
+
+            Flux::toast(
+                text: "Payment for Order {$order->order_number} verified and confirmed at counter.",
+                heading: 'Payment Confirmed',
+                variant: 'success'
+            );
+        }
     }
 
     /**
@@ -430,41 +464,32 @@ new #[Title('Production Operations Hub')] class extends Component {
         </div>
 
         <!-- Search, Filters & View Controls Bar -->
-        <div class="p-3.5 rounded-2xl bg-stone-900/80 border border-stone-800/90 flex flex-col md:flex-row items-center justify-between gap-3.5 backdrop-blur-sm">
-            <div class="relative w-full md:w-96">
-                <flux:icon name="magnifying-glass" class="size-4 text-stone-500 absolute left-3.5 top-1/2 -translate-y-1/2" />
-                <input 
-                    wire:model.live.debounce.200ms="searchQuery" 
-                    type="text" 
-                    placeholder="Search Order #, Customer Name, Title..."
-                    class="w-full bg-stone-950 border border-stone-800 focus:border-amber-500 rounded-xl pl-10 pr-4 py-2 text-xs text-white placeholder-stone-500 outline-none transition-colors"
-                />
-            </div>
-
-            <div class="flex items-center gap-2 overflow-x-auto w-full md:w-auto pb-1 md:pb-0">
-                @php
-                    $filters = [
-                        'all' => 'All Jobs',
-                        'rush_only' => '⚡ Rush Only',
-                        'cover_only' => '📦 Cover Only',
-                        'full_package' => '📄 Full Package',
-                        'hardbound' => '📕 Hardbound',
-                        'softbound' => '📘 Softbound',
-                    ];
-                @endphp
-
-                @foreach ($filters as $key => $label)
+        <div class="p-3.5 rounded-2xl bg-stone-900/80 border border-stone-800/90 flex flex-col gap-3.5 backdrop-blur-sm">
+            <!-- Top Row: Service Category Tabs & View Switcher -->
+            <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 border-b border-stone-800/80 pb-3">
+                <div class="flex items-center gap-2 overflow-x-auto w-full sm:w-auto">
+                    <span class="text-[11px] font-bold text-stone-500 uppercase tracking-wider mr-1 hidden sm:inline">Category:</span>
                     <button 
-                        wire:click="$set('selectedFilter', '{{ $key }}')"
-                        class="px-3 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition-all {{ $selectedFilter === $key ? 'bg-amber-500 text-stone-950 shadow-md shadow-amber-500/20 font-black' : 'bg-stone-950 text-stone-400 hover:text-white border border-stone-800' }}"
+                        wire:click="$set('selectedService', 'all')"
+                        class="px-3.5 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition-all {{ $selectedService === 'all' ? 'bg-amber-500 text-stone-950 shadow-md shadow-amber-500/20 font-black' : 'bg-stone-950 text-stone-400 hover:text-white border border-stone-800' }}"
                     >
-                        {{ $label }}
+                        All Services
                     </button>
-                @endforeach
+                    <button 
+                        wire:click="$set('selectedService', 'thesis_binding')"
+                        class="px-3.5 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition-all {{ $selectedService === 'thesis_binding' ? 'bg-amber-500/20 text-amber-300 border border-amber-500/40 font-black' : 'bg-stone-950 text-stone-400 hover:text-white border border-stone-800' }}"
+                    >
+                        📚 Thesis Binding
+                    </button>
+                    <button 
+                        wire:click="$set('selectedService', 'document_printing')"
+                        class="px-3.5 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition-all {{ $selectedService === 'document_printing' ? 'bg-blue-500/20 text-blue-300 border border-blue-500/40 font-black' : 'bg-stone-950 text-stone-400 hover:text-white border border-stone-800' }}"
+                    >
+                        📄 Document Printing
+                    </button>
+                </div>
 
-                <div class="h-5 w-px bg-stone-800 mx-1 hidden sm:block"></div>
-
-                <div class="flex items-center bg-stone-950 p-0.5 rounded-xl border border-stone-800 shrink-0">
+                <div class="flex items-center bg-stone-950 p-0.5 rounded-xl border border-stone-800 shrink-0 self-end sm:self-auto">
                     <button 
                         wire:click="$set('selectedView', 'kanban')" 
                         class="p-1.5 rounded-lg transition-colors {{ $selectedView === 'kanban' ? 'bg-stone-800 text-amber-400' : 'text-stone-500 hover:text-stone-300' }}"
@@ -479,6 +504,61 @@ new #[Title('Production Operations Hub')] class extends Component {
                     >
                         <flux:icon name="queue-list" class="size-4" />
                     </button>
+                </div>
+            </div>
+
+            <!-- Bottom Row: Search & Sub-filters -->
+            <div class="flex flex-col md:flex-row items-center justify-between gap-3">
+                <div class="relative w-full md:w-80">
+                    <flux:icon name="magnifying-glass" class="size-4 text-stone-500 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                    <input 
+                        wire:model.live.debounce.200ms="searchQuery" 
+                        type="text" 
+                        placeholder="Search Order #, Customer Name, Title..."
+                        class="w-full bg-stone-950 border border-stone-800 focus:border-amber-500 rounded-xl pl-10 pr-4 py-1.5 text-xs text-white placeholder-stone-500 outline-none transition-colors"
+                    />
+                </div>
+
+                <div class="flex items-center gap-1.5 overflow-x-auto w-full md:w-auto pb-1 md:pb-0">
+                    @php
+                        if ($selectedService === 'document_printing') {
+                            $filters = [
+                                'all' => 'All Docs',
+                                'rush_only' => '⚡ Rush Only',
+                                'ring_bind' => '🌀 Ring Bound',
+                                'folder' => '📁 Folders',
+                                'staple' => '📎 Stapled',
+                                'loose' => '📄 Loose Sheets',
+                            ];
+                        } elseif ($selectedService === 'thesis_binding') {
+                            $filters = [
+                                'all' => 'All Thesis',
+                                'rush_only' => '⚡ Rush Only',
+                                'cover_only' => '📦 Cover Only',
+                                'full_package' => '📄 Full Package',
+                                'hardbound' => '📕 Hardbound',
+                                'softbound' => '📘 Softbound',
+                            ];
+                        } else {
+                            $filters = [
+                                'all' => 'All Jobs',
+                                'rush_only' => '⚡ Rush Only',
+                                'cover_only' => '📦 Cover Only',
+                                'full_package' => '📄 Full Package',
+                                'hardbound' => '📕 Hardbound',
+                                'softbound' => '📘 Softbound',
+                            ];
+                        }
+                    @endphp
+
+                    @foreach ($filters as $key => $label)
+                        <button 
+                            wire:click="$set('selectedFilter', '{{ $key }}')"
+                            class="px-2.5 py-1 rounded-lg text-[11px] font-bold whitespace-nowrap transition-all {{ $selectedFilter === $key ? 'bg-stone-800 text-white font-black border border-stone-700' : 'text-stone-400 hover:text-stone-200' }}"
+                        >
+                            {{ $label }}
+                        </button>
+                    @endforeach
                 </div>
             </div>
         </div>
@@ -561,46 +641,79 @@ new #[Title('Production Operations Hub')] class extends Component {
 
                                 <div class="p-3.5 rounded-xl bg-stone-950 border {{ $order->is_rush ? 'border-amber-500/60 shadow-lg shadow-amber-500/10 ring-1 ring-amber-500/30' : 'border-stone-800/90 hover:border-stone-700' }} transition-all space-y-3">
                                     
-                                    <!-- Card Top Row: Order Number & Rush Indicator -->
-                                    <div class="flex items-center justify-between gap-1.5">
-                                        <span class="font-mono text-xs font-black text-white tracking-wider">
-                                            {{ $order->order_number }}
-                                        </span>
-                                        
-                                        @if ($order->is_rush)
-                                            <span class="px-2 py-0.5 rounded-md text-[10px] font-black bg-amber-500/20 text-amber-400 border border-amber-500/40 flex items-center gap-1 animate-pulse">
-                                                ⚡ RUSH
+                                    <!-- Card Top Row: Order Number, File Link & Payment / Rush -->
+                                    <div class="flex items-center justify-between gap-1.5 flex-wrap">
+                                        <div class="flex items-center gap-1.5">
+                                            <span class="font-mono text-xs font-black text-white tracking-wider">
+                                                {{ $order->order_number }}
                                             </span>
-                                        @endif
+                                            @if ($item?->document_file_path)
+                                                <a 
+                                                    href="{{ Storage::url($item->document_file_path) }}" 
+                                                    target="_blank"
+                                                    class="px-1.5 py-0.5 rounded text-[9px] font-bold bg-blue-500/20 text-blue-300 hover:bg-blue-500/30 border border-blue-500/30 flex items-center gap-1 transition-colors"
+                                                    title="View Document File: {{ $item->document_original_name }}"
+                                                >
+                                                    <flux:icon name="document-text" class="size-2.5" />
+                                                    <span>PDF</span>
+                                                </a>
+                                            @endif
+                                        </div>
+                                        
+                                        <div class="flex items-center gap-1">
+                                            <span class="px-1.5 py-0.5 rounded text-[9px] font-black border {{ $order->paymentStatusBadgeColor() }}">
+                                                {{ $order->payment_status === \App\Models\Order::PAYMENT_VERIFIED_PAID ? 'PAID' : ($order->payment_status === \App\Models\Order::PAYMENT_UNPAID ? 'UNPAID' : 'PENDING') }}
+                                            </span>
+                                            @if ($order->is_rush)
+                                                <span class="px-2 py-0.5 rounded-md text-[10px] font-black bg-amber-500/20 text-amber-400 border border-amber-500/40 flex items-center gap-1 animate-pulse">
+                                                    ⚡ RUSH
+                                                </span>
+                                            @endif
+                                        </div>
                                     </div>
 
                                     <!-- Service Tag & Customer Name -->
+                                    @php
+                                        $isDocPrinting = $order->service_key === 'document_printing' || ($item && $item->isDocumentPrinting());
+                                    @endphp
                                     <div>
                                         <div class="flex items-center gap-1.5 flex-wrap">
-                                            @if ($isCoverOnly)
-                                                <span class="px-2 py-0.5 rounded text-[10px] font-black bg-purple-500/15 text-purple-300 border border-purple-500/30">
-                                                    📦 Cover Only
+                                            @if ($isDocPrinting)
+                                                <span class="px-2 py-0.5 rounded text-[10px] font-black bg-blue-500/20 text-blue-300 border border-blue-500/30">
+                                                    📄 Doc Print
+                                                </span>
+                                                <span class="px-1.5 py-0.5 rounded text-[10px] font-bold bg-stone-800 text-stone-300">
+                                                    {{ $item?->paper_size ?? 'Letter' }}
+                                                </span>
+                                                <span class="text-[10px] font-semibold text-stone-400">
+                                                    x{{ $item?->copies_count ?? 1 }} copy
                                                 </span>
                                             @else
-                                                <span class="px-2 py-0.5 rounded text-[10px] font-black bg-blue-500/15 text-blue-300 border border-blue-500/30">
-                                                    📄 Full Package
+                                                @if ($isCoverOnly)
+                                                    <span class="px-2 py-0.5 rounded text-[10px] font-black bg-purple-500/15 text-purple-300 border border-purple-500/30">
+                                                        📦 Cover Only
+                                                    </span>
+                                                @else
+                                                    <span class="px-2 py-0.5 rounded text-[10px] font-black bg-blue-500/15 text-blue-300 border border-blue-500/30">
+                                                        📄 Full Package
+                                                    </span>
+                                                @endif
+
+                                                <span class="px-1.5 py-0.5 rounded text-[10px] font-bold bg-stone-800 text-stone-300">
+                                                    {{ ucfirst($item?->binding_type ?? 'Hardbound') }}
+                                                </span>
+                                                <span class="text-[10px] font-semibold text-stone-400">
+                                                    x{{ $item?->copies_count ?? 1 }} copy
                                                 </span>
                                             @endif
-
-                                            <span class="px-1.5 py-0.5 rounded text-[10px] font-bold bg-stone-800 text-stone-300">
-                                                {{ ucfirst($item?->binding_type ?? 'Hardbound') }}
-                                            </span>
-                                            <span class="text-[10px] font-semibold text-stone-400">
-                                                x{{ $item?->copies_count ?? 1 }} copy
-                                            </span>
                                         </div>
                                         <p class="text-xs font-bold text-stone-100 mt-1.5 truncate">
                                             {{ $order->customer->name ?? 'Customer' }}
                                         </p>
                                     </div>
 
-                                    <!-- Physical Paper Intake Banner (For Cover-Only) -->
-                                    @if ($isCoverOnly)
+                                    <!-- Physical Paper Intake Banner (For Thesis Cover-Only) -->
+                                    @if (! $isDocPrinting && $isCoverOnly)
                                         @if ($isPendingPaper)
                                             <div class="p-2 rounded-lg bg-amber-500/10 border border-amber-500/30 space-y-1.5">
                                                 <p class="text-[10px] font-bold text-amber-400 flex items-center gap-1">
@@ -623,36 +736,64 @@ new #[Title('Production Operations Hub')] class extends Component {
                                         @endif
                                     @endif
 
-                                    <!-- Page Breakdown & Spine Width Badge -->
-                                    <div class="grid grid-cols-2 gap-1.5 py-1 text-[11px] border-y border-stone-800/80">
-                                        <div>
-                                            <span class="text-stone-500 text-[10px] block">Pages (B/W + Col)</span>
-                                            <span class="font-bold text-stone-300">
-                                                {{ $item?->bw_pages_count ?? 0 }} / {{ $item?->color_pages_count ?? 0 }}
-                                            </span>
+                                    <!-- Page Breakdown & Specs Badge -->
+                                    @if ($isDocPrinting)
+                                        <div class="grid grid-cols-2 gap-1.5 py-1 text-[11px] border-y border-stone-800/80">
+                                            <div>
+                                                <span class="text-stone-500 text-[10px] block">Pages (B/W + Col)</span>
+                                                <span class="font-bold text-stone-300">
+                                                    {{ $item?->bw_pages_count ?? 0 }} / {{ $item?->color_pages_count ?? 0 }}
+                                                </span>
+                                            </div>
+                                            <div>
+                                                <span class="text-stone-500 text-[10px] block">Paper Feed</span>
+                                                <span class="font-bold text-blue-400 font-mono">
+                                                    {{ $item?->getPhysicalSheetsCount() }} sh ({{ $item?->isDuplex() ? 'Duplex' : 'Simplex' }})
+                                                </span>
+                                            </div>
                                         </div>
-                                        <div>
-                                            <span class="text-stone-500 text-[10px] block">Spine Width</span>
-                                            <span class="font-bold text-amber-400 font-mono">
-                                                ~{{ $item?->estimated_spine_thickness_mm ?? '15.0' }} mm
-                                            </span>
-                                        </div>
-                                    </div>
 
-                                    <!-- Cover & Foil Color Chips -->
-                                    @if ($item?->cover_color || $item?->foil_color)
                                         <div class="flex items-center gap-1.5 text-[10px] flex-wrap">
-                                            @if ($item?->cover_color)
-                                                <span class="px-1.5 py-0.5 rounded bg-stone-900 border border-stone-800 text-stone-300">
+                                            <span class="px-1.5 py-0.5 rounded bg-stone-900 border border-stone-800 text-stone-300">
+                                                {{ $item?->getFinishingLabel() }}
+                                            </span>
+                                            @if ($item?->cover_color && $item?->getFinishingType() === 'ring_bind')
+                                                <span class="px-1.5 py-0.5 rounded bg-stone-900 border border-stone-800 text-stone-400">
                                                     Cover: {{ $item->cover_color }}
                                                 </span>
                                             @endif
-                                            @if ($item?->foil_color)
-                                                <span class="px-1.5 py-0.5 rounded bg-amber-500/10 border border-amber-500/20 text-amber-300">
-                                                    Foil: {{ $item->foil_color }}
-                                                </span>
-                                            @endif
                                         </div>
+                                    @else
+                                        <div class="grid grid-cols-2 gap-1.5 py-1 text-[11px] border-y border-stone-800/80">
+                                            <div>
+                                                <span class="text-stone-500 text-[10px] block">Pages (B/W + Col)</span>
+                                                <span class="font-bold text-stone-300">
+                                                    {{ $item?->bw_pages_count ?? 0 }} / {{ $item?->color_pages_count ?? 0 }}
+                                                </span>
+                                            </div>
+                                            <div>
+                                                <span class="text-stone-500 text-[10px] block">Spine Width</span>
+                                                <span class="font-bold text-amber-400 font-mono">
+                                                    ~{{ $item?->estimated_spine_thickness_mm ?? '15.0' }} mm
+                                                </span>
+                                            </div>
+                                        </div>
+
+                                        <!-- Cover & Foil Color Chips -->
+                                        @if ($item?->cover_color || $item?->foil_color)
+                                            <div class="flex items-center gap-1.5 text-[10px] flex-wrap">
+                                                @if ($item?->cover_color)
+                                                    <span class="px-1.5 py-0.5 rounded bg-stone-900 border border-stone-800 text-stone-300">
+                                                        Cover: {{ $item->cover_color }}
+                                                    </span>
+                                                @endif
+                                                @if ($item?->foil_color)
+                                                    <span class="px-1.5 py-0.5 rounded bg-amber-500/10 border border-amber-500/20 text-amber-300">
+                                                        Foil: {{ $item->foil_color }}
+                                                    </span>
+                                                @endif
+                                            </div>
+                                        @endif
                                     @endif
 
                                     <!-- Action Buttons -->
@@ -847,96 +988,196 @@ new #[Title('Production Operations Hub')] class extends Component {
                 <div class="p-6 overflow-y-auto space-y-6 text-xs text-stone-300">
                     
                     <!-- Specifications Grid -->
-                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                        <div class="p-3 rounded-xl bg-stone-950 border border-stone-800">
-                            <span class="text-stone-500 text-[10px] uppercase font-bold block">Fulfillment Mode</span>
-                            <span class="font-black text-white mt-0.5 block">
-                                {{ $ticketItem?->isCoverOnly() ? '📦 Cover Only' : '📄 Full Package' }}
-                            </span>
-                        </div>
+                    @php
+                        $isTicketDoc = $ticketOrder->service_key === 'document_printing' || ($ticketItem && $ticketItem->isDocumentPrinting());
+                    @endphp
 
-                        <div class="p-3 rounded-xl bg-stone-950 border border-stone-800">
-                            <span class="text-stone-500 text-[10px] uppercase font-bold block">Binding & Copies</span>
-                            <span class="font-black text-amber-400 mt-0.5 block">
-                                {{ ucfirst($ticketItem?->binding_type ?? 'Hardbound') }} ({{ $ticketItem?->copies_count ?? 1 }}x)
-                            </span>
-                        </div>
-
-                        <div class="p-3 rounded-xl bg-stone-950 border border-stone-800">
-                            <span class="text-stone-500 text-[10px] uppercase font-bold block">Pages (B/W vs Color)</span>
-                            <span class="font-black text-white mt-0.5 block">
-                                {{ $ticketItem?->bw_pages_count ?? 0 }} B/W + {{ $ticketItem?->color_pages_count ?? 0 }} Col
-                            </span>
-                        </div>
-
-                        <div class="p-3 rounded-xl bg-stone-950 border border-stone-800">
-                            <span class="text-stone-500 text-[10px] uppercase font-bold block">Calculated Spine</span>
-                            <span class="font-black text-emerald-400 font-mono mt-0.5 block">
-                                ~{{ $ticketItem?->estimated_spine_thickness_mm ?? '15.0' }} mm
-                            </span>
-                        </div>
-                    </div>
-
-                    <!-- Hot Foil Stamping Specifications Card -->
-                    <div class="p-4 rounded-2xl bg-stone-950 border border-stone-800 space-y-3">
-                        <div class="flex items-center justify-between border-b border-stone-800/80 pb-2">
-                            <h4 class="font-black text-amber-400 text-xs uppercase tracking-wider flex items-center gap-1.5">
-                                <flux:icon name="sparkles" class="size-3.5 text-amber-400" />
-                                Hot Foil Stamping & Cover Metadata
-                            </h4>
-                            <div class="flex items-center gap-2">
-                                <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-stone-800 text-stone-300">
-                                    Cover: {{ $ticketItem?->cover_color ?? 'Maroon' }}
+                    @if ($isTicketDoc)
+                        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                            <div class="p-3 rounded-xl bg-stone-950 border border-stone-800">
+                                <span class="text-stone-500 text-[10px] uppercase font-bold block">Paper Size & Weight</span>
+                                <span class="font-black text-white mt-0.5 block">
+                                    {{ $ticketItem?->paper_size }} ({{ $customFields['paper_stock'] ?? '70gsm' }})
                                 </span>
-                                <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-500/20 text-amber-300 border border-amber-500/30">
-                                    Foil: {{ $ticketItem?->foil_color ?? 'Gold' }}
+                            </div>
+
+                            <div class="p-3 rounded-xl bg-stone-950 border border-stone-800">
+                                <span class="text-stone-500 text-[10px] uppercase font-bold block">Sides & Physical Feed</span>
+                                <span class="font-black text-blue-400 mt-0.5 block">
+                                    {{ $ticketItem?->getPhysicalSheetsCount() }} sh ({{ ($customFields['print_sides'] ?? 'simplex') === 'duplex' ? 'Duplex' : 'Simplex' }})
+                                </span>
+                            </div>
+
+                            <div class="p-3 rounded-xl bg-stone-950 border border-stone-800">
+                                <span class="text-stone-500 text-[10px] uppercase font-bold block">Page Breakdown</span>
+                                <span class="font-black text-white mt-0.5 block">
+                                    {{ $ticketItem?->bw_pages_count ?? 0 }} B/W + {{ $ticketItem?->color_pages_count ?? 0 }} Col
+                                </span>
+                            </div>
+
+                            <div class="p-3 rounded-xl bg-stone-950 border border-stone-800">
+                                <span class="text-stone-500 text-[10px] uppercase font-bold block">Finishing & Copies</span>
+                                <span class="font-black text-amber-400 mt-0.5 block">
+                                    {{ $ticketItem?->getFinishingLabel() }} (x{{ $ticketItem?->copies_count ?? 1 }})
                                 </span>
                             </div>
                         </div>
 
-                        @if (count($customFields) > 0)
-                            <div class="grid grid-cols-1 gap-2.5">
-                                @foreach ($customFields as $fieldKey => $fieldValue)
-                                    <div class="p-3 rounded-xl bg-stone-900/70 border border-stone-800/80 flex items-start justify-between gap-3">
-                                        <div>
-                                            <span class="text-[10px] uppercase font-bold text-stone-500 block">
-                                                {{ ucwords(str_replace('_', ' ', $fieldKey)) }}
-                                            </span>
-                                            <p class="font-bold text-white text-xs mt-0.5 select-all">{{ $fieldValue }}</p>
-                                        </div>
-                                        <button 
-                                            onclick="navigator.clipboard.writeText('{{ addslashes($fieldValue) }}')"
-                                            class="p-1.5 rounded-lg text-stone-500 hover:text-amber-400 hover:bg-stone-800 transition-colors"
-                                            title="Copy Text"
-                                        >
-                                            <flux:icon name="clipboard" class="size-3.5" />
-                                        </button>
-                                    </div>
-                                @endforeach
+                        <!-- Document Print Instructions Card -->
+                        <div class="p-4 rounded-2xl bg-stone-950 border border-stone-800 space-y-3">
+                            <div class="flex items-center justify-between border-b border-stone-800/80 pb-2">
+                                <h4 class="font-black text-blue-400 text-xs uppercase tracking-wider flex items-center gap-1.5">
+                                    <flux:icon name="document-text" class="size-3.5 text-blue-400" />
+                                    Document Printing Specifications
+                                </h4>
+                                @if (! empty($customFields['ring_back_cover_color']))
+                                    <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-stone-800 text-stone-300">
+                                        Back Cover: {{ $customFields['ring_back_cover_color'] }}
+                                    </span>
+                                @endif
                             </div>
-                        @else
-                            <p class="text-stone-500 text-xs italic">No custom foil fields submitted.</p>
-                        @endif
-                    </div>
 
-                    <!-- PDF Asset Download & Preview Link -->
-                    @if ($ticketItem?->document_file_path)
-                        <div class="p-4 rounded-2xl bg-blue-500/10 border border-blue-500/30 flex items-center justify-between gap-3">
-                            <div class="flex items-center gap-3">
-                                <flux:icon name="document-arrow-down" class="size-8 text-blue-400 shrink-0" />
-                                <div>
-                                    <p class="font-bold text-white text-xs">{{ $ticketItem->document_original_name ?? 'Manuscript.pdf' }}</p>
-                                    <p class="text-[10px] text-blue-300">Ready for printer rasterization & production</p>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+                                <div class="p-3 rounded-xl bg-stone-900/60 border border-stone-800/80">
+                                    <span class="text-[10px] uppercase font-bold text-stone-500 block">Color Mode</span>
+                                    <p class="font-bold text-white mt-0.5">{{ strtoupper($customFields['color_mode'] ?? 'BW') }}</p>
+                                    @if (! empty($customFields['custom_color_pages']))
+                                        <p class="text-[11px] text-amber-400 mt-1">Color Pages: {{ $customFields['custom_color_pages'] }}</p>
+                                    @endif
+                                </div>
+
+                                <div class="p-3 rounded-xl bg-stone-900/60 border border-stone-800/80">
+                                    <span class="text-[10px] uppercase font-bold text-stone-500 block">Finishing Service</span>
+                                    <p class="font-bold text-white mt-0.5">{{ $ticketItem?->getFinishingLabel() }}</p>
+                                    <p class="text-[11px] text-stone-400 mt-1">{{ $ticketItem?->copies_count ?? 1 }} sets to produce</p>
                                 </div>
                             </div>
-                            <a 
-                                href="{{ Storage::url($ticketItem->document_file_path) }}" 
-                                target="_blank" 
-                                class="px-4 py-2 rounded-xl text-xs font-black bg-blue-500 hover:bg-blue-400 text-stone-950 transition-colors flex items-center gap-1.5 shadow-sm"
-                            >
-                                <flux:icon name="arrow-down-tray" class="size-3.5" />
-                                <span>Download PDF</span>
-                            </a>
+                        </div>
+                    @else
+                        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                            <div class="p-3 rounded-xl bg-stone-950 border border-stone-800">
+                                <span class="text-stone-500 text-[10px] uppercase font-bold block">Fulfillment Mode</span>
+                                <span class="font-black text-white mt-0.5 block">
+                                    {{ $ticketItem?->isCoverOnly() ? '📦 Cover Only' : '📄 Full Package' }}
+                                </span>
+                            </div>
+
+                            <div class="p-3 rounded-xl bg-stone-950 border border-stone-800">
+                                <span class="text-stone-500 text-[10px] uppercase font-bold block">Binding & Copies</span>
+                                <span class="font-black text-amber-400 mt-0.5 block">
+                                    {{ ucfirst($ticketItem?->binding_type ?? 'Hardbound') }} ({{ $ticketItem?->copies_count ?? 1 }}x)
+                                </span>
+                            </div>
+
+                            <div class="p-3 rounded-xl bg-stone-950 border border-stone-800">
+                                <span class="text-stone-500 text-[10px] uppercase font-bold block">Pages (B/W vs Color)</span>
+                                <span class="font-black text-white mt-0.5 block">
+                                    {{ $ticketItem?->bw_pages_count ?? 0 }} B/W + {{ $ticketItem?->color_pages_count ?? 0 }} Col
+                                </span>
+                            </div>
+
+                            <div class="p-3 rounded-xl bg-stone-950 border border-stone-800">
+                                <span class="text-stone-500 text-[10px] uppercase font-bold block">Calculated Spine</span>
+                                <span class="font-black text-emerald-400 font-mono mt-0.5 block">
+                                    ~{{ $ticketItem?->estimated_spine_thickness_mm ?? '15.0' }} mm
+                                </span>
+                            </div>
+                        </div>
+
+                        <!-- Hot Foil Stamping Specifications Card -->
+                        <div class="p-4 rounded-2xl bg-stone-950 border border-stone-800 space-y-3">
+                            <div class="flex items-center justify-between border-b border-stone-800/80 pb-2">
+                                <h4 class="font-black text-amber-400 text-xs uppercase tracking-wider flex items-center gap-1.5">
+                                    <flux:icon name="sparkles" class="size-3.5 text-amber-400" />
+                                    Hot Foil Stamping & Cover Metadata
+                                </h4>
+                                <div class="flex items-center gap-2">
+                                    <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-stone-800 text-stone-300">
+                                        Cover: {{ $ticketItem?->cover_color ?? 'Maroon' }}
+                                    </span>
+                                    <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-500/20 text-amber-300 border border-amber-500/30">
+                                        Foil: {{ $ticketItem?->foil_color ?? 'Gold' }}
+                                    </span>
+                                </div>
+                            </div>
+
+                            @if (count($customFields) > 0)
+                                <div class="grid grid-cols-1 gap-2.5">
+                                    @foreach ($customFields as $fieldKey => $fieldValue)
+                                        <div class="p-3 rounded-xl bg-stone-900/70 border border-stone-800/80 flex items-start justify-between gap-3">
+                                            <div>
+                                                <span class="text-[10px] uppercase font-bold text-stone-500 block">
+                                                    {{ ucwords(str_replace('_', ' ', $fieldKey)) }}
+                                                </span>
+                                                <p class="font-bold text-white text-xs mt-0.5 select-all">{{ $fieldValue }}</p>
+                                            </div>
+                                            <button 
+                                                onclick="navigator.clipboard.writeText('{{ addslashes($fieldValue) }}')"
+                                                class="p-1.5 rounded-lg text-stone-500 hover:text-amber-400 hover:bg-stone-800 transition-colors"
+                                                title="Copy Text"
+                                            >
+                                                <flux:icon name="clipboard" class="size-3.5" />
+                                            </button>
+                                        </div>
+                                    @endforeach
+                                </div>
+                            @else
+                                <p class="text-stone-500 text-xs italic">No custom foil fields submitted.</p>
+                            @endif
+                        </div>
+                    @endif
+
+                    <!-- Customer Document Print Asset Box -->
+                    @if ($ticketItem?->document_file_path)
+                        <div class="p-4 rounded-2xl bg-gradient-to-r from-blue-950/40 to-indigo-950/30 border border-blue-500/40 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-lg shadow-blue-500/5">
+                            <div class="flex items-center gap-3 min-w-0">
+                                <div class="size-11 rounded-2xl bg-blue-500/20 border border-blue-500/30 flex items-center justify-center shrink-0">
+                                    <flux:icon name="document-text" class="size-6 text-blue-400" />
+                                </div>
+                                <div class="min-w-0">
+                                    <div class="flex items-center gap-2 flex-wrap">
+                                        <p class="font-bold text-white text-xs truncate max-w-[280px] sm:max-w-md select-all">{{ $ticketItem->document_original_name ?? 'Document.pdf' }}</p>
+                                        <span class="px-2 py-0.5 rounded text-[10px] font-black bg-blue-500/20 text-blue-300 border border-blue-500/30 shrink-0">
+                                            Print-Ready File
+                                        </span>
+                                    </div>
+                                    <p class="text-[11px] text-stone-400 mt-0.5">Uploaded by customer for direct rasterization and printing.</p>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-2 w-full sm:w-auto shrink-0">
+                                <a 
+                                    href="{{ Storage::url($ticketItem->document_file_path) }}" 
+                                    target="_blank" 
+                                    download="{{ $ticketItem->document_original_name ?? 'Document.pdf' }}"
+                                    class="flex-1 sm:flex-initial px-4 py-2 rounded-xl text-xs font-black bg-blue-500 hover:bg-blue-400 text-stone-950 transition-colors flex items-center justify-center gap-1.5 shadow-md shadow-blue-500/20 cursor-pointer"
+                                >
+                                    <flux:icon name="arrow-down-tray" class="size-3.5" />
+                                    <span>Download File</span>
+                                </a>
+                                <a 
+                                    href="{{ Storage::url($ticketItem->document_file_path) }}" 
+                                    target="_blank" 
+                                    class="px-3 py-2 rounded-xl text-xs font-bold bg-stone-800 hover:bg-stone-700 text-stone-200 border border-stone-700 transition-colors flex items-center justify-center gap-1 cursor-pointer"
+                                    title="Preview in new tab"
+                                >
+                                    <flux:icon name="arrow-top-right-on-square" class="size-3.5" />
+                                </a>
+                            </div>
+                        </div>
+                    @else
+                        <div class="p-4 rounded-2xl bg-amber-500/10 border border-amber-500/30 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+                            <div class="flex items-center gap-3">
+                                <div class="size-10 rounded-2xl bg-amber-500/20 border border-amber-500/30 flex items-center justify-center shrink-0">
+                                    <flux:icon name="folder" class="size-5 text-amber-400" />
+                                </div>
+                                <div>
+                                    <p class="font-bold text-amber-300 text-xs">Counter File Intake (No Online File Uploaded)</p>
+                                    <p class="text-[11px] text-stone-400 mt-0.5">Customer placed order without file attachment. Collect file via USB Flash Drive, Bluetooth, or Email at the counter.</p>
+                                </div>
+                            </div>
+                            <span class="px-2.5 py-1 rounded-xl text-[10px] font-extrabold bg-amber-500/20 text-amber-400 border border-amber-500/30 shrink-0">
+                                Walk-in Intake
+                            </span>
                         </div>
                     @endif
 
@@ -979,6 +1220,15 @@ new #[Title('Production Operations Hub')] class extends Component {
                     </span>
                     
                     <div class="flex items-center gap-2">
+                        @if (! in_array($ticketOrder->payment_status, [Order::PAYMENT_VERIFIED_PAID, 'paid', 'verified']))
+                            <button 
+                                wire:click="verifyPayment({{ $ticketOrder->id }})"
+                                class="px-4 py-2 rounded-xl text-xs font-black bg-emerald-500 hover:bg-emerald-400 text-stone-950 transition-colors shadow-sm flex items-center gap-1.5 cursor-pointer"
+                            >
+                                <flux:icon name="check" class="size-3.5" />
+                                <span>Verify Payment (₱{{ number_format($ticketOrder->total_amount, 2) }})</span>
+                            </button>
+                        @endif
                         <button 
                             wire:click="$set('showJobTicketModal', false)"
                             class="px-4 py-2 rounded-xl text-xs font-bold bg-stone-800 hover:bg-stone-700 text-stone-300 transition-colors"

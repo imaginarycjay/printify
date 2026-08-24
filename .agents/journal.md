@@ -491,6 +491,113 @@ This file logs all completed tasks, steps, and key state changes. The agent must
 - **Key State Changes:**
   - Updated `app/Models/Order.php` and `resources/views/pages/owner/⚡analytics-hub.blade.php`.
 
+---
+
+## [2026-08-24 20:15:00] End-to-End Document Printing & Ring Binding Service Implementation
+- **Request:** Implement the real-world Philippine document printing service across all 3 actors (Customer, Business Owner, Production Staff). Include smart page counting, duplex sheet calculation, mixed color page parsing, post-press finishing (plastic ring binding with PVC acetate, sliding folders, stapling), automated inventory BOM deduction, and multi-service category filtering in the Staff Hub.
+- **Status:** Success
+- **Steps Taken:**
+  - Created migration `2026_08_24_200000_create_document_printing_configs_table.php` and ran migration.
+  - Created `app/Models/DocumentPrintingConfig.php` model with rate helpers and BOM relations.
+  - Enhanced `app/Models/OrderItem.php` with `isDocumentPrinting()`, `getPrintSides()`, `isDuplex()`, `getPhysicalSheetsCount()`, `getFinishingType()`, and `getFinishingLabel()`.
+  - Created Business Owner Config App [`⚡document-printing.blade.php`](file:///home/imaginarycjay/programming/capstone_system/resources/views/pages/owner/⚡document-printing.blade.php) (`owner.document-printing`) with 4 tabs (Rates, Paper Stock & Duplex, Finishing, BOM Recipes).
+  - Created Customer Ordering Wizard [`⚡document-order-wizard.blade.php`](file:///home/imaginarycjay/programming/capstone_system/resources/views/pages/customer/⚡document-order-wizard.blade.php) (`customer.order-document`) with live price quotation and duplex sheet reduction.
+  - Updated Customer Dashboard [`⚡customer-dashboard.blade.php`](file:///home/imaginarycjay/programming/capstone_system/resources/views/pages/customer/⚡customer-dashboard.blade.php) to activate Document Printing order button.
+  - Updated Owner Dashboard [`⚡owner-dashboard.blade.php`](file:///home/imaginarycjay/programming/capstone_system/resources/views/pages/owner/⚡owner-dashboard.blade.php) with Document Printing launcher tile.
+  - Updated Production Staff Hub [`⚡staff-dashboard.blade.php`](file:///home/imaginarycjay/programming/capstone_system/resources/views/pages/staff/⚡staff-dashboard.blade.php):
+    - Added Service Category pills (`All Services`, `📚 Thesis Binding`, `📄 Document Printing`).
+    - Added Document sub-filters (`All Docs`, `⚡ Rush Only`, `🌀 Ring Bound`, `📁 Folders`, `📎 Stapled`, `📄 Loose Sheets`).
+    - Made Kanban cards and Job Ticket modal adaptive for Document Printing (shows physical sheet feed, original document download, finishing specs).
+  - Enhanced `app/Services/InventoryDeductionService.php` to calculate and deduct exact physical paper sheets (divided by 2 if duplex) and ring binding/acetate BOM items.
+  - Updated `app/Services/SalesAnalyticsService.php` to compute BOM costs for document printing.
+  - Updated Agile docs [`lean-prd.md`](file:///home/imaginarycjay/programming/capstone_system/capstone_paper/agile_development_draft/lean-prd.md) with Module 2.1 specifications.
+  - Created test suite `tests/Feature/DocumentPrintingServiceTest.php` (5 tests).
+- **Verification & Outcome:**
+  - `vendor/bin/pint --format agent`: Passed.
+  - `composer types:check` (PHPStan Level 7): **0 errors**.
+  - `php artisan test --compact`: **85 passed (294 assertions, 0 errors)**.
+- **Key State Changes:**
+  - Created `DocumentPrintingConfig.php`, `2026_08_24_200000_create_document_printing_configs_table.php`, `⚡document-printing.blade.php`, `⚡document-order-wizard.blade.php`, `DocumentPrintingServiceTest.php`.
+  - Updated `OrderItem.php`, `InventoryDeductionService.php`, `SalesAnalyticsService.php`, `⚡staff-dashboard.blade.php`, `⚡customer-dashboard.blade.php`, `⚡owner-dashboard.blade.php`, `routes/web.php`, `lean-prd.md`.
+
+---
+
+## [2026-08-24 20:36:00] Payment Verification Actions & Pickup Auto-Marking
+- **Request:** Explain who verifies orders vs payments in print shop operations, enable 1-click payment verification across Owner Financial Ledger and Staff Job Tickets, and ensure orders marked completed on pickup automatically transition unverified payments to `verified_paid`.
+- **Status:** Success
+- **Steps Taken:**
+  - Updated `app/Models/Order.php` `advanceStage()`: When an order reaches `STAGE_COMPLETED` (customer physical pick-up at counter), any unverified payment is automatically transitioned to `Order::PAYMENT_VERIFIED_PAID`.
+  - Updated `resources/views/pages/owner/⚡analytics-hub.blade.php`:
+    - Added `verifyPayment(int $orderId)` action.
+    - Added 1-click `[ ✓ Verify ]` button in the Financial Transaction Ledger next to any `PENDING VERIFICATION` badge.
+  - Updated `resources/views/pages/staff/⚡staff-dashboard.blade.php`:
+    - Added `verifyPayment(int $orderId)` action.
+    - Added `[ 💵 Verify Payment ]` button in the Job Ticket Modal footer.
+  - Ran linting, static analysis, and feature tests.
+- **Verification & Outcome:**
+  - `vendor/bin/pint --format agent`: Passed.
+  - `composer types:check` (PHPStan Level 7): **0 errors**.
+  - `php artisan test --compact`: **85 passed (294 assertions, 0 errors)**.
+- **Key State Changes:**
+  - Updated `Order.php`, `⚡analytics-hub.blade.php`, and `⚡staff-dashboard.blade.php`.
+
+---
+
+## [2026-08-24 21:40:00] Customer Document File Visibility & Stepper Payment Status UI Fix
+- **Request:** Fix customer file visibility in Staff Job Ticket (staff couldn't see the uploaded file to print), and fix confusing UI where Cash on Counter orders showed "Verified Paid" in Step 2 of the customer progress bar despite having "Payment Pending" on the badge.
+- **Status:** Success
+- **Steps Taken:**
+  - In [`⚡document-order-wizard.blade.php`](file:///home/imaginarycjay/programming/capstone_system/resources/views/pages/customer/⚡document-order-wizard.blade.php):
+    - Added `$uploaded_file_path` and `$uploaded_payment_proof_path` to immediately persist uploaded documents upon file selection, avoiding Livewire temporary upload expiration across wizard steps.
+    - Updated Step 3 confirmation ticket to display real-time Payment Status badge and Production Stage label.
+  - In [`Order.php`](file:///home/imaginarycjay/programming/capstone_system/app/Models/Order.php):
+    - Added `paymentStatusLabel()` method (`Verified Paid`, `Pending Verification`, `Pay at Counter (Unpaid)`, `Payment Rejected`).
+    - Added styling for `Order::PAYMENT_UNPAID` (orange badge).
+  - In [`⚡customer-dashboard.blade.php`](file:///home/imaginarycjay/programming/capstone_system/resources/views/pages/customer/⚡customer-dashboard.blade.php):
+    - Fixed Step 2 in the 5-stage progress bar to dynamically label `Paid & Queued`, `Queued (Counter Pay)`, or `Queued (Reviewing)` instead of hardcoded "Verified Paid".
+    - Fixed "Total Paid" amount header to dynamically read "Total Paid" when verified paid or "Amount Due" when unpaid.
+    - Enhanced official order receipt modal with full support for Document Printing items (paper feed, duplex, finishing).
+  - In [`⚡staff-dashboard.blade.php`](file:///home/imaginarycjay/programming/capstone_system/resources/views/pages/staff/⚡staff-dashboard.blade.php):
+    - Added document file link (PDF badge) and payment status badge (`PAID`, `UNPAID`, `PENDING`) to the top row of every Kanban card.
+    - Added prominent **Customer Document Print Asset Box** in the Job Ticket Modal with direct 1-click **Download File** and **Open in New Tab** buttons, or an informative **Walk-in Counter Intake** banner if no file was uploaded.
+- **Verification & Outcome:**
+  - `vendor/bin/pint --format agent`: Passed.
+  - `composer types:check` (PHPStan Level 7): **0 errors**.
+  - `php artisan test --compact`: **85 passed (294 assertions, 0 errors)**.
+- **Key State Changes:**
+  - Updated `Order.php`, `⚡document-order-wizard.blade.php`, `⚡customer-dashboard.blade.php`, `⚡staff-dashboard.blade.php`.
+
+---
+
+## [2026-08-24 22:11:00] Role-Based Route Protection, Dynamic Analytics Service Catalog & Order Pickup Status Sync
+- **Request:** 
+  1. Sync customer order status & progress stepper to "Completed & Received" when marked received by staff.
+  2. Make the Service switcher on Sales & Financial Analytics Hub dynamic via `PrintServiceCatalog` (including Document Printing and future modules).
+  3. Prevent URL tampering/cross-role route access (e.g. going from owner to staff or customer to owner) with graceful redirection.
+- **Status:** Success
+- **Steps Taken:**
+  - Created [`EnsureUserHasRole.php`](file:///home/imaginarycjay/programming/capstone_system/app/Http/Middleware/EnsureUserHasRole.php) middleware and registered alias `'role'` in [`bootstrap/app.php`](file:///home/imaginarycjay/programming/capstone_system/bootstrap/app.php).
+  - Applied strict single-role middleware across route groups in [`routes/web.php`](file:///home/imaginarycjay/programming/capstone_system/routes/web.php):
+    - `/owner/*` &rarr; `role:business_owner` (Owner strictly only)
+    - `/staff/*` &rarr; `role:production_staff` (Staff strictly only; redirected to `/owner/dashboard` if Owner tries to visit)
+    - `/customer/*` &rarr; `role:customer` (Customer strictly only; redirected to `/owner/dashboard` if Owner tries to visit)
+  - Added `PrintServiceCatalog::customerServices()` helper and updated `SalesAnalyticsService.php` to include `service_breakdown` in `getProductMix()`.
+  - Updated [`⚡analytics-hub.blade.php`](file:///home/imaginarycjay/programming/capstone_system/resources/views/pages/owner/⚡analytics-hub.blade.php) toolbar to dynamically render service filter buttons from active shop catalog services and display the Service Distribution breakdown in Product Mix.
+  - Updated [`Order.php`](file:///home/imaginarycjay/programming/capstone_system/app/Models/Order.php) `stageLabel()` and [`⚡customer-dashboard.blade.php`](file:///home/imaginarycjay/programming/capstone_system/resources/views/pages/customer/⚡customer-dashboard.blade.php) to display "Completed / Received" and "✓ Completed & Received" on Step 5.
+  - Created [`RoleBasedAccessControlTest.php`](file:///home/imaginarycjay/programming/capstone_system/tests/Feature/RoleBasedAccessControlTest.php) with 6 comprehensive test cases covering strict isolation across all 3 actors.
+- **Verification & Outcome:**
+  - `vendor/bin/pint --format agent`: Passed.
+  - `composer types:check` (PHPStan Level 7): **0 errors**.
+  - `php artisan test --compact`: **93 passed (323 assertions, 0 errors)**.
+- **Key State Changes:**
+  - Created `EnsureUserHasRole.php`, `RoleBasedAccessControlTest.php`.
+  - Updated `bootstrap/app.php`, `routes/web.php`, `PrintServiceCatalog.php`, `SalesAnalyticsService.php`, `Order.php`, `⚡analytics-hub.blade.php`, `⚡customer-dashboard.blade.php`.
+
+
+
+
+
+
 
 
 

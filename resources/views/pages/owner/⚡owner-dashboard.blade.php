@@ -210,6 +210,7 @@ new class extends Component {
                         'production_hub' => route('staff.production-hub'),
                         'web_builder' => route('owner.web-builder'),
                         'thesis_binding' => route('owner.thesis-binding'),
+                        'document_printing' => route('owner.document-printing'),
                         default => null,
                     };
                 @endphp

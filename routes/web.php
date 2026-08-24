@@ -9,30 +9,35 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // Smart Single Sign-On (SSO) Role Redirector
     Route::livewire('dashboard', 'pages::⚡dashboard')->name('dashboard');
 
-    // Business Owner Routes
-    Route::prefix('owner')->name('owner.')->group(function () {
+    // Business Owner Routes (Strictly Restricted to Business Owner)
+    Route::prefix('owner')->name('owner.')->middleware('role:business_owner')->group(function () {
         Route::livewire('dashboard', 'pages::owner.⚡owner-dashboard')->name('dashboard');
         Route::livewire('setup', 'pages::owner.⚡owner-wizard')->name('wizard');
         Route::livewire('analytics', 'pages::owner.⚡analytics-hub')->name('analytics-hub');
         Route::livewire('web-builder', 'pages::owner.⚡web-builder')->name('web-builder');
         Route::livewire('inventory', 'pages::owner.⚡inventory-hub')->name('inventory-hub');
         Route::livewire('thesis-binding', 'pages::owner.⚡thesis-binding')->name('thesis-binding');
+        Route::livewire('document-printing', 'pages::owner.⚡document-printing')->name('document-printing');
     });
 
-    // Production Staff Routes
-    Route::prefix('staff')->name('staff.')->group(function () {
+    // Production Staff Routes (Strictly Restricted to Production Staff)
+    Route::prefix('staff')->name('staff.')->middleware('role:production_staff')->group(function () {
         Route::livewire('dashboard', 'pages::staff.⚡staff-dashboard')->name('dashboard');
         Route::livewire('production', 'pages::staff.⚡staff-dashboard')->name('production-hub');
     });
 
-    // Customer Routes
-    Route::prefix('customer')->name('customer.')->group(function () {
+    // Customer Routes (Strictly Restricted to Customer)
+    Route::prefix('customer')->name('customer.')->middleware('role:customer')->group(function () {
         Route::livewire('dashboard', 'pages::customer.⚡customer-dashboard')->name('dashboard');
         Route::livewire('order/thesis-binding', 'pages::customer.⚡thesis-order-wizard')->name('order-thesis');
+        Route::livewire('order/document-printing', 'pages::customer.⚡document-order-wizard')->name('order-document');
     });
 
-    // Backward-compatible direct order alias
-    Route::livewire('order/thesis-binding', 'pages::customer.⚡thesis-order-wizard')->name('order.thesis-binding');
+    // Backward-compatible direct order aliases (Strictly Customer)
+    Route::middleware('role:customer')->group(function () {
+        Route::livewire('order/thesis-binding', 'pages::customer.⚡thesis-order-wizard')->name('order.thesis-binding');
+        Route::livewire('order/document-printing', 'pages::customer.⚡document-order-wizard')->name('order.document-printing');
+    });
 });
 
 if (app()->isLocal()) {

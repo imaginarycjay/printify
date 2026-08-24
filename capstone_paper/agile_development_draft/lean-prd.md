@@ -87,6 +87,21 @@ graph TD
 - **Dynamic Metadata Form Input:** Customer fills out the custom fields defined by the shop admin for foil stamping and book spine layout.
 - **Estimated Completion Date & Capacity Slot Reservation:** System provides a guaranteed completion date based on current daily quota availability and selected lead time.
 
+### Module 2.1: High-Speed Document Printing & Ring Binding Service
+- **Smart File Intake & Page Detection:** Supports multi-format customer document uploads (PDF, DOCX) with automated page counting and custom page-range selection (e.g. `1, 3, 5-10` for mixed color prints).
+- **Print Layout & Duplex Optimization:**
+  - *Simplex (Single-Sided):* 1 page printed per physical paper sheet.
+  - *Duplex (Back-to-Back):* 2 pages printed per sheet, reducing paper consumption by $50\%$ with shop-configurable percentage discount:
+    $$\text{Physical Paper Sheets Consumed} = \left\lceil \frac{\text{Total Pages}}{2} \right\rceil \times \text{Copies}$$
+- **Paper Size & Paper Weight Surcharges:** Configurable base page rates for Short (Letter 8.5x11"), A4, and Long (Legal 8.5x13") across Standard 70gsm, Premium 80gsm, and Heavy 100gsm.
+- **Value-Added Post-Press Finishing Services:**
+  - *Loose Sheets / No Binding (Free)*
+  - *Corner Stapling (+₱2.00)*
+  - *Sliding Folder & Fastener (+₱15.00)*
+  - *Plastic Ring / Coil Binding (+₱45.00) (Includes Clear PVC Acetate Front Cover + Morocco / Linen Back Board)*
+  - *Booklet Staple & Fold (+₱20.00)*
+- **Automated Bill of Materials (BOM) Recipe Integration:** Real-time deduction of specific paper reams/sheets, plastic ring spines, and acetate sheets from Central Inventory upon staff queue progression.
+
 ### Module 3: Manual Payment Verification & Workflow Dispatcher
 - **Domestic Payment Method Support:** Displays the shop's official payment channels (e.g., GCash QR code, GCash Account Name/Number, Maya, or In-Store Cash Deposit instructions).
 - **Receipt Proof Submission:** Customer uploads a digital screenshot/photo of their payment transaction and inputs the reference number.

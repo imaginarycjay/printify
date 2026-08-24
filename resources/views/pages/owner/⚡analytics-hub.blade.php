@@ -52,6 +52,27 @@ new #[Title('Sales & Financial Analytics Hub')] class extends Component {
             'Content-Disposition' => 'attachment; filename="' . $filename . '"',
         ]);
     }
+
+    /**
+     * Verify payment for an order and instantly reflect in metrics.
+     */
+    public function verifyPayment(int $orderId): void
+    {
+        $order = Order::find($orderId);
+        if ($order) {
+            $order->update([
+                'payment_status' => Order::PAYMENT_VERIFIED_PAID,
+                'payment_verified_at' => now(),
+                'payment_verified_by' => auth()->id(),
+            ]);
+
+            \Flux\Flux::toast(
+                text: "Payment of ₱" . number_format($order->total_amount, 2) . " for Order {$order->order_number} verified and confirmed.",
+                heading: 'Payment Confirmed',
+                variant: 'success'
+            );
+        }
+    }
 }; ?>
 
 <div class="min-h-screen w-full bg-stone-950 text-stone-100 font-sans antialiased flex flex-col justify-between relative selection:bg-amber-500 selection:text-white">
@@ -219,12 +240,26 @@ new #[Title('Sales & Financial Analytics Hub')] class extends Component {
                 >
                     All Services
                 </button>
-                <button 
-                    wire:click="$set('selected_service', 'thesis_binding')"
-                    class="px-3 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition-all {{ $selected_service === 'thesis_binding' ? 'bg-amber-500/20 text-amber-300 border border-amber-500/40 font-black' : 'bg-stone-950 text-stone-400 hover:text-white border border-stone-800' }}"
-                >
-                    📚 Thesis Binding
-                </button>
+
+                @php
+                    $catalogServices = \App\Services\PrintServiceCatalog::customerServices();
+                @endphp
+                @foreach ($catalogServices as $sKey => $sConfig)
+                    @if (! $shop || $shop->hasService($sKey))
+                        <button 
+                            wire:click="$set('selected_service', '{{ $sKey }}')"
+                            class="px-3 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition-all {{ $selected_service === $sKey ? 'bg-amber-500/20 text-amber-300 border border-amber-500/40 font-black' : 'bg-stone-950 text-stone-400 hover:text-white border border-stone-800' }}"
+                        >
+                            @if ($sKey === 'thesis_binding')
+                                📚 Thesis Binding
+                            @elseif ($sKey === 'document_printing')
+                                📄 Document Printing
+                            @else
+                                {{ $sConfig['name'] }}
+                            @endif
+                        </button>
+                    @endif
+                @endforeach
 
                 <div class="h-5 w-px bg-stone-800 mx-1 hidden sm:block"></div>
 
@@ -479,6 +514,26 @@ new #[Title('Sales & Financial Analytics Hub')] class extends Component {
                             <p class="text-stone-500 text-xs italic">No color orders logged yet</p>
                         @endforelse
                     </div>
+
+                    <!-- Service Distribution Breakdown -->
+                    @if (! empty($productMix['service_breakdown']) && count($productMix['service_breakdown']) > 1)
+                        <div class="pt-3 border-t border-stone-800/80 space-y-2">
+                            <span class="text-[11px] font-bold uppercase tracking-wider text-stone-400 block">
+                                Service Distribution
+                            </span>
+                            @foreach ($productMix['service_breakdown'] as $srv)
+                                <div class="flex items-center justify-between py-1 border-b border-stone-800/50">
+                                    <span class="font-bold text-stone-200">{{ $srv['name'] }}</span>
+                                    <div class="flex items-center gap-2">
+                                        <span class="text-stone-400 font-mono text-[11px]">{{ $srv['count'] }} orders</span>
+                                        <span class="px-1.5 py-0.2 rounded text-[9px] font-black bg-stone-800 text-blue-400">
+                                            {{ $srv['percentage'] }}%
+                                        </span>
+                                    </div>
+                                </div>
+                            @endforeach
+                        </div>
+                    @endif
                 </div>
             </div>
         </div>
@@ -556,9 +611,20 @@ new #[Title('Sales & Financial Analytics Hub')] class extends Component {
                                     <span class="text-[10px] text-stone-500 block">{{ $item?->total_pages_count ?? 0 }} pages</span>
                                 </td>
                                 <td class="p-3.5">
-                                    <span class="px-2 py-0.5 rounded-full text-[10px] font-black {{ in_array($order->payment_status, [Order::PAYMENT_VERIFIED_PAID, 'paid', 'verified']) ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30' : 'bg-amber-500/20 text-amber-400 border border-amber-500/30' }}">
-                                        {{ strtoupper(str_replace('_', ' ', $order->payment_status)) }}
-                                    </span>
+                                    <div class="flex items-center gap-2 flex-wrap">
+                                        <span class="px-2 py-0.5 rounded-full text-[10px] font-black {{ in_array($order->payment_status, [Order::PAYMENT_VERIFIED_PAID, 'paid', 'verified']) ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30' : 'bg-amber-500/20 text-amber-400 border border-amber-500/30' }}">
+                                            {{ strtoupper(str_replace('_', ' ', $order->payment_status)) }}
+                                        </span>
+                                        @if (! in_array($order->payment_status, [Order::PAYMENT_VERIFIED_PAID, 'paid', 'verified', Order::PAYMENT_REJECTED]))
+                                            <button 
+                                                wire:click="verifyPayment({{ $order->id }})"
+                                                class="px-2 py-0.5 rounded-md text-[10px] font-black bg-emerald-500 hover:bg-emerald-400 text-stone-950 transition-colors shadow-sm cursor-pointer"
+                                                title="Confirm & Verify Payment"
+                                            >
+                                                ✓ Verify
+                                            </button>
+                                        @endif
+                                    </div>
                                 </td>
                                 <td class="p-3.5 text-right font-mono font-black text-emerald-400 text-sm">
                                     ₱{{ number_format($order->total_amount, 2) }}

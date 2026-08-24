@@ -231,6 +231,13 @@ class Order extends Model
             case self::STAGE_READY_FOR_PICKUP:
                 $this->production_stage = self::STAGE_COMPLETED;
                 $this->order_status = self::STATUS_COMPLETED;
+                if ($this->payment_status !== self::PAYMENT_VERIFIED_PAID && $this->payment_status !== self::PAYMENT_REJECTED) {
+                    $this->payment_status = self::PAYMENT_VERIFIED_PAID;
+                    $this->payment_verified_at = now();
+                    if ($staffId) {
+                        $this->payment_verified_by = $staffId;
+                    }
+                }
                 break;
         }
 
@@ -288,7 +295,7 @@ class Order extends Model
             self::STAGE_BINDING => 'Cover Assembly & Stamping',
             self::STAGE_QUALITY_CHECK => 'Quality Inspection (QC)',
             self::STAGE_READY_FOR_PICKUP => 'Ready for Pickup',
-            self::STAGE_COMPLETED => 'Order Completed',
+            self::STAGE_COMPLETED => 'Order Completed & Received',
             default => 'Queued for Production',
         };
     }
@@ -337,6 +344,20 @@ class Order extends Model
     }
 
     /**
+     * Human-readable label for payment status.
+     */
+    public function paymentStatusLabel(): string
+    {
+        return match ($this->payment_status) {
+            self::PAYMENT_VERIFIED_PAID => 'Verified Paid',
+            self::PAYMENT_PENDING_VERIFICATION => 'Pending Verification',
+            self::PAYMENT_UNPAID => 'Pay at Counter (Unpaid)',
+            self::PAYMENT_REJECTED => 'Payment Rejected',
+            default => ucfirst(str_replace('_', ' ', $this->payment_status)),
+        };
+    }
+
+    /**
      * Get user-friendly payment status badge styling classes.
      */
     public function paymentStatusBadgeColor(): string
@@ -344,6 +365,7 @@ class Order extends Model
         return match ($this->payment_status) {
             self::PAYMENT_VERIFIED_PAID => 'bg-emerald-500/15 text-emerald-400 border-emerald-500/30',
             self::PAYMENT_PENDING_VERIFICATION => 'bg-amber-500/15 text-amber-400 border-amber-500/30',
+            self::PAYMENT_UNPAID => 'bg-orange-500/15 text-orange-400 border-orange-500/30',
             self::PAYMENT_REJECTED => 'bg-red-500/15 text-red-400 border-red-500/30',
             default => 'bg-stone-500/15 text-stone-400 border-stone-500/30',
         };

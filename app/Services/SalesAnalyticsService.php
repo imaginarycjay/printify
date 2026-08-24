@@ -137,16 +137,18 @@ class SalesAnalyticsService
     }
 
     /**
-     * Compute product and fulfillment mix breakdown (Hardbound vs Softbound, Full Package vs Cover Only).
+     * Compute product and fulfillment mix breakdown (Hardbound vs Softbound vs Ring Bound, Service Distribution).
      *
      * @return array{
      *     full_package_count: int,
      *     cover_only_count: int,
      *     hardbound_count: int,
      *     softbound_count: int,
+     *     ring_bind_count: int,
      *     rush_count: int,
      *     regular_count: int,
-     *     top_colors: array<int, array{color: string, count: int, percentage: float}>
+     *     top_colors: array<int, array{color: string, count: int, percentage: float}>,
+     *     service_breakdown: array<int, array{service_key: string, name: string, count: int, percentage: float}>
      * }
      */
     public function getProductMix(PrintShop $shop, string $period = 'all'): array
@@ -158,12 +160,14 @@ class SalesAnalyticsService
         /** @var Collection<int, OrderItem> $items */
         $items = $orders->flatMap(fn (Order $o) => $o->items);
         $totalItems = max(1, $items->count());
+        $totalOrders = max(1, $orders->count());
 
         $fullPackageCount = $items->filter(fn (OrderItem $i): bool => $i->fulfillment_type === OrderItem::FULFILLMENT_FULL_PACKAGE)->count();
         $coverOnlyCount = $items->filter(fn (OrderItem $i): bool => $i->fulfillment_type === OrderItem::FULFILLMENT_COVER_ONLY)->count();
 
         $hardboundCount = $items->filter(fn (OrderItem $i): bool => $i->binding_type === 'hardbound')->count();
         $softboundCount = $items->filter(fn (OrderItem $i): bool => $i->binding_type === 'softbound')->count();
+        $ringBindCount = $items->filter(fn (OrderItem $i): bool => $i->binding_type === 'ring_bind' || $i->getFinishingType() === 'ring_bind')->count();
 
         $rushCount = $orders->where('is_rush', true)->count();
         $regularCount = $orders->where('is_rush', false)->count();
@@ -181,14 +185,28 @@ class SalesAnalyticsService
             ->take(5)
             ->all();
 
+        // Service Distribution
+        $serviceBreakdown = $orders->groupBy('service_key')
+            ->map(fn (Collection $group, string|int $key): array => [
+                'service_key' => (string) $key,
+                'name' => PrintServiceCatalog::find((string) $key)['name'] ?? ucwords(str_replace('_', ' ', (string) $key)),
+                'count' => $group->count(),
+                'percentage' => round(($group->count() / $totalOrders) * 100, 1),
+            ])
+            ->sortByDesc('count')
+            ->values()
+            ->all();
+
         return [
             'full_package_count' => $fullPackageCount,
             'cover_only_count' => $coverOnlyCount,
             'hardbound_count' => $hardboundCount,
             'softbound_count' => $softboundCount,
+            'ring_bind_count' => $ringBindCount,
             'rush_count' => $rushCount,
             'regular_count' => $regularCount,
             'top_colors' => $colorGroups,
+            'service_breakdown' => $serviceBreakdown,
         ];
     }
 
@@ -300,20 +318,31 @@ class SalesAnalyticsService
                 $copies = max(1, $orderItem->copies_count);
                 $isCoverOnly = $orderItem->isCoverOnly();
 
-                // Paper cost (0 if Cover-Only)
-                if (! $isCoverOnly) {
-                    $pages = (int) $orderItem->total_pages_count;
-                    $totalCost += ($pages * $paperUnitCost * $copies);
-                }
+                if ($order->service_key === 'document_printing' || $orderItem->isDocumentPrinting()) {
+                    $sheets = $orderItem->getPhysicalSheetsCount();
+                    $totalCost += ($sheets * $paperUnitCost);
 
-                // Hardbound board & leatherette
-                if ($orderItem->binding_type === 'hardbound') {
-                    $totalCost += ($boardUnitCost * $copies);
-                    $totalCost += ($leatherUnitCost * $copies);
-                    $totalCost += ($foilUnitCost * $copies);
+                    if ($orderItem->getFinishingType() === 'ring_bind') {
+                        $totalCost += (15.00 * $copies); // Ring spine + 2x acetate + back board
+                    } elseif ($orderItem->getFinishingType() === 'folder') {
+                        $totalCost += (8.00 * $copies);
+                    }
                 } else {
-                    // Softbound thermal cover
-                    $totalCost += (15.00 * $copies);
+                    // Paper cost (0 if Cover-Only)
+                    if (! $isCoverOnly) {
+                        $pages = (int) $orderItem->total_pages_count;
+                        $totalCost += ($pages * $paperUnitCost * $copies);
+                    }
+
+                    // Hardbound board & leatherette
+                    if ($orderItem->binding_type === 'hardbound') {
+                        $totalCost += ($boardUnitCost * $copies);
+                        $totalCost += ($leatherUnitCost * $copies);
+                        $totalCost += ($foilUnitCost * $copies);
+                    } else {
+                        // Softbound thermal cover
+                        $totalCost += (15.00 * $copies);
+                    }
                 }
             }
         }

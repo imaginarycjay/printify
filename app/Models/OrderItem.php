@@ -94,6 +94,75 @@ class OrderItem extends Model
     }
 
     /**
+     * Check if this item belongs to document printing service.
+     */
+    public function isDocumentPrinting(): bool
+    {
+        return ($this->order && $this->order->service_key === 'document_printing') ||
+            (isset($this->custom_fields_data['service_key']) && $this->custom_fields_data['service_key'] === 'document_printing') ||
+            isset($this->custom_fields_data['print_sides']) ||
+            isset($this->custom_fields_data['finishing_type']);
+    }
+
+    /**
+     * Get print sides (simplex vs duplex).
+     */
+    public function getPrintSides(): string
+    {
+        return (string) ($this->custom_fields_data['print_sides'] ?? 'simplex');
+    }
+
+    /**
+     * Check if duplex (back-to-back).
+     */
+    public function isDuplex(): bool
+    {
+        return $this->getPrintSides() === 'duplex';
+    }
+
+    /**
+     * Get the number of physical paper sheets required.
+     * If duplex, sheets = ceil(total_pages / 2) * copies.
+     */
+    public function getPhysicalSheetsCount(): int
+    {
+        $totalPages = max(1, (int) $this->total_pages_count);
+        $copies = max(1, (int) $this->copies_count);
+
+        if ($this->isCoverOnly()) {
+            return 0;
+        }
+
+        if ($this->isDuplex()) {
+            return (int) ceil($totalPages / 2) * $copies;
+        }
+
+        return $totalPages * $copies;
+    }
+
+    /**
+     * Get finishing type (loose, staple, folder, ring_bind, booklet).
+     */
+    public function getFinishingType(): string
+    {
+        return (string) ($this->custom_fields_data['finishing_type'] ?? 'loose');
+    }
+
+    /**
+     * Get human-readable finishing label.
+     */
+    public function getFinishingLabel(): string
+    {
+        return match ($this->getFinishingType()) {
+            'staple' => '📎 Corner Staple',
+            'folder' => '📁 Sliding Folder & Fastener',
+            'ring_bind' => '🌀 Plastic Ring Binding',
+            'booklet' => '📘 Booklet Staple & Fold',
+            default => '📄 Loose Sheets (No Binding)',
+        };
+    }
+
+    /**
      * Parent order.
      *
      * @return BelongsTo<Order, $this>

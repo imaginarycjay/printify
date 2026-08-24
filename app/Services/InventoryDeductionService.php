@@ -2,8 +2,10 @@
 
 namespace App\Services;
 
+use App\Models\DocumentPrintingConfig;
 use App\Models\InventoryItem;
 use App\Models\Order;
+use App\Models\OrderItem;
 use App\Models\StockMovement;
 use App\Models\ThesisBindingBomItem;
 use App\Models\ThesisBindingConfig;
@@ -26,79 +28,11 @@ class InventoryDeductionService
             return $deductions;
         }
 
-        $config = ThesisBindingConfig::where('print_shop_id', $shop->id)->first();
-        if ($config && ! $config->auto_deduct_inventory) {
-            return $deductions;
-        }
-
-        DB::transaction(function () use ($order, $config, $staff, &$deductions) {
-            foreach ($order->items as $orderItem) {
-                $isCoverOnly = $orderItem->isCoverOnly();
-                $copies = max(1, $orderItem->copies_count);
-                $totalPages = $orderItem->total_pages_count ?? 0;
-
-                // 1. Fetch explicit BOM recipe items if configured
-                $bomItems = $config
-                    ? ThesisBindingBomItem::where('thesis_binding_config_id', $config->id)
-                        ->where(function ($q) use ($orderItem) {
-                            $q->where('binding_type', $orderItem->binding_type)
-                                ->orWhere('binding_type', 'both');
-                        })
-                        ->with('inventoryItem')
-                        ->get()
-                    : collect();
-
-                if ($bomItems->isNotEmpty()) {
-                    foreach ($bomItems as $bomItem) {
-                        $inventoryItem = $bomItem->inventoryItem;
-                        if (! $inventoryItem) {
-                            continue;
-                        }
-
-                        $isPaper = $this->isPaperItem($inventoryItem);
-
-                        // If Cover-Only ("Dala ang Papel"), skip paper sheet consumption
-                        if ($isCoverOnly && $isPaper) {
-                            continue;
-                        }
-
-                        // Determine usage quantity
-                        if ($isPaper) {
-                            $consumedQty = $totalPages * $copies;
-                        } else {
-                            $consumedQty = $bomItem->usage_qty * $copies;
-                        }
-
-                        if ($consumedQty <= 0) {
-                            continue;
-                        }
-
-                        $prevStock = (float) $inventoryItem->stock_qty;
-                        $newStock = max(0, $prevStock - $consumedQty);
-
-                        $inventoryItem->update(['stock_qty' => $newStock]);
-
-                        StockMovement::create([
-                            'inventory_item_id' => $inventoryItem->id,
-                            'movement_type' => StockMovement::TYPE_PRODUCTION_DEDUCTION,
-                            'quantity' => -$consumedQty,
-                            'previous_stock' => $prevStock,
-                            'resulting_stock' => $newStock,
-                            'reference_note' => "Order {$order->order_number} ({$orderItem->binding_type} ".($isCoverOnly ? 'Cover Only' : 'Full Package').')',
-                            'logged_by' => $staff?->id,
-                        ]);
-
-                        $deductions[] = [
-                            'item_name' => $inventoryItem->name,
-                            'quantity_deducted' => $consumedQty,
-                            'unit' => $inventoryItem->unit,
-                            'remaining_stock' => $newStock,
-                        ];
-                    }
-                } else {
-                    // Fallback: Smart deduction from shop inventory matching keywords
-                    $this->fallbackDeduction($order, $orderItem, $staff, $deductions);
-                }
+        DB::transaction(function () use ($order, $staff, &$deductions) {
+            if ($order->service_key === 'document_printing') {
+                $this->deductForDocumentPrinting($order, $staff, $deductions);
+            } else {
+                $this->deductForThesisBinding($order, $staff, $deductions);
             }
         });
 
@@ -106,125 +40,278 @@ class InventoryDeductionService
     }
 
     /**
+     * Handles BOM deduction for Document Printing orders.
+     *
+     * @param  array<int, array{item_name: string, quantity_deducted: float, unit: string, remaining_stock: float}>  $deductions
+     */
+    protected function deductForDocumentPrinting(Order $order, ?User $staff, array &$deductions): void
+    {
+        $shop = $order->printShop;
+        if (! $shop) {
+            return;
+        }
+
+        $config = DocumentPrintingConfig::where('print_shop_id', $shop->id)->first();
+        if ($config && ! $config->auto_deduct_inventory) {
+            return;
+        }
+
+        foreach ($order->items as $orderItem) {
+            $copies = max(1, $orderItem->copies_count);
+            $physicalSheets = $orderItem->getPhysicalSheetsCount();
+            $paperSize = strtolower($orderItem->paper_size);
+
+            // 1. Deduct Paper Stock
+            $paperItem = null;
+            if ($config) {
+                if (str_contains($paperSize, 'a4') && $config->bom_a4_paper_item_id) {
+                    $paperItem = $config->a4PaperItem;
+                } elseif ((str_contains($paperSize, 'long') || str_contains($paperSize, 'legal')) && $config->bom_long_paper_item_id) {
+                    $paperItem = $config->longPaperItem;
+                } elseif ($config->bom_short_paper_item_id) {
+                    $paperItem = $config->shortPaperItem;
+                }
+            }
+
+            // Fallback paper item lookup
+            if (! $paperItem) {
+                $paperItem = $shop->inventoryItems()
+                    ->where(function ($q) use ($paperSize) {
+                        if (str_contains($paperSize, 'a4')) {
+                            $q->where('name', 'like', '%A4%');
+                        } elseif (str_contains($paperSize, 'long') || str_contains($paperSize, 'legal')) {
+                            $q->where('name', 'like', '%Long%');
+                        } else {
+                            $q->where('name', 'like', '%Short%')->orWhere('name', 'like', '%Letter%');
+                        }
+                    })
+                    ->first();
+            }
+
+            if ($paperItem && $physicalSheets > 0) {
+                $deductions[] = $this->applyDeduction($paperItem, (float) $physicalSheets, "Order {$order->order_number} (Doc Print {$orderItem->paper_size} {$orderItem->getPrintSides()})", $staff);
+            }
+
+            // 2. Deduct Finishing Items (Ring Binding, Folders, Acetate)
+            $finishing = $orderItem->getFinishingType();
+            if ($finishing === 'ring_bind') {
+                // Ring Spine
+                $ringItem = ($config && $config->bom_ring_spine_item_id) ? $config->ringSpineItem : null;
+                if (! $ringItem) {
+                    $ringItem = $shop->inventoryItems()->where('name', 'like', '%Ring%')->orWhere('name', 'like', '%Comb%')->first();
+                }
+                if ($ringItem) {
+                    $deductions[] = $this->applyDeduction($ringItem, (float) $copies, "Order {$order->order_number} (Plastic Ring Comb)", $staff);
+                }
+
+                // PVC Acetate Covers (2 per copy: front and back)
+                $acetateItem = ($config && $config->bom_pvc_acetate_item_id) ? $config->pvcAcetateItem : null;
+                if (! $acetateItem) {
+                    $acetateItem = $shop->inventoryItems()->where('name', 'like', '%Acetate%')->orWhere('name', 'like', '%PVC%')->first();
+                }
+                if ($acetateItem) {
+                    $deductions[] = $this->applyDeduction($acetateItem, (float) ($copies * 2), "Order {$order->order_number} (Clear PVC Acetate Covers)", $staff);
+                }
+
+                // Back Cover Board
+                $boardItem = ($config && $config->bom_back_cover_item_id) ? $config->backCoverItem : null;
+                if (! $boardItem) {
+                    $boardItem = $shop->inventoryItems()->where('name', 'like', '%Morocco%')->orWhere('name', 'like', '%Board%')->first();
+                }
+                if ($boardItem) {
+                    $deductions[] = $this->applyDeduction($boardItem, (float) $copies, "Order {$order->order_number} (Morocco Back Board)", $staff);
+                }
+            } elseif ($finishing === 'folder') {
+                $folderItem = $shop->inventoryItems()->where('name', 'like', '%Folder%')->first();
+                if ($folderItem) {
+                    $deductions[] = $this->applyDeduction($folderItem, (float) $copies, "Order {$order->order_number} (Sliding Folder)", $staff);
+                }
+            }
+        }
+    }
+
+    /**
+     * Handles BOM deduction for Thesis Binding orders.
+     *
+     * @param  array<int, array{item_name: string, quantity_deducted: float, unit: string, remaining_stock: float}>  $deductions
+     */
+    protected function deductForThesisBinding(Order $order, ?User $staff, array &$deductions): void
+    {
+        $shop = $order->printShop;
+        if (! $shop) {
+            return;
+        }
+
+        $config = ThesisBindingConfig::where('print_shop_id', $shop->id)->first();
+        if ($config && ! $config->auto_deduct_inventory) {
+            return;
+        }
+
+        foreach ($order->items as $orderItem) {
+            $isCoverOnly = $orderItem->isCoverOnly();
+            $copies = max(1, $orderItem->copies_count);
+            $totalPages = $orderItem->total_pages_count ?? 0;
+
+            // 1. Fetch explicit BOM recipe items if configured
+            $bomItems = $config
+                ? ThesisBindingBomItem::where('thesis_binding_config_id', $config->id)
+                    ->where(function ($q) use ($orderItem) {
+                        $q->where('binding_type', $orderItem->binding_type)
+                            ->orWhere('binding_type', 'both');
+                    })
+                    ->with('inventoryItem')
+                    ->get()
+                : collect();
+
+            if ($bomItems->isNotEmpty()) {
+                foreach ($bomItems as $bomItem) {
+                    $inventoryItem = $bomItem->inventoryItem;
+                    if (! $inventoryItem) {
+                        continue;
+                    }
+
+                    $isPaper = $this->isPaperItem($inventoryItem);
+
+                    // If Cover-Only ("Dala ang Papel"), skip paper sheet consumption
+                    if ($isCoverOnly && $isPaper) {
+                        continue;
+                    }
+
+                    // Determine usage quantity
+                    if ($isPaper) {
+                        $consumedQty = $totalPages * $copies;
+                    } else {
+                        $consumedQty = $bomItem->usage_qty * $copies;
+                    }
+
+                    if ($consumedQty <= 0) {
+                        continue;
+                    }
+
+                    $deductions[] = $this->applyDeduction($inventoryItem, (float) $consumedQty, "Order {$order->order_number} ({$orderItem->binding_type} ".($isCoverOnly ? 'Cover Only' : 'Full Package').')', $staff);
+                }
+            } else {
+                // Fallback: Smart deduction from shop inventory matching keywords
+                $this->fallbackDeduction($order, $orderItem, $staff, $deductions);
+            }
+        }
+    }
+
+    /**
      * Fallback smart deduction when specific BOM recipes have not been explicitly linked.
      *
      * @param  array<int, array{item_name: string, quantity_deducted: float, unit: string, remaining_stock: float}>  $deductions
      */
-    protected function fallbackDeduction(Order $order, mixed $orderItem, ?User $staff, array &$deductions): void
+    protected function fallbackDeduction(Order $order, OrderItem $orderItem, ?User $staff, array &$deductions): void
     {
-        $shopId = $order->print_shop_id;
+        $shop = $order->printShop;
+        if (! $shop) {
+            return;
+        }
+
         $copies = max(1, $orderItem->copies_count);
         $isCoverOnly = $orderItem->isCoverOnly();
+        $totalPages = $orderItem->total_pages_count ?? 0;
 
-        // 1. Paper deduction (Only for full package)
-        if (! $isCoverOnly && ($orderItem->total_pages_count > 0)) {
-            $paper = InventoryItem::where('print_shop_id', $shopId)
-                ->where(function ($q) {
-                    $q->where('category', 'Paper')
-                        ->orWhere('name', 'like', '%Paper%')
-                        ->orWhere('name', 'like', '%80gsm%')
-                        ->orWhere('name', 'like', '%70gsm%');
-                })->first();
-
-            if ($paper) {
-                $qty = $orderItem->total_pages_count * $copies;
-                $this->applyDeduction($paper, $qty, "Order {$order->order_number} Page Printing", $order, $staff, $deductions);
+        // 1. Bond Paper (Deduct 0 if Cover Only)
+        if (! $isCoverOnly && $totalPages > 0) {
+            $paperItem = $shop->inventoryItems()->where('name', 'like', '%Bond Paper%')->orWhere('name', 'like', '%Paper%')->first();
+            if ($paperItem) {
+                $paperQty = (float) ($totalPages * $copies);
+                $deductions[] = $this->applyDeduction($paperItem, $paperQty, "Order {$order->order_number} (Manuscript Pages)", $staff);
             }
         }
 
-        // 2. Chipboard deduction (For hardbound)
+        // 2. Hardbound Materials (Chipboard, Leatherette, Gold Foil)
         if ($orderItem->binding_type === 'hardbound') {
-            $chipboard = InventoryItem::where('print_shop_id', $shopId)
-                ->where(function ($q) {
-                    $q->where('name', 'like', '%Chipboard%')
-                        ->orWhere('name', 'like', '%Board%')
-                        ->orWhere('category', 'Raw Material');
-                })->first();
-
-            if ($chipboard) {
-                $this->applyDeduction($chipboard, 1.0 * $copies, "Order {$order->order_number} Hardbound Case", $order, $staff, $deductions);
+            $boardItem = $shop->inventoryItems()->where('name', 'like', '%Chipboard%')->orWhere('name', 'like', '%Board%')->first();
+            if ($boardItem) {
+                $deductions[] = $this->applyDeduction($boardItem, (float) $copies, "Order {$order->order_number} (Hardbound Chipboard)", $staff);
             }
-        }
 
-        // 3. Leatherette cover deduction
-        if ($orderItem->binding_type === 'hardbound') {
-            $leatherette = InventoryItem::where('print_shop_id', $shopId)
-                ->where(function ($q) use ($orderItem) {
-                    $q->where('name', 'like', '%Leatherette%')
-                        ->orWhere('name', 'like', '%'.($orderItem->cover_color ?? '').'%');
-                })->first();
+            $leatherItem = $shop->inventoryItems()->where('name', 'like', '%Leatherette%')->orWhere('name', 'like', '%Leather%')->first();
+            if ($leatherItem) {
+                $deductions[] = $this->applyDeduction($leatherItem, (float) $copies, "Order {$order->order_number} (Leatherette Cover)", $staff);
+            }
 
-            if ($leatherette) {
-                $this->applyDeduction($leatherette, 1.0 * $copies, "Order {$order->order_number} Cover Wrapping", $order, $staff, $deductions);
+            $foilItem = $shop->inventoryItems()->where('name', 'like', '%Foil%')->first();
+            if ($foilItem) {
+                $deductions[] = $this->applyDeduction($foilItem, (float) $copies, "Order {$order->order_number} (Foil Stamping)", $staff);
             }
         }
     }
 
     /**
-     * Helper to apply single inventory deduction and record stock movement.
+     * Apply stock deduction and log StockMovement.
      *
-     * @param  array<int, array{item_name: string, quantity_deducted: float, unit: string, remaining_stock: float}>  $deductions
-     *
-     * @param-out  array<int, array{item_name: string, quantity_deducted: float, unit: string, remaining_stock: float}>  $deductions
+     * @return array{item_name: string, quantity_deducted: float, unit: string, remaining_stock: float}
      */
-    protected function applyDeduction(InventoryItem $item, float $qty, string $note, Order $order, ?User $staff, array &$deductions): void
-    {
-        $prev = (float) $item->stock_qty;
-        $new = (float) max(0, $prev - $qty);
+    protected function applyDeduction(
+        InventoryItem $inventoryItem,
+        float $consumedQty,
+        string $referenceNote,
+        ?User $staff
+    ): array {
+        $prevStock = (float) $inventoryItem->stock_qty;
+        $newStock = (float) max(0, $prevStock - $consumedQty);
 
-        $item->update(['stock_qty' => $new]);
+        $inventoryItem->update(['stock_qty' => $newStock]);
 
         StockMovement::create([
-            'inventory_item_id' => $item->id,
+            'inventory_item_id' => $inventoryItem->id,
             'movement_type' => StockMovement::TYPE_PRODUCTION_DEDUCTION,
-            'quantity' => -$qty,
-            'previous_stock' => $prev,
-            'resulting_stock' => $new,
-            'reference_note' => $note,
+            'quantity' => -$consumedQty,
+            'previous_stock' => $prevStock,
+            'resulting_stock' => $newStock,
+            'reference_note' => $referenceNote,
             'logged_by' => $staff?->id,
         ]);
 
-        $deductions[] = [
-            'item_name' => $item->name,
-            'quantity_deducted' => $qty,
-            'unit' => $item->unit,
-            'remaining_stock' => $new,
+        return [
+            'item_name' => $inventoryItem->name,
+            'quantity_deducted' => $consumedQty,
+            'unit' => $inventoryItem->unit,
+            'remaining_stock' => $newStock,
         ];
     }
 
     /**
-     * Records material wastage/spoilage reported by production staff.
+     * Check if an inventory item represents paper stock.
      */
-    public function recordSpoilage(InventoryItem $item, float $qty, string $reason, ?User $staff = null): StockMovement
+    protected function isPaperItem(InventoryItem $item): bool
     {
-        $prev = (float) $item->stock_qty;
-        $new = max(0, $prev - $qty);
+        $name = strtolower($item->name);
+        $category = strtolower($item->category);
 
-        $item->update(['stock_qty' => $new]);
+        return str_contains($name, 'paper') ||
+            str_contains($name, 'bond') ||
+            str_contains($name, 'gsm') ||
+            str_contains($category, 'paper') ||
+            str_contains($category, 'stock');
+    }
+
+    /**
+     * Record material wastage or spoilage.
+     */
+    public function recordSpoilage(
+        InventoryItem $item,
+        float $wastedQty,
+        string $reason,
+        ?User $staff = null
+    ): StockMovement {
+        $prevStock = (float) $item->stock_qty;
+        $newStock = max(0, $prevStock - $wastedQty);
+
+        $item->update(['stock_qty' => $newStock]);
 
         return StockMovement::create([
             'inventory_item_id' => $item->id,
             'movement_type' => StockMovement::TYPE_SPOILAGE_WASTE,
-            'quantity' => -$qty,
-            'previous_stock' => $prev,
-            'resulting_stock' => $new,
-            'reference_note' => "Spoilage/Wastage: {$reason}",
+            'quantity' => -$wastedQty,
+            'previous_stock' => $prevStock,
+            'resulting_stock' => $newStock,
+            'reference_note' => "Spoilage/Waste: {$reason}",
             'logged_by' => $staff?->id,
         ]);
-    }
-
-    /**
-     * Accurately check if an inventory item represents printable paper sheets.
-     */
-    protected function isPaperItem(InventoryItem $item): bool
-    {
-        $cat = strtolower($item->category ?? '');
-        $name = strtolower($item->name ?? '');
-
-        if (str_contains($name, 'leatherette') || str_contains($name, 'chipboard') || str_contains($name, 'foil') || str_contains($name, 'glue') || str_contains($name, 'board')) {
-            return false;
-        }
-
-        return $cat === 'paper' || str_contains($name, 'paper') || str_contains($name, 'copier') || str_contains($name, 'gsm');
     }
 }

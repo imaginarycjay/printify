@@ -155,26 +155,30 @@ new class extends Component {
                     </div>
 
                     <!-- 2. Document Printing -->
-                    <div class="p-6 rounded-3xl bg-stone-900/60 border border-stone-800 space-y-5 shadow-xl flex flex-col justify-between opacity-80 hover:opacity-100 transition-opacity">
+                    <div class="p-6 rounded-3xl bg-stone-900/80 border border-stone-800/90 hover:border-blue-500/50 space-y-5 shadow-xl flex flex-col justify-between group transition-all">
                         <div class="space-y-4">
                             <div class="flex items-center justify-between">
-                                <span class="size-12 rounded-2xl bg-gradient-to-br from-blue-500 to-indigo-600 text-white flex items-center justify-center shadow-lg">
-                                    <flux:icon name="document-text" class="size-6" />
+                                <span class="size-12 rounded-2xl bg-gradient-to-br from-blue-500 to-indigo-600 text-white flex items-center justify-center shadow-lg shadow-blue-500/20 group-hover:scale-105 transition-transform">
+                                    <flux:icon name="document-text" class="size-6 text-white" />
                                 </span>
-                                <span class="px-2.5 py-1 rounded-full text-[10px] font-bold bg-stone-800 text-stone-400">Available In Shop</span>
+                                <span class="px-2.5 py-1 rounded-full text-[10px] font-black bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">ONLINE</span>
                             </div>
                             <div>
-                                <h3 class="text-base font-black text-white">Document Printing & Ring Binding</h3>
-                                <p class="text-xs text-stone-400 mt-1 leading-relaxed">High-speed monochrome and colored PDF documents, ring binding, and booklet stapling.</p>
+                                <h3 class="text-base font-black text-white group-hover:text-blue-400 transition-colors">Document Printing & Ring Binding</h3>
+                                <p class="text-xs text-stone-400 mt-1 leading-relaxed">High-speed monochrome & color PDF documents, duplex printing, sliding folders, and ring binding.</p>
                             </div>
-                            <div class="p-3 rounded-2xl bg-stone-950 border border-stone-800 text-xs flex items-center justify-between">
-                                <span class="text-stone-400">Price rate:</span>
-                                <strong class="text-white">₱1.50 <span class="text-[10px] font-normal text-stone-500">/ page</span></strong>
+                            <div class="p-3 rounded-2xl bg-stone-950/80 border border-stone-800 text-xs flex items-center justify-between">
+                                <span class="text-stone-400">Starting from:</span>
+                                <strong class="text-blue-400 font-extrabold">₱1.50 <span class="text-[10px] font-normal text-stone-500">/ page</span></strong>
                             </div>
                         </div>
-                        <button disabled class="w-full py-3 rounded-2xl bg-stone-800 text-stone-500 text-xs font-bold text-center cursor-not-allowed">
-                            Order via Counter
-                        </button>
+                        <a
+                            href="{{ route('customer.order-document') }}"
+                            wire:navigate
+                            class="w-full py-3 rounded-2xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-black uppercase tracking-wider text-center shadow-lg shadow-blue-600/20 block transition-all"
+                        >
+                            Order Document Printing &rarr;
+                        </a>
                     </div>
 
                     <!-- 3. Tarpaulin Printing -->
@@ -228,15 +232,19 @@ new class extends Component {
                                         <div class="flex flex-wrap items-center gap-2">
                                             <span class="font-mono font-black text-amber-400 text-sm sm:text-base">{{ $order->order_number }}</span>
                                             <span class="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold border {{ $order->statusBadgeColor() }}">
-                                                {{ ucfirst(str_replace('_', ' ', $order->order_status)) }}
+                                                {{ $order->order_status === \App\Models\Order::STATUS_COMPLETED || $order->production_stage === \App\Models\Order::STAGE_COMPLETED ? 'Completed / Received' : ucfirst(str_replace('_', ' ', $order->order_status)) }}
                                             </span>
                                             <span class="px-2 py-0.5 rounded text-[10px] font-bold border {{ $order->paymentStatusBadgeColor() }}">
-                                                Payment: {{ ucfirst(str_replace('_', ' ', $order->payment_status)) }}
+                                                {{ $order->paymentStatusLabel() }}
                                             </span>
                                             @php
                                                 $firstItem = $order->items->first();
                                             @endphp
-                                            @if ($firstItem && $firstItem->isCoverOnly())
+                                            @if ($order->service_key === 'document_printing' || ($firstItem && $firstItem->isDocumentPrinting()))
+                                                <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-blue-500/20 text-blue-300 border border-blue-500/30">
+                                                    📄 Document Print
+                                                </span>
+                                            @elseif ($firstItem && $firstItem->isCoverOnly())
                                                 <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-500/20 text-amber-300 border border-amber-500/30">
                                                     📦 Cover Only
                                                 </span>
@@ -258,7 +266,7 @@ new class extends Component {
 
                                     <div class="flex items-center gap-3">
                                         <div class="text-right">
-                                            <span class="text-[10px] text-stone-500 block">Total Paid</span>
+                                            <span class="text-[10px] text-stone-500 block">{{ $order->payment_status === \App\Models\Order::PAYMENT_VERIFIED_PAID ? 'Total Paid' : 'Amount Due' }}</span>
                                             <span class="text-lg font-black text-white">₱{{ number_format($order->total_amount, 2) }}</span>
                                         </div>
                                         <button
@@ -283,7 +291,15 @@ new class extends Component {
                                         <!-- Step 2 -->
                                         <div class="text-center space-y-1">
                                             <span class="size-6 sm:size-7 rounded-full flex items-center justify-center text-[10px] sm:text-xs font-black mx-auto {{ $stage >= 2 ? 'bg-emerald-500 text-stone-950 ring-2 sm:ring-4 ring-emerald-500/20' : 'bg-stone-800 text-stone-500' }}">2</span>
-                                            <span class="text-[8px] sm:text-[10px] font-bold {{ $stage >= 2 ? 'text-white' : 'text-stone-500' }} block leading-tight">Verified Paid</span>
+                                            <span class="text-[8px] sm:text-[10px] font-bold {{ $stage >= 2 ? 'text-white' : 'text-stone-500' }} block leading-tight">
+                                                @if ($order->payment_status === \App\Models\Order::PAYMENT_VERIFIED_PAID)
+                                                    Paid & Queued
+                                                @elseif ($order->payment_status === \App\Models\Order::PAYMENT_UNPAID)
+                                                    Queued (Counter Pay)
+                                                @else
+                                                    Queued (Reviewing)
+                                                @endif
+                                            </span>
                                         </div>
 
                                         <!-- Step 3 -->
@@ -299,9 +315,16 @@ new class extends Component {
                                         </div>
 
                                         <!-- Step 5 -->
+                                        @php
+                                            $isOrderCompleted = $order->order_status === \App\Models\Order::STATUS_COMPLETED || $order->production_stage === \App\Models\Order::STAGE_COMPLETED;
+                                        @endphp
                                         <div class="text-center space-y-1">
-                                            <span class="size-6 sm:size-7 rounded-full flex items-center justify-center text-[10px] sm:text-xs font-black mx-auto {{ $stage >= 5 ? 'bg-emerald-500 text-stone-950 shadow-lg shadow-emerald-500/40' : 'bg-stone-800 text-stone-500' }}">5</span>
-                                            <span class="text-[8px] sm:text-[10px] font-bold {{ $stage >= 5 ? 'text-emerald-400 font-extrabold' : 'text-stone-500' }} block leading-tight">Pickup</span>
+                                            <span class="size-6 sm:size-7 rounded-full flex items-center justify-center text-[10px] sm:text-xs font-black mx-auto {{ $stage >= 5 ? ($isOrderCompleted ? 'bg-emerald-500 text-stone-950 shadow-lg shadow-emerald-500/40' : 'bg-amber-500 text-stone-950 ring-2 sm:ring-4 ring-amber-500/20 animate-pulse') : 'bg-stone-800 text-stone-500' }}">
+                                                {{ $isOrderCompleted ? '✓' : '5' }}
+                                            </span>
+                                            <span class="text-[8px] sm:text-[10px] font-bold {{ $stage >= 5 ? ($isOrderCompleted ? 'text-emerald-400 font-extrabold' : 'text-amber-400 font-extrabold') : 'text-stone-500' }} block leading-tight">
+                                                {{ $isOrderCompleted ? 'Completed & Received' : 'Ready for Pickup' }}
+                                            </span>
                                         </div>
                                     </div>
                                 </div>
@@ -337,6 +360,12 @@ new class extends Component {
                             <strong class="text-white">{{ $user?->name }} ({{ $user?->email }})</strong>
                         </div>
                         <div class="flex justify-between">
+                            <span class="text-stone-500">Payment Status:</span>
+                            <span class="px-2 py-0.5 rounded text-[10px] font-bold border {{ $selectedOrder->paymentStatusBadgeColor() }}">
+                                {{ $selectedOrder->paymentStatusLabel() }}
+                            </span>
+                        </div>
+                        <div class="flex justify-between">
                             <span class="text-stone-500">Payment Reference:</span>
                             <strong class="text-amber-400 font-mono">{{ $selectedOrder->payment_reference_no ?? 'N/A' }}</strong>
                         </div>
@@ -349,45 +378,49 @@ new class extends Component {
                             <div class="p-3.5 rounded-2xl bg-stone-950 border border-stone-800 space-y-2">
                                 <div class="flex justify-between font-bold text-white">
                                     <span>
-                                        {{ ucfirst($item->binding_type) }}
-                                        @if ($item->isCoverOnly())
-                                            <span class="text-amber-400 text-[10px] font-semibold">(Cover & Binding Only)</span>
+                                        @if ($selectedOrder->service_key === 'document_printing' || $item->isDocumentPrinting())
+                                            📄 Document Printing ({{ $item->getFinishingLabel() }})
                                         @else
-                                            Thesis
+                                            {{ ucfirst($item->binding_type) }}
+                                            @if ($item->isCoverOnly())
+                                                <span class="text-amber-400 text-[10px] font-semibold">(Cover & Binding Only)</span>
+                                            @else
+                                                Thesis
+                                            @endif
                                         @endif
                                         ({{ $item->copies_count }} {{ $item->copies_count > 1 ? 'copies' : 'copy' }})
                                     </span>
                                     <span>₱{{ number_format($item->total_price, 2) }}</span>
                                 </div>
                                 <div class="text-[11px] text-stone-400 space-y-0.5">
-                                    @if ($item->isCoverOnly())
+                                    @if ($selectedOrder->service_key === 'document_printing' || $item->isDocumentPrinting())
+                                        <div>Pages: {{ $item->bw_pages_count }} B&W + {{ $item->color_pages_count }} Color &bull; {{ $item->paper_size }} ({{ $item->isDuplex() ? 'Duplex' : 'Simplex' }})</div>
+                                        <div>Paper Feed: <strong class="text-blue-400">{{ $item->getPhysicalSheetsCount() }} sheets</strong> per copy</div>
+                                        @if ($item->cover_color && $item->getFinishingType() === 'ring_bind')
+                                            <div>Back Cover Board: {{ $item->cover_color }}</div>
+                                        @endif
+                                    @elseif ($item->isCoverOnly())
                                         <div>Pre-Printed Pages: {{ $item->total_pages_count }} pages &bull; Est. Spine: ~{{ $item->estimated_spine_thickness_mm ?? '10.0' }} mm</div>
                                         <div>Paper Status: <span class="{{ $item->is_paper_received ? 'text-emerald-400' : 'text-amber-400' }} font-bold">{{ $item->is_paper_received ? 'Received at Shop' : 'Pending Customer Drop-off' }}</span></div>
+                                        <div>Cover: {{ $item->cover_color }} &bull; Foil: {{ $item->foil_color ?? 'None' }}</div>
                                     @else
                                         <div>Pages: {{ $item->bw_pages_count }} B&W + {{ $item->color_pages_count }} Color ({{ $item->paper_size }})</div>
-                                    @endif
-                                    <div>Cover: {{ $item->cover_color }} &bull; Foil: {{ $item->foil_color ?? 'None' }}</div>
-                                    @if ($item->custom_fields_data)
-                                        <div class="pt-1 text-[10px] text-stone-500 border-t border-stone-800/80">
-                                            @foreach ($item->custom_fields_data as $key => $val)
-                                                <div><strong>{{ $key }}:</strong> {{ $val }}</div>
-                                            @endforeach
-                                        </div>
+                                        <div>Cover: {{ $item->cover_color }} &bull; Foil: {{ $item->foil_color ?? 'None' }}</div>
                                     @endif
                                 </div>
                             </div>
                         @endforeach
                     </div>
 
-                    <!-- Total Paid -->
+                    <!-- Total Amount / Paid -->
                     <div class="flex justify-between items-center p-4 rounded-2xl bg-stone-950 border border-amber-500/30 text-sm font-extrabold text-white">
-                        <span>Grand Total Paid:</span>
+                        <span>{{ $selectedOrder->payment_status === \App\Models\Order::PAYMENT_VERIFIED_PAID ? 'Grand Total Paid:' : 'Total Amount Due:' }}</span>
                         <span class="text-lg text-amber-400">₱{{ number_format($selectedOrder->total_amount, 2) }}</span>
                     </div>
                 </div>
 
                 <div class="pt-2">
-                    <button wire:click="closeOrderModal" class="w-full py-2.5 rounded-xl bg-stone-800 hover:bg-stone-700 text-stone-200 text-xs font-bold">
+                    <button wire:click="closeOrderModal" class="w-full py-2.5 rounded-xl bg-stone-800 hover:bg-stone-700 text-stone-200 text-xs font-bold cursor-pointer">
                         Close Receipt
                     </button>
                 </div>
