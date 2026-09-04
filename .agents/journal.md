@@ -593,29 +593,6 @@ This file logs all completed tasks, steps, and key state changes. The agent must
   - Created `EnsureUserHasRole.php`, `RoleBasedAccessControlTest.php`.
   - Updated `bootstrap/app.php`, `routes/web.php`, `PrintServiceCatalog.php`, `SalesAnalyticsService.php`, `Order.php`, `⚡analytics-hub.blade.php`, `⚡customer-dashboard.blade.php`.
 
----
-
-## [2026-09-02 22:15:00] New Environment Setup & Dependency Installation
-- **Request:** Set up all dependencies for Laravel, PostgreSQL, Composer, and Node.js on a newly migrated WSL Ubuntu system, configure database, run migrations, and run the project.
-- **Status:** Success
-- **Steps Taken:**
-  - Installed system prerequisites: PHP 8.5, Composer 2.10, Node.js 22.22, NPM, PostgreSQL, and required PHP extensions (`pdo_pgsql`, `pdo_sqlite`, `curl`, `mbstring`, `xml`, `zip`, `bcmath`, `intl`, `gd`).
-  - Configured PostgreSQL connection in [`.env`](file:///home/imaginarycjay/printify/.env) (`DB_CONNECTION=pgsql`, `DB_PORT=5432`, `DB_DATABASE=printify`).
-  - Ran `composer install` & `php artisan key:generate`.
-  - Initialized PostgreSQL user `postgres` and created database `printify`.
-  - Ran all 19 database migrations (`php artisan migrate --force`).
-  - Installed NPM dependencies and compiled Vite frontend assets (`npm run build`).
-  - Verified tests and code quality gate with `composer test` (Pint + PHPStan Level 7 + Pest 5: **93 passed, 323 assertions, 0 errors**).
-- **Verification & Outcome:**
-  - `php artisan db:show`: PostgreSQL connected, 19 tables created.
-  - `composer test`: 93 passed (323 assertions).
-  - Assets compiled into `public/build/`.
-- **Key State Changes:**
-  - Generated `vendor/autoload.php` and installed full dependency tree.
-  - Initialized PostgreSQL `printify` database and executed all schema migrations.
-  - Built frontend assets with Vite.
-  - Configured `.env` for PostgreSQL.
-
 
 
 
