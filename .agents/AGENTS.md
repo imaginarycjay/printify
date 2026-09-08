@@ -4,7 +4,7 @@
 
 To save tokens and preserve context across sessions:
 1. **Read the Journal First**: At the start of a new session or task, read `.agents/journal.md` to quickly catch up on recent modifications, status of tasks, and context without re-scanning the entire codebase.
-2. **Update the Journal on Completion**: Before ending your turn or finishing a user request, you MUST append a new markdown entry to `.agents/journal.md` summarizing the task.
+2. **Update the Journal on Completion (Major Tasks Only)**: Before ending your turn or finishing a user request, append a new markdown entry to `.agents/journal.md` summarizing the task. **Do NOT record in the journal for minor fixes or adjustments** unless explicitly instructed by the user. Only record major milestones, new modules, structural additions, or significant features.
 
 ### Journal Entry Template
 

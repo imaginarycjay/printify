@@ -1,0 +1,77 @@
+<mxfile host="app.diagrams.net" modified="2026-09-07T10:00:00.000Z" agent="Antigravity" version="21.0.0" type="device">
+  <diagram id="conceptual_framework" name="Figure 1. Conceptual Framework">
+    <mxGraphModel dx="1422" dy="894" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1200" pageHeight="950" background="#ffffff" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+
+        <!-- Title -->
+        <mxCell id="title_node" value="Figure 1. Conceptual Framework for Integrated Dynamic Order, Job Scheduling, and Inventory Management System" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;fontSize=15;fontStyle=1;fontColor=#0f172a;fontFamily=Helvetica;" vertex="1" parent="1">
+          <mxGeometry x="120" y="20" width="960" height="30" as="geometry" />
+        </mxCell>
+
+        <!-- 1. INPUT -->
+        <mxCell id="box_input" value="&lt;b&gt;1. INPUT&lt;/b&gt;&lt;hr style='margin: 4px 0; border: 0; border-top: 1px solid #94a3b8;'&gt;&lt;b&gt;Stakeholder Profiles:&lt;/b&gt;&lt;br&gt;• Business Owners (Pricing &amp; Config)&lt;br&gt;• Production Staff (Task Allocation)&lt;br&gt;• Customers (Self-Service Ordering)&lt;br&gt;&lt;br&gt;&lt;b&gt;Modular Service Parameters:&lt;/b&gt;&lt;br&gt;• Dynamic Pricing Formulas (Page/SqFt/Unit)&lt;br&gt;• Media Specs (Short, A4, Long; 70-100 gsm)&lt;br&gt;• Substrates (Paper, Vinyl, Garment, PVC)&lt;br&gt;• Finishing Rules (Foil, Ring Bind, Eyelets)&lt;br&gt;&lt;br&gt;&lt;b&gt;Customer Assets &amp; Proofs:&lt;/b&gt;&lt;br&gt;• PDF Manuscripts &amp; Vector Artwork&lt;br&gt;• GCash / Maya Receipts &amp; Cash Proofs&lt;br&gt;&lt;br&gt;&lt;b&gt;Raw Consumables &amp; BOM:&lt;/b&gt;&lt;br&gt;• Paper Reams, Vinyl Rolls, Inks, Boards&lt;br&gt;• Stock Baselines &amp; Safety Buffers" style="rounded=1;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacingLeft=12;spacingRight=12;spacingTop=12;spacingBottom=12;fillColor=#f8fafc;strokeColor=#0284c7;strokeWidth=2;fontFamily=Helvetica;fontSize=11;fontColor=#0f172a;" vertex="1" parent="1">
+          <mxGeometry x="50" y="80" width="340" height="420" as="geometry" />
+        </mxCell>
+
+        <!-- 2. PROCESS -->
+        <mxCell id="box_process" value="&lt;b&gt;2. PROCESS&lt;/b&gt;&lt;hr style='margin: 4px 0; border: 0; border-top: 1px solid #94a3b8;'&gt;&lt;b&gt;Order Intake &amp; Dynamic Quotation:&lt;/b&gt;&lt;br&gt;• Instant multi-attribute cost computation&lt;br&gt;• Duplex discounts, rush fees &amp; add-ons&lt;br&gt;• Manual payment verification &amp; routing&lt;br&gt;&lt;br&gt;&lt;b&gt;Workshop Floor Scheduling:&lt;/b&gt;&lt;br&gt;• 5-Stage Kanban Queue Tracking&lt;br&gt;  (Queue → Print → Assembly → QC → Ready)&lt;br&gt;• Customer paper tracking ('Dala ang Papel')&lt;br&gt;• Machine &amp; operator task assignment&lt;br&gt;&lt;br&gt;&lt;b&gt;Automated Inventory Telemetry:&lt;/b&gt;&lt;br&gt;• Stage-based Bill of Materials (BOM) burn&lt;br&gt;• 7-day &amp; 30-day velocity (Burn Rate) calculation&lt;br&gt;• Dynamic Reorder Point (ROP) evaluation&lt;br&gt;&lt;br&gt;&lt;b&gt;Business Intelligence:&lt;/b&gt;&lt;br&gt;• Sales, product mix &amp; margin aggregation" style="rounded=1;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacingLeft=12;spacingRight=12;spacingTop=12;spacingBottom=12;fillColor=#f8fafc;strokeColor=#6366f1;strokeWidth=2;fontFamily=Helvetica;fontSize=11;fontColor=#0f172a;" vertex="1" parent="1">
+          <mxGeometry x="430" y="80" width="340" height="420" as="geometry" />
+        </mxCell>
+
+        <!-- 3. OUTPUT -->
+        <mxCell id="box_output" value="&lt;b&gt;3. OUTPUT&lt;/b&gt;&lt;hr style='margin: 4px 0; border: 0; border-top: 1px solid #94a3b8;'&gt;&lt;b&gt;Integrated Web-to-Print Platform:&lt;/b&gt;&lt;br&gt;• Role-segregated cloud portals&lt;br&gt;&lt;br&gt;&lt;b&gt;Customer Experience:&lt;/b&gt;&lt;br&gt;• Interactive multi-service order wizards&lt;br&gt;• Live 5-stage visual progress stepper&lt;br&gt;&lt;br&gt;&lt;b&gt;Workshop Floor Hub:&lt;/b&gt;&lt;br&gt;• Digital job tickets &amp; floor Kanban console&lt;br&gt;• Transparent machine &amp; operator queues&lt;br&gt;&lt;br&gt;&lt;b&gt;Automated Inventory Telemetry:&lt;/b&gt;&lt;br&gt;• Automated low-stock &amp; restock alerts&lt;br&gt;• Real-time stock ledgers &amp; audit trails&lt;br&gt;&lt;br&gt;&lt;b&gt;Financial &amp; Operational BI:&lt;/b&gt;&lt;br&gt;• Multi-service sales &amp; revenue dashboards&lt;br&gt;• Exportable accounting summaries" style="rounded=1;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacingLeft=12;spacingRight=12;spacingTop=12;spacingBottom=12;fillColor=#f8fafc;strokeColor=#10b981;strokeWidth=2;fontFamily=Helvetica;fontSize=11;fontColor=#0f172a;" vertex="1" parent="1">
+          <mxGeometry x="810" y="80" width="340" height="420" as="geometry" />
+        </mxCell>
+
+        <!-- 4. OUTCOME -->
+        <mxCell id="box_outcome" value="&lt;b&gt;4. OUTCOME (Immediate Operational Benefits)&lt;/b&gt;&lt;hr style='margin: 4px 0; border: 0; border-top: 1px solid #94a3b8;'&gt;• &lt;b&gt;Error-Free Multi-Product Intake:&lt;/b&gt; Eliminates manual calculation errors, counter congestion, and pricing discrepancies across services.&lt;br&gt;• &lt;b&gt;Organized Workshop Floor:&lt;/b&gt; Completely eliminates lost paper job tickets, misplaced client files, and production floor mix-ups.&lt;br&gt;• &lt;b&gt;24/7 Client Transparency:&lt;/b&gt; Provides frictionless online order tracking, drastically reducing repeated follow-up calls and visits.&lt;br&gt;• &lt;b&gt;Zero Stockout Halts:&lt;/b&gt; Prevents unexpected supply exhaustion during peak academic rush, election campaigns, and commercial events.&lt;br&gt;• &lt;b&gt;Data-Driven Procurement:&lt;/b&gt; Replaces intuitive inventory guesswork with actual sales burn-rate velocity and automated reorder alerts." style="rounded=1;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacingLeft=14;spacingRight=14;spacingTop=12;spacingBottom=12;fillColor=#fefce8;strokeColor=#eab308;strokeWidth=2;fontFamily=Helvetica;fontSize=11;fontColor=#0f172a;" vertex="1" parent="1">
+          <mxGeometry x="180" y="550" width="840" height="150" as="geometry" />
+        </mxCell>
+
+        <!-- 5. IMPACT -->
+        <mxCell id="box_impact" value="&lt;b&gt;5. IMPACT (Long-Term Organizational &amp; Academic Contributions)&lt;/b&gt;&lt;hr style='margin: 4px 0; border: 0; border-top: 1px solid #94a3b8;'&gt;• &lt;b&gt;Enterprise Productivity &amp; Profitability:&lt;/b&gt; Maximizes operational throughput, reduces raw material waste, and boosts profit margins for printing MSMEs.&lt;br&gt;• &lt;b&gt;Heightened Market Trust &amp; Reliability:&lt;/b&gt; Strengthens client confidence through consistent turnaround times and superior service dependability.&lt;br&gt;• &lt;b&gt;Code-Free Business Adaptability:&lt;/b&gt; Empowers printing shop owners to dynamically configure, price, and launch new print products without coding.&lt;br&gt;• &lt;b&gt;Information Systems Benchmark:&lt;/b&gt; Establishes a validated empirical baseline for lightweight job-shop business automation and inventory replenishment." style="rounded=1;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacingLeft=14;spacingRight=14;spacingTop=12;spacingBottom=12;fillColor=#f0fdf4;strokeColor=#14b8a6;strokeWidth=2;fontFamily=Helvetica;fontSize=11;fontColor=#0f172a;" vertex="1" parent="1">
+          <mxGeometry x="180" y="750" width="840" height="140" as="geometry" />
+        </mxCell>
+
+        <!-- Arrow: INPUT -> PROCESS -->
+        <mxCell id="edge_input_process" value="Feeds Operational Data" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2.5;strokeColor=#334155;endArrow=classic;endFill=1;fontSize=10;fontColor=#334155;fontStyle=1;" edge="1" parent="1" source="box_input" target="box_process">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- Arrow: PROCESS -> OUTPUT -->
+        <mxCell id="edge_process_output" value="Generates Functional Deliverables" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2.5;strokeColor=#334155;endArrow=classic;endFill=1;fontSize=10;fontColor=#334155;fontStyle=1;" edge="1" parent="1" source="box_process" target="box_output">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- Arrow: OUTPUT -> OUTCOME -->
+        <mxCell id="edge_output_outcome" value="Delivers Immediate Operational Gains" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2.5;strokeColor=#334155;endArrow=classic;endFill=1;fontSize=10;fontColor=#334155;fontStyle=1;" edge="1" parent="1" source="box_output" target="box_outcome">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="980" y="525" />
+              <mxPoint x="600" y="525" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+
+        <!-- Arrow: OUTCOME -> IMPACT -->
+        <mxCell id="edge_outcome_impact" value="Achieves Long-Term Strategic Goals" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2.5;strokeColor=#334155;endArrow=classic;endFill=1;fontSize=10;fontColor=#334155;fontStyle=1;" edge="1" parent="1" source="box_outcome" target="box_impact">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- Feedback Loop: OUTCOME -> INPUT -->
+        <mxCell id="edge_feedback" value="Continuous System Refinement &amp; Stock Synchronization" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#0284c7;dashed=1;endArrow=classic;endFill=1;fontSize=10;fontColor=#0284c7;fontStyle=1;" edge="1" parent="1" source="box_outcome" target="box_input">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="180" y="625" />
+              <mxPoint x="120" y="625" />
+              <mxPoint x="120" y="500" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
