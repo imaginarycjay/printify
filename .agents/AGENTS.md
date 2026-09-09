@@ -29,3 +29,15 @@ Use the following format for each entry, appending it to the end of `.agents/jou
 2. **On-Demand Skill Discovery & Installation**: If the user's prompt involves a framework, tool, or library where you lack specific expertise or best practices, you MUST:
    - Search the web for a matching AI agent skill or standard workflow instructions.
    - Install the new skill by creating the folder `.agents/skills/<skill-name>/` and writing a `SKILL.md` file (including YAML frontmatter with `name` and `description`).
+
+## Academic Thesis & Capstone Writing Rules
+
+Whenever the prompt involves academic writing, capstone paper, thesis manuscript, outline, or revisions:
+1. **Mandatory Skill Activation**: Always read and apply `.agents/skills/research-paper-writing/SKILL.md` (from https://github.com/Master-cai/Research-Paper-Writing-Skills.git), `.agents/skills/humanize-academic-writing/SKILL.md`, and `.agents/skills/scholarly/SKILL.md`.
+2. **USM Institutional Standards**: Follow the accepted USM BSIS outline structure (e.g., Nonakan and Comission references):
+   - No in-text citations in Chapter 1 (citations are reserved for Chapter 2).
+   - Statement of the Problem in cohesive paragraph form (no numbered itemized questions).
+   - 5-Stage IPO Model (Input-Process-Output-Outcome-Impact) for Conceptual Framework.
+   - Professional academic English for paper text, without AI clichés or empty transitions.
+3. **Conversational Language**: Always respond to the user in **Taglish** in the chat, but write the paper manuscript text in formal academic English.
+
