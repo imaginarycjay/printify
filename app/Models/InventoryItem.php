@@ -84,6 +84,16 @@ class InventoryItem extends Model
     }
 
     /**
+     * Get the unified ServiceBom recipes referencing this inventory item.
+     *
+     * @return HasMany<ServiceBom, $this>
+     */
+    public function serviceBoms(): HasMany
+    {
+        return $this->hasMany(ServiceBom::class);
+    }
+
+    /**
      * Get the stock movements log for this inventory item.
      *
      * @return HasMany<StockMovement, $this>

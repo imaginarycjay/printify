@@ -6,10 +6,12 @@ use App\Models\DocumentPrintingConfig;
 use App\Models\InventoryItem;
 use App\Models\Order;
 use App\Models\OrderItem;
+use App\Models\ServiceBom;
 use App\Models\StockMovement;
 use App\Models\ThesisBindingBomItem;
 use App\Models\ThesisBindingConfig;
 use App\Models\User;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 
 class InventoryDeductionService
@@ -29,7 +31,14 @@ class InventoryDeductionService
         }
 
         DB::transaction(function () use ($order, $staff, &$deductions) {
-            if ($order->service_key === 'document_printing') {
+            $serviceBoms = ServiceBom::where('print_shop_id', $order->print_shop_id)
+                ->where('service_key', $order->service_key)
+                ->with('inventoryItem')
+                ->get();
+
+            if ($serviceBoms->isNotEmpty()) {
+                $this->deductViaServiceBoms($order, $serviceBoms, $staff, $deductions);
+            } elseif ($order->service_key === 'document_printing') {
                 $this->deductForDocumentPrinting($order, $staff, $deductions);
             } else {
                 $this->deductForThesisBinding($order, $staff, $deductions);
@@ -288,6 +297,74 @@ class InventoryDeductionService
             str_contains($name, 'gsm') ||
             str_contains($category, 'paper') ||
             str_contains($category, 'stock');
+    }
+
+    /**
+     * Deducts inventory materials dynamically using unified ServiceBom recipes.
+     *
+     * @param  Collection<int, ServiceBom>  $serviceBoms
+     * @param  array<int, array{item_name: string, quantity_deducted: float, unit: string, remaining_stock: float}>  $deductions
+     */
+    protected function deductViaServiceBoms(
+        Order $order,
+        Collection $serviceBoms,
+        ?User $staff,
+        array &$deductions
+    ): void {
+        foreach ($order->items as $orderItem) {
+            $isCoverOnly = $orderItem->isCoverOnly();
+            $copies = max(1, $orderItem->copies_count);
+            $totalPages = max(1, (int) $orderItem->total_pages_count);
+            $physicalSheets = $orderItem->getPhysicalSheetsCount();
+
+            foreach ($serviceBoms as $bom) {
+                $item = $bom->inventoryItem;
+                if (! $item) {
+                    continue;
+                }
+
+                // Check condition criteria if present
+                if (! empty($bom->conditions)) {
+                    $matched = true;
+                    foreach ($bom->conditions as $key => $val) {
+                        $actual = $orderItem->{$key}
+                            ?? data_get($orderItem->specifications, $key)
+                            ?? data_get($orderItem->custom_fields_data, $key);
+
+                        if ($actual === null || ! str_contains(strtolower((string) $actual), strtolower((string) $val))) {
+                            $matched = false;
+                            break;
+                        }
+                    }
+
+                    if (! $matched) {
+                        continue;
+                    }
+                }
+
+                // If customer supplied paper (Cover Only), skip paper consumption
+                if ($isCoverOnly && $this->isPaperItem($item)) {
+                    continue;
+                }
+
+                // Calculate consumed quantity
+                $consumedQty = match ($bom->usage_type) {
+                    ServiceBom::USAGE_PER_PAGE => (float) ($totalPages * $copies * $bom->usage_qty),
+                    ServiceBom::USAGE_PER_SHEET => (float) ($physicalSheets * $bom->usage_qty),
+                    ServiceBom::USAGE_FIXED => (float) $bom->usage_qty,
+                    default => (float) ($copies * $bom->usage_qty), // per_copy
+                };
+
+                if ($consumedQty > 0) {
+                    $deductions[] = $this->applyDeduction(
+                        $item,
+                        $consumedQty,
+                        "Order {$order->order_number} ({$bom->component_name})",
+                        $staff
+                    );
+                }
+            }
+        }
     }
 
     /**

@@ -593,6 +593,32 @@ This file logs all completed tasks, steps, and key state changes. The agent must
   - Created `EnsureUserHasRole.php`, `RoleBasedAccessControlTest.php`.
   - Updated `bootstrap/app.php`, `routes/web.php`, `PrintServiceCatalog.php`, `SalesAnalyticsService.php`, `Order.php`, `⚡analytics-hub.blade.php`, `⚡customer-dashboard.blade.php`.
 
+---
+
+## [2026-09-09 22:50:00] Database Schema Simplification & Unified Bill of Materials (BOM) Architecture
+- **Request:** Simplify and optimize the database schema to eliminate manual per-service tables, eliminate the 6 crossing foreign keys from Document Printing to Inventory, normalize order items, and provide clean DBML for dbdiagram.io.
+- **Status:** Success
+- **Steps Taken:**
+  - Created migration `2026_09_09_144448_unify_service_configurations_and_boms.php` adding `settings` (JSON) and `display_order` to `shop_services`, creating unified `service_boms` table, and adding `specifications` (JSON) to `order_items`.
+  - Created [`ServiceBom.php`](file:///home/imaginarycjay/printify/app/Models/ServiceBom.php) Eloquent model with relationships to `PrintShop` and `InventoryItem`.
+  - Updated [`ShopService.php`](file:///home/imaginarycjay/printify/app/Models/ShopService.php) with `settings` casting and `getSetting()`/`updateSetting()` methods.
+  - Updated [`PrintShop.php`](file:///home/imaginarycjay/printify/app/Models/PrintShop.php) and [`InventoryItem.php`](file:///home/imaginarycjay/printify/app/Models/InventoryItem.php) with `serviceBoms()` relationships.
+  - Updated [`OrderItem.php`](file:///home/imaginarycjay/printify/app/Models/OrderItem.php) with `specifications` casting.
+  - Refactored [`InventoryDeductionService.php`](file:///home/imaginarycjay/printify/app/Services/InventoryDeductionService.php) to dynamically deduct raw materials using `ServiceBom` recipes with `per_copy`, `per_page`, and `per_sheet` (duplex-aware) rules.
+  - Created comprehensive feature test [`UnifiedServiceBomTest.php`](file:///home/imaginarycjay/printify/tests/Feature/UnifiedServiceBomTest.php).
+  - Updated [`database_schema.dbml`](file:///home/imaginarycjay/printify/capstone_paper/capstone_draft_folder/diagrams/database_schema.dbml) with the normalized 8-table architecture and visual table groupings.
+  - Updated Section 11 ERD narrative in [`chapter_3_methodology_draft.md`](file:///home/imaginarycjay/printify/capstone_paper/capstone_draft_folder/outline_draft/chapter_3_methodology_draft.md).
+- **Verification & Outcome:**
+  - `vendor/bin/pint --format agent`: Passed.
+  - `composer types:check` (PHPStan Level 7): **0 errors**.
+  - `php artisan test --compact`: **95 passed (330 assertions, 0 errors)**.
+  - `composer test` (Pint + PHPStan + Pest): Full CI gate passed with **100% success**.
+- **Key State Changes:**
+  - Added migration `2026_09_09_144448_unify_service_configurations_and_boms.php`.
+  - Added model `ServiceBom.php` and feature test `UnifiedServiceBomTest.php`.
+  - Updated `database_schema.dbml` and `chapter_3_methodology_draft.md`.
+
+
 
 
 

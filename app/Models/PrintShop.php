@@ -64,6 +64,16 @@ class PrintShop extends Model
     }
 
     /**
+     * Get the unified Bill of Materials (BOM) recipes for the print shop.
+     *
+     * @return HasMany<ServiceBom, $this>
+     */
+    public function serviceBoms(): HasMany
+    {
+        return $this->hasMany(ServiceBom::class);
+    }
+
+    /**
      * Get the thesis binding configuration for the print shop.
      *
      * @return HasOne<ThesisBindingConfig, $this>
