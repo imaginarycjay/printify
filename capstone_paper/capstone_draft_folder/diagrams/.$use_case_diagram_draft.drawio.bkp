@@ -1,0 +1,169 @@
+<mxfile host="Electron">
+  <diagram name="Page-1" id="eKBidzU0FNEcWcwEzeUl">
+    <mxGraphModel dx="2514" dy="1051" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="RoGWqo4ajR8E0biaib37-1" parent="1" style="swimlane;whiteSpace=wrap;html=1;fontColor=light-dark(#000000,#FFFFFF);" value="" vertex="1">
+          <mxGeometry height="1100" width="620" x="80" as="geometry" />
+        </mxCell>
+        <mxCell id="RoGWqo4ajR8E0biaib37-24" parent="RoGWqo4ajR8E0biaib37-1" style="ellipse;whiteSpace=wrap;html=1;perimeterSpacing=0;movable=1;resizable=1;rotatable=1;deletable=1;editable=1;locked=0;connectable=1;fontColor=light-dark(#000000,#FFFFFF);" value="&lt;span style=&quot;font-family: -apple-system, BlinkMacSystemFont, &amp;quot;Segoe WPC&amp;quot;, &amp;quot;Segoe UI&amp;quot;, system-ui, Ubuntu, &amp;quot;Droid Sans&amp;quot;, sans-serif; font-size: 14px; text-align: left;&quot;&gt;Track Live Order Progress &amp;amp; Status&lt;/span&gt;" vertex="1">
+          <mxGeometry height="55" width="300" x="160" y="455" as="geometry" />
+        </mxCell>
+        <mxCell id="RoGWqo4ajR8E0biaib37-8" parent="RoGWqo4ajR8E0biaib37-1" style="ellipse;whiteSpace=wrap;html=1;perimeterSpacing=0;movable=1;resizable=1;rotatable=1;deletable=1;editable=1;locked=0;connectable=1;fontColor=light-dark(#000000,#FFFFFF);" value="&lt;span style=&quot;font-family: -apple-system, BlinkMacSystemFont, &amp;quot;Segoe WPC&amp;quot;, &amp;quot;Segoe UI&amp;quot;, system-ui, Ubuntu, &amp;quot;Droid Sans&amp;quot;, sans-serif; font-size: 14px; text-align: left;&quot;&gt;Browse Catalog &amp;amp; Calculate Quotation&lt;/span&gt;" vertex="1">
+          <mxGeometry height="55" width="300" x="160" y="160" as="geometry" />
+        </mxCell>
+        <mxCell id="RoGWqo4ajR8E0biaib37-49" edge="1" parent="RoGWqo4ajR8E0biaib37-1" source="RoGWqo4ajR8E0biaib37-9" style="edgeStyle=none;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;endArrow=none;endFill=0;dashed=1;" target="RoGWqo4ajR8E0biaib37-10">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="RoGWqo4ajR8E0biaib37-50" connectable="0" parent="RoGWqo4ajR8E0biaib37-49" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" value="&amp;lt;&amp;lt;include&amp;gt;&amp;gt;" vertex="1">
+          <mxGeometry relative="1" x="0.0229" y="-2" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="RoGWqo4ajR8E0biaib37-51" edge="1" parent="RoGWqo4ajR8E0biaib37-1" source="RoGWqo4ajR8E0biaib37-9" style="edgeStyle=none;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;endArrow=none;endFill=0;dashed=1;" target="RoGWqo4ajR8E0biaib37-11">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="RoGWqo4ajR8E0biaib37-52" connectable="0" parent="RoGWqo4ajR8E0biaib37-51" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" value="&amp;lt;&amp;lt;extend&amp;gt;&amp;gt;" vertex="1">
+          <mxGeometry relative="1" x="-0.0067" y="1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="RoGWqo4ajR8E0biaib37-9" parent="RoGWqo4ajR8E0biaib37-1" style="ellipse;whiteSpace=wrap;html=1;perimeterSpacing=0;movable=1;resizable=1;rotatable=1;deletable=1;editable=1;locked=0;connectable=1;fontColor=light-dark(#000000,#FFFFFF);" value="&lt;span style=&quot;font-family: -apple-system, BlinkMacSystemFont, &amp;quot;Segoe WPC&amp;quot;, &amp;quot;Segoe UI&amp;quot;, system-ui, Ubuntu, &amp;quot;Droid Sans&amp;quot;, sans-serif; font-size: 14px; text-align: left;&quot;&gt;Place Order &amp;amp; Upload Documents&lt;/span&gt;" vertex="1">
+          <mxGeometry height="55" width="300" x="160" y="220" as="geometry" />
+        </mxCell>
+        <mxCell id="RoGWqo4ajR8E0biaib37-10" parent="RoGWqo4ajR8E0biaib37-1" style="ellipse;whiteSpace=wrap;html=1;perimeterSpacing=0;movable=1;resizable=1;rotatable=1;deletable=1;editable=1;locked=0;connectable=1;fontColor=light-dark(#000000,#FFFFFF);" value="&lt;span style=&quot;font-family: -apple-system, BlinkMacSystemFont, &amp;quot;Segoe WPC&amp;quot;, &amp;quot;Segoe UI&amp;quot;, system-ui, Ubuntu, &amp;quot;Droid Sans&amp;quot;, sans-serif; text-align: left;&quot;&gt;&lt;font&gt;Specify Print Attributes &amp;amp; Finishing&lt;/font&gt;&lt;/span&gt;" vertex="1">
+          <mxGeometry height="55" width="240" x="50" y="320" as="geometry" />
+        </mxCell>
+        <mxCell id="RoGWqo4ajR8E0biaib37-11" parent="RoGWqo4ajR8E0biaib37-1" style="ellipse;whiteSpace=wrap;html=1;perimeterSpacing=0;movable=1;resizable=1;rotatable=1;deletable=1;editable=1;locked=0;connectable=1;fontColor=light-dark(#000000,#FFFFFF);" value="&lt;span style=&quot;font-family: -apple-system, BlinkMacSystemFont, &amp;quot;Segoe WPC&amp;quot;, &amp;quot;Segoe UI&amp;quot;, system-ui, Ubuntu, &amp;quot;Droid Sans&amp;quot;, sans-serif; text-align: left;&quot;&gt;&lt;font&gt;Declare Customer-Supplied Substrates&lt;/font&gt;&lt;/span&gt;" vertex="1">
+          <mxGeometry height="55" width="240" x="340" y="320" as="geometry" />
+        </mxCell>
+        <mxCell id="RoGWqo4ajR8E0biaib37-12" parent="RoGWqo4ajR8E0biaib37-1" style="ellipse;whiteSpace=wrap;html=1;perimeterSpacing=0;movable=1;resizable=1;rotatable=1;deletable=1;editable=1;locked=0;connectable=1;fontColor=light-dark(#000000,#FFFFFF);" value="&lt;span style=&quot;font-family: -apple-system, BlinkMacSystemFont, &amp;quot;Segoe WPC&amp;quot;, &amp;quot;Segoe UI&amp;quot;, system-ui, Ubuntu, &amp;quot;Droid Sans&amp;quot;, sans-serif; font-size: 14px; text-align: left;&quot;&gt;Submit Proof of Payment&lt;/span&gt;" vertex="1">
+          <mxGeometry height="55" width="300" x="160" y="390" as="geometry" />
+        </mxCell>
+        <mxCell id="RoGWqo4ajR8E0biaib37-7" parent="RoGWqo4ajR8E0biaib37-1" style="ellipse;whiteSpace=wrap;html=1;perimeterSpacing=0;movable=1;resizable=1;rotatable=1;deletable=1;editable=1;locked=0;connectable=1;fontColor=light-dark(#000000,#FFFFFF);" value="&lt;span style=&quot;font-family: -apple-system, BlinkMacSystemFont, &amp;quot;Segoe WPC&amp;quot;, &amp;quot;Segoe UI&amp;quot;, system-ui, Ubuntu, &amp;quot;Droid Sans&amp;quot;, sans-serif; font-size: 14px; text-align: left;&quot;&gt;Register Customer Account&lt;/span&gt;" vertex="1">
+          <mxGeometry height="55" width="300" x="160" y="100" as="geometry" />
+        </mxCell>
+        <mxCell id="RoGWqo4ajR8E0biaib37-6" parent="RoGWqo4ajR8E0biaib37-1" style="ellipse;whiteSpace=wrap;html=1;perimeterSpacing=0;movable=1;resizable=1;rotatable=1;deletable=1;editable=1;locked=0;connectable=1;fontColor=light-dark(#000000,#FFFFFF);" value="&lt;span style=&quot;text-align: left; font-family: -apple-system, BlinkMacSystemFont, &amp;quot;Segoe WPC&amp;quot;, &amp;quot;Segoe UI&amp;quot;, system-ui, Ubuntu, &amp;quot;Droid Sans&amp;quot;, sans-serif;&quot;&gt;&lt;font&gt;Log In &amp;amp; Manage Profile&lt;/font&gt;&lt;/span&gt;" vertex="1">
+          <mxGeometry height="55" width="300" x="160" y="40" as="geometry" />
+        </mxCell>
+        <mxCell id="RoGWqo4ajR8E0biaib37-13" parent="RoGWqo4ajR8E0biaib37-1" style="ellipse;whiteSpace=wrap;html=1;perimeterSpacing=0;movable=1;resizable=1;rotatable=1;deletable=1;editable=1;locked=0;connectable=1;fontColor=light-dark(#000000,#FFFFFF);align=center;verticalAlign=top;" value="&#xa;&lt;span style=&quot;font-family: -apple-system, BlinkMacSystemFont, &amp;quot;Segoe WPC&amp;quot;, &amp;quot;Segoe UI&amp;quot;, system-ui, Ubuntu, &amp;quot;Droid Sans&amp;quot;, sans-serif; font-size: 14px; font-style: normal; font-variant-ligatures: normal; font-variant-caps: normal; font-weight: 400; letter-spacing: normal; orphans: 2; text-indent: 0px; text-transform: none; widows: 2; word-spacing: 0px; -webkit-text-stroke-width: 0px; white-space: normal; text-decoration-thickness: initial; text-decoration-style: initial; text-decoration-color: initial; float: none; display: inline !important;&quot;&gt;Verify Payment Transactions&lt;/span&gt;&#xa;&#xa;" vertex="1">
+          <mxGeometry height="55" width="300" x="160" y="520" as="geometry" />
+        </mxCell>
+        <mxCell id="RoGWqo4ajR8E0biaib37-57" edge="1" parent="RoGWqo4ajR8E0biaib37-1" source="RoGWqo4ajR8E0biaib37-14" style="edgeStyle=none;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;endArrow=none;endFill=0;dashed=1;" target="RoGWqo4ajR8E0biaib37-15">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="RoGWqo4ajR8E0biaib37-59" connectable="0" parent="RoGWqo4ajR8E0biaib37-57" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" value="&amp;lt;&amp;lt;include&amp;gt;&amp;gt;" vertex="1">
+          <mxGeometry relative="1" x="0.0325" y="-2" as="geometry">
+            <mxPoint y="-1" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="RoGWqo4ajR8E0biaib37-58" edge="1" parent="RoGWqo4ajR8E0biaib37-1" source="RoGWqo4ajR8E0biaib37-14" style="edgeStyle=none;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;endArrow=none;endFill=0;dashed=1;" target="RoGWqo4ajR8E0biaib37-16">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="RoGWqo4ajR8E0biaib37-60" connectable="0" parent="RoGWqo4ajR8E0biaib37-58" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" value="&amp;lt;&amp;lt;extend&amp;gt;&amp;gt;" vertex="1">
+          <mxGeometry relative="1" x="-0.0364" y="1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="RoGWqo4ajR8E0biaib37-14" parent="RoGWqo4ajR8E0biaib37-1" style="ellipse;whiteSpace=wrap;html=1;perimeterSpacing=0;movable=1;resizable=1;rotatable=1;deletable=1;editable=1;locked=0;connectable=1;fontColor=light-dark(#000000,#FFFFFF);" value="&lt;span style=&quot;font-family: -apple-system, BlinkMacSystemFont, &amp;quot;Segoe WPC&amp;quot;, &amp;quot;Segoe UI&amp;quot;, system-ui, Ubuntu, &amp;quot;Droid Sans&amp;quot;, sans-serif; font-size: 14px; text-align: left;&quot;&gt;Manage 5-Stage Kanban Production Queue&lt;/span&gt;" vertex="1">
+          <mxGeometry height="55" width="300" x="160" y="580" as="geometry" />
+        </mxCell>
+        <mxCell id="RoGWqo4ajR8E0biaib37-15" parent="RoGWqo4ajR8E0biaib37-1" style="ellipse;whiteSpace=wrap;html=1;perimeterSpacing=0;movable=1;resizable=1;rotatable=1;deletable=1;editable=1;locked=0;connectable=1;fontColor=light-dark(#000000,#FFFFFF);" value="&lt;span style=&quot;font-family: -apple-system, BlinkMacSystemFont, &amp;quot;Segoe WPC&amp;quot;, &amp;quot;Segoe UI&amp;quot;, system-ui, Ubuntu, &amp;quot;Droid Sans&amp;quot;, sans-serif; text-align: left;&quot;&gt;&lt;font&gt;Deduct Materials via Automated BOM&lt;/font&gt;&lt;/span&gt;" vertex="1">
+          <mxGeometry height="55" width="240" x="30" y="680" as="geometry" />
+        </mxCell>
+        <mxCell id="RoGWqo4ajR8E0biaib37-16" parent="RoGWqo4ajR8E0biaib37-1" style="ellipse;whiteSpace=wrap;html=1;perimeterSpacing=0;movable=1;resizable=1;rotatable=1;deletable=1;editable=1;locked=0;connectable=1;fontColor=light-dark(#000000,#FFFFFF);" value="&lt;span style=&quot;font-family: -apple-system, BlinkMacSystemFont, &amp;quot;Segoe WPC&amp;quot;, &amp;quot;Segoe UI&amp;quot;, system-ui, Ubuntu, &amp;quot;Droid Sans&amp;quot;, sans-serif; text-align: left;&quot;&gt;&lt;font&gt;Inspect Customer-Supplied Substrates&lt;/font&gt;&lt;/span&gt;" vertex="1">
+          <mxGeometry height="55" width="240" x="360" y="680" as="geometry" />
+        </mxCell>
+        <mxCell id="RoGWqo4ajR8E0biaib37-17" parent="RoGWqo4ajR8E0biaib37-1" style="ellipse;whiteSpace=wrap;html=1;perimeterSpacing=0;movable=1;resizable=1;rotatable=1;deletable=1;editable=1;locked=0;connectable=1;fontColor=light-dark(#000000,#FFFFFF);" value="&lt;span style=&quot;font-family: -apple-system, BlinkMacSystemFont, &amp;quot;Segoe WPC&amp;quot;, &amp;quot;Segoe UI&amp;quot;, system-ui, Ubuntu, &amp;quot;Droid Sans&amp;quot;, sans-serif; font-size: 14px; text-align: left;&quot;&gt;Record Spoilage &amp;amp; Inventory Adjustments&lt;/span&gt;" vertex="1">
+          <mxGeometry height="55" width="300" x="160" y="735" as="geometry" />
+        </mxCell>
+        <mxCell id="RoGWqo4ajR8E0biaib37-64" edge="1" parent="RoGWqo4ajR8E0biaib37-1" source="RoGWqo4ajR8E0biaib37-18" style="edgeStyle=none;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;endArrow=none;endFill=0;dashed=1;" target="RoGWqo4ajR8E0biaib37-19">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="RoGWqo4ajR8E0biaib37-65" connectable="0" parent="RoGWqo4ajR8E0biaib37-64" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" value="&amp;lt;&amp;lt;include&amp;gt;&amp;gt;" vertex="1">
+          <mxGeometry relative="1" x="-0.0572" y="-3" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="RoGWqo4ajR8E0biaib37-18" parent="RoGWqo4ajR8E0biaib37-1" style="ellipse;whiteSpace=wrap;html=1;perimeterSpacing=0;movable=1;resizable=1;rotatable=1;deletable=1;editable=1;locked=0;connectable=1;fontColor=light-dark(#000000,#FFFFFF);" value="&lt;span style=&quot;font-family: -apple-system, BlinkMacSystemFont, &amp;quot;Segoe WPC&amp;quot;, &amp;quot;Segoe UI&amp;quot;, system-ui, Ubuntu, &amp;quot;Droid Sans&amp;quot;, sans-serif; font-size: 14px; text-align: left;&quot;&gt;Configure Services &amp;amp; Dynamic Rates&lt;/span&gt;" vertex="1">
+          <mxGeometry height="55" width="300" x="120" y="805" as="geometry" />
+        </mxCell>
+        <mxCell id="RoGWqo4ajR8E0biaib37-19" parent="RoGWqo4ajR8E0biaib37-1" style="ellipse;whiteSpace=wrap;html=1;perimeterSpacing=0;movable=1;resizable=1;rotatable=1;deletable=1;editable=1;locked=0;connectable=1;fontColor=light-dark(#000000,#FFFFFF);" value="&lt;span style=&quot;font-family: -apple-system, BlinkMacSystemFont, &amp;quot;Segoe WPC&amp;quot;, &amp;quot;Segoe UI&amp;quot;, system-ui, Ubuntu, &amp;quot;Droid Sans&amp;quot;, sans-serif; text-align: left;&quot;&gt;&lt;font&gt;Define Bill of Materials (BOM) Recipes&lt;/font&gt;&lt;/span&gt;" vertex="1">
+          <mxGeometry height="45" width="200" x="400" y="875" as="geometry" />
+        </mxCell>
+        <mxCell id="RoGWqo4ajR8E0biaib37-22" parent="RoGWqo4ajR8E0biaib37-1" style="ellipse;whiteSpace=wrap;html=1;perimeterSpacing=0;movable=1;resizable=1;rotatable=1;deletable=1;editable=1;locked=0;connectable=1;fontColor=light-dark(#000000,#FFFFFF);" value="&lt;span style=&quot;font-family: -apple-system, BlinkMacSystemFont, &amp;quot;Segoe WPC&amp;quot;, &amp;quot;Segoe UI&amp;quot;, system-ui, Ubuntu, &amp;quot;Droid Sans&amp;quot;, sans-serif; font-size: 14px; text-align: left;&quot;&gt;Generate Sales &amp;amp; Cashflow Analytics&lt;/span&gt;" vertex="1">
+          <mxGeometry height="55" width="300" x="160" y="980" as="geometry" />
+        </mxCell>
+        <mxCell id="RoGWqo4ajR8E0biaib37-23" parent="RoGWqo4ajR8E0biaib37-1" style="ellipse;whiteSpace=wrap;html=1;perimeterSpacing=0;movable=1;resizable=1;rotatable=1;deletable=1;editable=1;locked=0;connectable=1;fontColor=light-dark(#000000,#FFFFFF);" value="&lt;span style=&quot;font-family: -apple-system, BlinkMacSystemFont, &amp;quot;Segoe WPC&amp;quot;, &amp;quot;Segoe UI&amp;quot;, system-ui, Ubuntu, &amp;quot;Droid Sans&amp;quot;, sans-serif; font-size: 14px; text-align: left;&quot;&gt;Log Out &amp;amp; Terminate Session&lt;/span&gt;" vertex="1">
+          <mxGeometry height="55" width="300" x="160" y="1040" as="geometry" />
+        </mxCell>
+        <mxCell id="RoGWqo4ajR8E0biaib37-21" parent="RoGWqo4ajR8E0biaib37-1" style="ellipse;whiteSpace=wrap;html=1;perimeterSpacing=0;movable=1;resizable=1;rotatable=1;deletable=1;editable=1;locked=0;connectable=1;fontColor=light-dark(#000000,#FFFFFF);" value="&lt;span style=&quot;font-family: -apple-system, BlinkMacSystemFont, &amp;quot;Segoe WPC&amp;quot;, &amp;quot;Segoe UI&amp;quot;, system-ui, Ubuntu, &amp;quot;Droid Sans&amp;quot;, sans-serif; font-size: 14px; text-align: left;&quot;&gt;Manage Inventory &amp;amp; Reorder Thresholds&lt;/span&gt;" vertex="1">
+          <mxGeometry height="55" width="300" x="160" y="920" as="geometry" />
+        </mxCell>
+        <mxCell id="RoGWqo4ajR8E0biaib37-42" edge="1" parent="1" source="RoGWqo4ajR8E0biaib37-2" style="rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=0.5;exitDx=0;exitDy=0;exitPerimeter=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="RoGWqo4ajR8E0biaib37-6">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="RoGWqo4ajR8E0biaib37-63" edge="1" parent="1" source="RoGWqo4ajR8E0biaib37-2" style="edgeStyle=none;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=0.5;exitDx=0;exitDy=0;exitPerimeter=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="RoGWqo4ajR8E0biaib37-18">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="RoGWqo4ajR8E0biaib37-66" edge="1" parent="1" source="RoGWqo4ajR8E0biaib37-2" style="edgeStyle=none;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=0.5;exitDx=0;exitDy=0;exitPerimeter=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="RoGWqo4ajR8E0biaib37-21">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="RoGWqo4ajR8E0biaib37-67" edge="1" parent="1" source="RoGWqo4ajR8E0biaib37-2" style="edgeStyle=none;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=0.5;exitDx=0;exitDy=0;exitPerimeter=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="RoGWqo4ajR8E0biaib37-22">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="RoGWqo4ajR8E0biaib37-68" edge="1" parent="1" source="RoGWqo4ajR8E0biaib37-2" style="edgeStyle=none;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=0.5;exitDx=0;exitDy=0;exitPerimeter=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="RoGWqo4ajR8E0biaib37-23">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="RoGWqo4ajR8E0biaib37-2" parent="1" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;outlineConnect=0;fontColor=light-dark(#000000,#FFFFFF);" value="Business Owner" vertex="1">
+          <mxGeometry height="105" width="60" x="-40" y="510" as="geometry" />
+        </mxCell>
+        <mxCell id="RoGWqo4ajR8E0biaib37-43" edge="1" parent="1" source="RoGWqo4ajR8E0biaib37-30" style="rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=0.5;exitDx=0;exitDy=0;exitPerimeter=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;" target="RoGWqo4ajR8E0biaib37-6">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="RoGWqo4ajR8E0biaib37-46" edge="1" parent="1" source="RoGWqo4ajR8E0biaib37-30" style="edgeStyle=none;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=0.5;exitDx=0;exitDy=0;exitPerimeter=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;" target="RoGWqo4ajR8E0biaib37-8">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="RoGWqo4ajR8E0biaib37-47" edge="1" parent="1" source="RoGWqo4ajR8E0biaib37-30" style="edgeStyle=none;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=0.5;exitDx=0;exitDy=0;exitPerimeter=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;" target="RoGWqo4ajR8E0biaib37-9">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="RoGWqo4ajR8E0biaib37-53" edge="1" parent="1" source="RoGWqo4ajR8E0biaib37-30" style="edgeStyle=none;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=0.5;exitDx=0;exitDy=0;exitPerimeter=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;" target="RoGWqo4ajR8E0biaib37-12">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="RoGWqo4ajR8E0biaib37-54" edge="1" parent="1" source="RoGWqo4ajR8E0biaib37-30" style="edgeStyle=none;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=0.5;exitDx=0;exitDy=0;exitPerimeter=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;" target="RoGWqo4ajR8E0biaib37-24">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="RoGWqo4ajR8E0biaib37-70" edge="1" parent="1" source="RoGWqo4ajR8E0biaib37-30" style="edgeStyle=none;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=0.5;exitDx=0;exitDy=0;exitPerimeter=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;" target="RoGWqo4ajR8E0biaib37-23">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="RoGWqo4ajR8E0biaib37-30" parent="1" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;outlineConnect=0;fontColor=light-dark(#000000,#FFFFFF);" value="Customer" vertex="1">
+          <mxGeometry height="105" width="60" x="820" y="265" as="geometry" />
+        </mxCell>
+        <mxCell id="RoGWqo4ajR8E0biaib37-44" edge="1" parent="1" source="RoGWqo4ajR8E0biaib37-34" style="rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=0.5;exitDx=0;exitDy=0;exitPerimeter=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;" target="RoGWqo4ajR8E0biaib37-6">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="RoGWqo4ajR8E0biaib37-55" edge="1" parent="1" source="RoGWqo4ajR8E0biaib37-34" style="edgeStyle=none;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=0.5;exitDx=0;exitDy=0;exitPerimeter=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;" target="RoGWqo4ajR8E0biaib37-13">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="RoGWqo4ajR8E0biaib37-56" edge="1" parent="1" source="RoGWqo4ajR8E0biaib37-34" style="edgeStyle=none;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=0.5;exitDx=0;exitDy=0;exitPerimeter=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;" target="RoGWqo4ajR8E0biaib37-14">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="RoGWqo4ajR8E0biaib37-61" edge="1" parent="1" source="RoGWqo4ajR8E0biaib37-34" style="edgeStyle=none;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=0.5;exitDx=0;exitDy=0;exitPerimeter=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;" target="RoGWqo4ajR8E0biaib37-17">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="RoGWqo4ajR8E0biaib37-69" edge="1" parent="1" source="RoGWqo4ajR8E0biaib37-34" style="edgeStyle=none;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=0.5;exitDx=0;exitDy=0;exitPerimeter=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;" target="RoGWqo4ajR8E0biaib37-23">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="RoGWqo4ajR8E0biaib37-34" parent="1" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;outlineConnect=0;fontColor=light-dark(#000000,#FFFFFF);" value="Production Staff" vertex="1">
+          <mxGeometry height="105" width="60" x="820" y="710" as="geometry" />
+        </mxCell>
+        <mxCell id="RoGWqo4ajR8E0biaib37-45" edge="1" parent="1" source="RoGWqo4ajR8E0biaib37-30" style="edgeStyle=none;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=0.5;exitDx=0;exitDy=0;exitPerimeter=0;entryX=0.968;entryY=0.602;entryDx=0;entryDy=0;entryPerimeter=0;" target="RoGWqo4ajR8E0biaib37-7">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

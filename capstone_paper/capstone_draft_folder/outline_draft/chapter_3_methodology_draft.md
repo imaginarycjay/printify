@@ -122,7 +122,7 @@ Table 3 details the minimum and recommended hardware specifications for the deve
 
 ### Project Design
 
-The project design outlines the technical architecture, data models, and system structure of the web-based management platform. It translates the identified operational and business requirements into concrete architectural blueprints. This section details the database schema through an Entity Relationship Diagram (ERD) to demonstrate how data entities interact, followed by behavioral modeling diagrams that define user roles, system interactions, and core operational workflows.
+The project design translates the operational requirements and technical constraints into actionable architectural blueprints. This stage bridges business rules with software implementation. Structurally, it defines the normalized data models and relational constraints that synchronize incoming print orders with automated Bill of Materials (BOM) inventory deductions. Behaviorally, it outlines how business owners, production operators, and customers interact across core functional modules, tracking jobs as they advance through workshop queues from intake to final handoff. The succeeding discussions present the logical database schema through an Entity Relationship Diagram (ERD), followed by behavioral use case models and operational workflow diagrams that direct daily print shop operations.
 
 #### Database Schema / Entity Relationship Diagram (ERD)
 
@@ -133,6 +133,16 @@ Customer transactions are captured in the **Orders** entity (1:N from Users and 
 Shop inventory and material resources are managed through the **InventoryItems** entity (1:N from PrintShops), which tracks stock balances, units of measurement, unit acquisition costs, and dynamic reorder point thresholds. Automated material consumption is governed by the **ServiceBoms** entity (1:N from ShopServices and N:1 to InventoryItems), a unified Bill of Materials repository that maps specific services and variant conditions to precise physical consumption recipes. All stock movements—including production deductions, supplier restocks, and workshop spoilage—are permanently recorded in the **StockMovements** entity (1:N from InventoryItems and Users, with direct foreign key traceability to Orders), establishing an immutable audit ledger that powers real-time material burn rate calculations and automated replenishment alerts.
 
 *(Figure 3. Entity Relationship Diagram will be placed here)*
+
+#### Use Case Diagram
+
+Figure 4 illustrates the Use Case Diagram of the Integrated Dynamic Order, Job Scheduling, and Inventory Management System. The diagram defines the system boundary and visualizes how external actors interact with core system functions across administrative, production, and customer domains. Three primary actors govern platform activity: the Business Owner, the Production Staff, and the Customer. Access privileges are strictly segregated through role-based authentication, directing each actor to dedicated operational interfaces upon system entry.
+
+The Customer initiates transaction lifecycles through the client-facing ordering interface. Customers browse the active service catalog, configure print specifications, and generate instant price quotations before placing orders and uploading digital artwork. The ordering workflow inherently requires configuring technical print parameters—such as paper dimensions, GSM weight, color mode, and binding options—represented through an *<<include>>* relationship. In contrast, the option to declare customer-supplied substrates (*"Dala ang Papel"*) extends the ordering workflow conditionally via an *<<extend>>* dependency, dynamically discounting service totals and bypassing raw material allocations. Following order placement, customers submit transaction reference numbers and payment proof, subsequently tracking the real-time stage progression of their print jobs through to pickup readiness.
+
+The Production Staff and Business Owner govern floor execution and enterprise management from internal authenticated interfaces. Production operators supervise jobs across a visual five-stage Kanban board (*Queue, Printing, Finishing/Assembly, Quality Check, and Ready for Pickup*). Advancing a job across these production stages automatically triggers an *<<include>>* dependency for automated Bill of Materials (BOM) inventory deductions, decrementing physical stock levels in real time. When an order involves customer-supplied materials, staff verify the delivered paper at the shop counter through an *<<extend>>* verification procedure before machine processing begins. At the managerial level, the Business Owner oversees system configuration. Owners dynamically configure print services and their underlying BOM recipes (*<<include>>*), adjust inventory safety thresholds, track material burn rates against dynamic reorder point thresholds, and generate business analytics to evaluate financial and operational performance.
+
+*(Figure 4. Use Case Diagram will be placed here)*
 
 
 
