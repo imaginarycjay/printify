@@ -618,6 +618,29 @@ This file logs all completed tasks, steps, and key state changes. The agent must
   - Added model `ServiceBom.php` and feature test `UnifiedServiceBomTest.php`.
   - Updated `database_schema.dbml` and `chapter_3_methodology_draft.md`.
 
+---
+
+## [2026-09-11 12:30:00] Use Case Diagram & UML Class Diagram Architecture and Manuscript Rationale
+- **Request:** Create Use Case Diagram and Class Diagram for Chapter 3 Methodology based on USM BSIS outline examples (Comission/Nonakan), build Mermaid JS diagram with markdown fallback guide for Draw.io plotting, and write a humanized academic rationale for Chapter 3.
+- **Status:** Success
+- **Steps Taken:**
+  - Extracted and reviewed institutional benchmark outlines (`Comission_Outline_Turn_it_in.pdf` and `Nonakan-Final-Outline.pdf`), identifying the standard 11-class OOP hierarchy (central `User` specialized into `BusinessOwner`, `ProductionStaff`, and `Customer`).
+  - Reviewed and verified `use_case_diagram_final.png` drawn by user, ensuring standard UML 2.5 compliance (`<<extend>>` arrows directed from Extension to Base, solid undirected association lines, 18 use cases).
+  - Drafted comprehensive UML Class Diagram specifications in [`capstone_paper/capstone_draft_folder/diagrams/class_diagram.md`](file:///home/imaginarycjay/printify/capstone_paper/capstone_draft_folder/diagrams/class_diagram.md) including:
+    - Syntactically valid Mermaid.js `classDiagram`.
+    - Detailed Markdown Fallback Blueprint with attributes, types, visibility, and methods matching Laravel Eloquent models (`User`, `PrintShop`, `ShopService`, `ServiceBom`, `InventoryItem`, `StockMovement`, `Order`, `OrderItem`).
+    - Complete relationship and multiplicity matrix (Generalization, Composition, Aggregation, Association).
+    - 3-Column Zero-Crossing visual layout guide for Draw.io / Lucidchart canvas.
+  - Authored humanized academic narrative for the Class Diagram in [`capstone_paper/capstone_draft_folder/outline_draft/chapter_3_methodology_draft.md`](file:///home/imaginarycjay/printify/capstone_paper/capstone_draft_folder/outline_draft/chapter_3_methodology_draft.md#L146-L153) under Figure 5.
+  - Created interactive artifact in [`class_diagram_artifact.md`](file:///home/imaginarycjay/.gemini/antigravity-cli/brain/5412c151-1650-4c16-9481-a783f2a446a1/class_diagram_artifact.md).
+- **Verification & Outcome:**
+  - Validated Mermaid.js class diagram syntax with Node.js parser.
+  - Verified alignment between Eloquent models and UML class signatures.
+  - Checked manuscript narrative against `.agents/skills/humanize-academic-writing` and `.agents/skills/research-paper-writing`.
+- **Key State Changes:**
+  - Created `capstone_paper/capstone_draft_folder/diagrams/class_diagram.md`.
+  - Updated `capstone_paper/capstone_draft_folder/outline_draft/chapter_3_methodology_draft.md` with Use Case and Class Diagram sections.
+
 
 
 

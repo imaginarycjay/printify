@@ -1,5 +1,4 @@
-# CHAPTER 3: METHODOLOGY
-
+# CHAPTER 3: METHODOLOGY MY PART ONLY
 This chapter presents the methodology used in conducting the study. It describes the research design, the participants involved, data collection procedures, system development approach, and evaluation methods applied in developing and assessing the proposed system. It also outlines the procedures followed by the researchers to ensure that the system meets its objectives and satisfies the operational needs of the printing shop.
 
 ### Project Design
@@ -143,6 +142,14 @@ The Customer initiates transaction lifecycles through the client-facing ordering
 The Production Staff and Business Owner govern floor execution and enterprise management from internal authenticated interfaces. Production operators supervise jobs across a visual five-stage Kanban board (*Queue, Printing, Finishing/Assembly, Quality Check, and Ready for Pickup*). Advancing a job across these production stages automatically triggers an *<<include>>* dependency for automated Bill of Materials (BOM) inventory deductions, decrementing physical stock levels in real time. When an order involves customer-supplied materials, staff verify the delivered paper at the shop counter through an *<<extend>>* verification procedure before machine processing begins. At the managerial level, the Business Owner oversees system configuration. Owners dynamically configure print services and their underlying BOM recipes (*<<include>>*), adjust inventory safety thresholds, track material burn rates against dynamic reorder point thresholds, and generate business analytics to evaluate financial and operational performance.
 
 *(Figure 4. Use Case Diagram will be placed here)*
+
+#### Class Diagram
+
+Figure 5 illustrates the Class Diagram of the Integrated Dynamic Order, Job Scheduling, and Inventory Management System. The diagram models the static structure of the platform, defining system entities, internal state attributes, operational methods, and structural relationships. System actors are formalized through an object-oriented inheritance hierarchy rooted in the generalized **User** superclass. This superclass encapsulates shared authentication states and profile management operations, which are subsequently specialized into three distinct subclasses: **BusinessOwner**, **ProductionStaff**, and **Customer**. Each specialized subclass defines role-specific behaviors, ensuring that administrative configuration, workshop floor job handling, and client order placement remain modular and structurally isolated.
+
+The domain model operationalizes print shop transactions and inventory replenishment through interconnected entity classes. A **BusinessOwner** manages a single **PrintShop** aggregate root (1:1), which anchors the establishment's catalog of **ShopService** offerings and physical **InventoryItem** supplies. Customers initiate transactions by placing an **Order** (1:N), which establishes a composite aggregation with one or more **OrderItem** instances to encapsulate itemized production parameters and document attachments. As production operators in the **ProductionStaff** role advance active orders across workshop stages, the system queries linked **ServiceBom** consumption recipes to calculate exact raw material usage. These material deductions directly decrement stock balances in **InventoryItem** and write immutable audit records to **StockMovement**, preserving strict inventory traceability and providing reliable telemetry for automated reorder alerts.
+
+*(Figure 5. Class Diagram will be placed here)*
 
 
 
