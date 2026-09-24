@@ -169,8 +169,7 @@ new class extends Component {
 
                     <div class="flex items-center justify-end pt-4">
                         <flux:button wire:click="nextStep" variant="primary" class="w-full sm:w-auto bg-amber-500 hover:bg-amber-400 text-stone-950 font-bold px-8 py-3 rounded-xl shadow-lg shadow-amber-500/25">
-                            Continue to Services Selection
-                            <flux:icon name="arrow-right" class="size-4 ms-1" />
+                            Proceed
                         </flux:button>
                     </div>
                 </div>
@@ -241,14 +240,12 @@ new class extends Component {
 
                     <!-- Navigation Footer -->
                     <div class="flex items-center justify-between border-t border-stone-800 pt-6 mt-6">
-                        <flux:button wire:click="previousStep" variant="subtle" class="text-stone-400 hover:text-white">
-                            <flux:icon name="arrow-left" class="size-4 me-1" />
-                            Back to Shop Name
+                        <flux:button wire:click="previousStep" variant="subtle" class="border border-stone-800 hover:border-stone-700 bg-stone-900/60 hover:bg-stone-800 text-stone-300 hover:text-white font-medium px-6 py-3 rounded-xl transition-all">
+                            Return
                         </flux:button>
 
                         <flux:button wire:click="completeSetup" variant="primary" class="bg-amber-500 hover:bg-amber-400 text-stone-950 font-bold px-8 py-3 rounded-xl shadow-lg shadow-amber-500/25">
-                            Finish Setup & Launch Dashboard
-                            <flux:icon name="sparkles" class="size-4 ms-1" />
+                            Finish Setup
                         </flux:button>
                     </div>
                 </div>

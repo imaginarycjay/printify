@@ -1,27 +1,11 @@
 # Project Rules & Guidelines
 
-## Agent Activity Journal
+## Mandatory Instructions (READ ON EVERY PROMPT)
 
-To save tokens and preserve context across sessions:
-1. **Read the Journal First**: At the start of a new session or task, read `.agents/journal.md` to quickly catch up on recent modifications, status of tasks, and context without re-scanning the entire codebase.
-2. **Update the Journal on Completion (Major Tasks Only)**: Before ending your turn or finishing a user request, append a new markdown entry to `.agents/journal.md` summarizing the task. **Do NOT record in the journal for minor fixes or adjustments** unless explicitly instructed by the user. Only record major milestones, new modules, structural additions, or significant features.
+1. **Strict English Response Mandate**: You MUST ALWAYS respond to the user in **English** across all conversational replies and outputs, regardless of what language or dialect (e.g., Tagalog, Taglish, Cebuano, etc.) the user uses in their prompt.
+2. **Mandatory Rule Review**: You MUST read and follow the instructions in `AGENTS.md` and `.agents/AGENTS.md` on **EVERY prompt** to maintain strict alignment with user instructions, architectural decisions, and project rules.
 
-### Journal Entry Template
-
-Use the following format for each entry, appending it to the end of `.agents/journal.md`:
-
-```markdown
 ---
-
-## [YYYY-MM-DD HH:MM:SS] <Short Task Name>
-- **Request:** <Brief summary of the user's prompt or goal>
-- **Status:** [Success | Error | In Progress]
-- **Steps Taken:**
-  - <Action 1 (e.g. created component/file)>
-  - <Action 2 (e.g. run test command)>
-- **Verification & Outcome:** <How it was verified, test output summaries, or error messages if any>
-- **Key State Changes:** <Any structural changes (e.g. dependencies added, database tables created/migrated, config keys added)>
-```
 
 ## Active Skill Verification & Installation
 
@@ -30,14 +14,16 @@ Use the following format for each entry, appending it to the end of `.agents/jou
    - Search the web for a matching AI agent skill or standard workflow instructions.
    - Install the new skill by creating the folder `.agents/skills/<skill-name>/` and writing a `SKILL.md` file (including YAML frontmatter with `name` and `description`).
 
+---
+
 ## Academic Thesis & Capstone Writing Rules
 
 Whenever the prompt involves academic writing, capstone paper, thesis manuscript, outline, or revisions:
-1. **Mandatory Skill Activation**: Always read and apply `.agents/skills/research-paper-writing/SKILL.md` (from https://github.com/Master-cai/Research-Paper-Writing-Skills.git), `.agents/skills/humanize-academic-writing/SKILL.md`, and `.agents/skills/scholarly/SKILL.md`.
-2. **USM Institutional Standards**: Follow the accepted USM BSIS outline structure (e.g., Nonakan and Comission references):
-   - No in-text citations in Chapter 1 (citations are reserved for Chapter 2).
+1. **Mandatory Skill Activation**: Always read and apply `.agents/skills/research-paper-writing/SKILL.md`, `.agents/skills/humanize-academic-writing/SKILL.md`, and `.agents/skills/scholarly/SKILL.md`.
+2. **USM Institutional Standards & Capstone Conventions**: Follow the accepted USM BSIS outline structure (e.g., Nonakan and Comission references):
+   - Use **"project"**, **"capstone project"**, and **"project developers"** instead of "research", "study", or "researchers" when working on BSIS capstones.
    - Statement of the Problem in cohesive paragraph form (no numbered itemized questions).
    - 5-Stage IPO Model (Input-Process-Output-Outcome-Impact) for Conceptual Framework.
    - Professional academic English for paper text, without AI clichés or empty transitions.
-3. **Conversational Language**: Always respond to the user in **Taglish** in the chat, but write the paper manuscript text in formal academic English.
-
+   - Incorporate in-text citations when specifically requested by the adviser or required by academic rigor.
+3. **Conversational Language**: Always respond to the user in **English** in the chat, regardless of what language the user uses in the prompt. Write all academic paper manuscript text in formal academic English.

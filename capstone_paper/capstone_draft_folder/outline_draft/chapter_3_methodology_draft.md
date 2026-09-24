@@ -36,59 +36,158 @@ This section defines the functional and technical requirements of the Integrated
 
 #### Functional Requirements
 
-1. **User Account Registration and Authentication**
-   * **Description:** Provides secure user registration, role-based login, and session access control tailored for business owners, production staff, and customers.
-   * **Input:** Full name, email address, contact number, password, and designated user role.
-   * **Process:** Validates input data, hashes passwords securely, verifies user credentials, assigns role permissions, and redirects the user to their designated dashboard.
-   * **Output:** User account confirmation message and access to the corresponding role-specific dashboard.
+This section formalizes the functional requirements of the platform. To maintain strict architectural alignment with the behavioral models of the system, each functional requirement directly maps to an atomic use case identified in the Use Case Diagram (Figure 5), incorporating both base operations and stereotype dependencies (`<<include>>` and `<<extend>>`).
 
-2. **Dynamic Service and Rate Configuration (Admin)**
-   * **Description:** Allows business owners to dynamically define and update print service offerings, page rates, paper stocks, finishing options, and pricing formulas without modifying the source code.
-   * **Input:** Service name, base prices, per-page rates for monochrome and color, paper sizes (Short, A4, Long), paper thickness options (70, 80, 100 gsm), duplex discount percentages, rush fee amounts, and finishing add-on rates.
-   * **Process:** Stores and updates configuration parameters in the database and applies dynamic pricing rules to the customer ordering calculations.
-   * **Output:** Updated service catalog, active pricing formulas, and instant confirmation alerts.
+**Table 2. Functional Requirements to Use Case Traceability Matrix**
 
-3. **Customer Self-Service Ordering and File Upload**
-   * **Description:** Enables customers to select printing services, specify customized attributes, upload document or artwork files, and receive instant price quotations.
-   * **Input:** Selected print service, page specifications, color mode, paper stock, binding and finishing selections, document files (PDF/images), quantity, and delivery or pickup preferences.
-   * **Process:** Computes the total order cost dynamically based on active pricing rules, validates uploaded files, creates a pending order record, and generates a unique Order ID.
-   * **Output:** Itemized price quotation, generated order summary, and order submission confirmation.
+| Requirement ID | Associated Use Case ID | Functional Requirement Title | Primary Actor(s) | UML Relationship Dependency |
+| :---: | :---: | :--- | :--- | :--- |
+| **FR-01** | **UC-02** | User Account Registration | Customer | Base Use Case |
+| **FR-02** | **UC-01** | User Authentication and Profile Management | Owner, Staff, Customer | Base Use Case |
+| **FR-03** | **UC-18** | Session Termination and Logout | Owner, Staff, Customer | Base Use Case |
+| **FR-04** | **UC-03** | Service Catalog Browsing and Quotation Calculation | Customer | Base Use Case |
+| **FR-05** | **UC-04** | Print Order Placement and Document Upload | Customer | Base Use Case |
+| **FR-06** | **UC-05** | Print Attribute and Finishing Specification | Customer | `<<include>>` (Included by UC-04) |
+| **FR-07** | **UC-06** | Customer-Supplied Substrate Declaration ("Dala ang Papel") | Customer | `<<extend>>` (Extends UC-04) |
+| **FR-08** | **UC-07** | Proof of Payment Submission | Customer | Base Use Case |
+| **FR-09** | **UC-08** | Live Order Progress and Status Tracking | Customer | Base Use Case |
+| **FR-10** | **UC-09** | Payment Transaction Auditing and Verification | Production Staff | Base Use Case |
+| **FR-11** | **UC-10** | Production Floor 5-Stage Kanban Queue Management | Production Staff | Base Use Case |
+| **FR-12** | **UC-11** | Automated Bill of Materials (BOM) Inventory Deduction | Production Staff / System | `<<include>>` (Included by UC-10) |
+| **FR-13** | **UC-12** | Customer-Supplied Substrate Counter Inspection | Production Staff | `<<extend>>` (Extends UC-10) |
+| **FR-14** | **UC-13** | Material Spoilage Logging and Stock Adjustments | Production Staff | Base Use Case |
+| **FR-15** | **UC-14** | Dynamic Service and Rate Configuration | Business Owner | Base Use Case |
+| **FR-16** | **UC-15** | Bill of Materials (BOM) Recipe Definition | Business Owner | `<<include>>` (Included by UC-14) |
+| **FR-17** | **UC-16** | Inventory Oversight and Dynamic Reorder Point (ROP) Alerting | Business Owner | Base Use Case |
+| **FR-18** | **UC-17** | Sales, Cashflow, and Operational Analytics Generation | Business Owner | Base Use Case |
 
-4. **Payment Proof Submission and Verification**
-   * **Description:** Facilitates manual payment verification where customers submit payment references and receipts for staff confirmation.
-   * **Input:** Selected payment method (GCash, Maya, or Counter Cash), transaction reference number, and payment receipt screenshot.
-   * **Process:** Records the payment proof, notifies production staff of pending payments, allows staff to cross-reference transactions, and updates the payment status upon approval.
-   * **Output:** Updated payment status (e.g., Pending, Paid, or Rejected) and automated order status update.
+The detailed behavioral specifications defining the Input, Process, and Output (IPO) for each functional requirement are itemized below:
 
-5. **Production Floor Job Scheduling (5-Stage Kanban Queue)**
-   * **Description:** Organizes active print jobs into a visual 5-stage production queue, allowing staff to track job progression, manage machine allocation, and meet fulfillment deadlines.
-   * **Input:** Confirmed customer orders, assigned operator names, and production stage transitions.
-   * **Process:** Routes confirmed orders into the production queue (Pending Queue → Printing → Assembly/Binding → Quality Check → Ready for Pickup), logs stage timestamps, and updates progress indicators.
-   * **Output:** Real-time visual Kanban board, digital job tickets, and synchronized progress updates on customer dashboards.
+1. **User Account Registration**
+   * **Use Case Mapping:** UC-02 (Base Use Case)
+   * **Description:** Provides self-service client account registration for customers wishing to transact through the platform.
+   * **Input:** Customer full name, valid email address, mobile phone number, and a secure password with confirmation.
+   * **Process:** Validates form syntax and email uniqueness, hashes the password securely using bcrypt, initializes a user record assigned with the default customer role, and persists the entity in the database.
+   * **Output:** Account creation confirmation alert and automatic redirection to the authentication interface.
 
-6. **Customer-Supplied Substrate Tracking ("Dala ang Papel")**
-   * **Description:** Tracks whether paper or substrates are supplied by the customer, adjusting pricing calculations and preventing unnecessary inventory deductions.
-   * **Input:** Customer-supplied paper selection toggle, sheet quantity, and paper description.
-   * **Process:** Deducts the shop paper cost from the total quotation, flags the order ticket for staff verification upon paper receipt, and bypasses shop raw paper stock deduction.
-   * **Output:** Adjusted order total, tagged digital job ticket, and updated material requirement logs.
+2. **User Authentication and Profile Management**
+   * **Use Case Mapping:** UC-01 (Base Use Case)
+   * **Description:** Authenticates registered user credentials, enforces role-based access control (RBAC), and allows users to manage their personal credentials and profile details.
+   * **Input:** Registered email address, password, and optional profile attribute updates (contact details, password changes).
+   * **Process:** Cross-references submitted credentials against hashed database records, initializes an authenticated user session, resolves role privileges, redirects the actor to their designated dashboard (Owner, Staff, or Customer), and validates profile modifications.
+   * **Output:** Authenticated user session, role-restricted dashboard access, and profile update status notifications.
 
-7. **Automated Bill of Materials (BOM) Inventory Deduction**
-   * **Description:** Automatically deducts raw printing supplies from the inventory based on predefined material recipes as jobs advance through production stages.
-   * **Input:** Active order specifications (page count, paper type, binding rings, cover boards) and production stage completions.
-   * **Process:** Multiplies job quantities by the linked BOM recipe and automatically decrements stock levels in the inventory database upon job execution.
-   * **Output:** Updated real-time inventory balances and recorded stock movement audit logs.
+3. **Session Termination and Logout**
+   * **Use Case Mapping:** UC-18 (Base Use Case)
+   * **Description:** Securely invalidates active authentication tokens and terminates user sessions to prevent unauthorized device access.
+   * **Input:** Logout command trigger from the user navigation interface.
+   * **Process:** Flushes authenticated session storage, invalidates security tokens, regenerates the CSRF token, and destroys cookie references.
+   * **Output:** Redirection to the public landing page accompanied by a session termination confirmation.
 
-8. **Real-Time Burn Rate Calculation and Dynamic Reorder Point (ROP) Alerts**
-   * **Description:** Monitors daily material consumption velocity across rolling 7-day and 30-day windows, evaluates dynamic reorder points, and alerts management of low stock levels.
-   * **Input:** Historical stock movement logs, daily consumption records, supplier lead times, and safety stock baselines.
-   * **Process:** Computes the daily material burn rate, calculates the dynamic reorder point threshold, and evaluates current stock levels against the threshold.
-   * **Output:** Visual low-stock warning badges, restocking recommendation alerts, and inventory health summaries.
+4. **Service Catalog Browsing and Quotation Calculation**
+   * **Use Case Mapping:** UC-03 (Base Use Case)
+   * **Description:** Enables customers to explore active printing services and calculate real-time itemized price quotations based on selected operational parameters.
+   * **Input:** Selected print service category, document dimensions, page counts, color mode (monochrome/color), paper stock, binding finishing, and copy volume.
+   * **Process:** Interrogates database pricing formulas in real time, applies dynamic rate multipliers via reactive Livewire component state, and computes cost subtotals without reloading the page.
+   * **Output:** Dynamic, itemized quotation breakdown reflecting base costs, per-page rates, finishing surcharges, and estimated totals.
 
-9. **Sales, Cashflow, and Inventory Reporting**
-   * **Description:** Compiles and visualizes business transaction data to generate comprehensive sales, material consumption, and financial reports.
-   * **Input:** Date range filters, service category selections, and report type parameters.
-   * **Process:** Aggregates transaction records, calculates gross revenue, net margins, and service volume distribution, and formats data into printable summaries and charts.
-   * **Output:** Interactive visual charts, service product mix reports, and exportable financial summary tables.
+5. **Print Order Placement and Document Upload**
+   * **Use Case Mapping:** UC-04 (Base Use Case)
+   * **Description:** Captures finalized customer print requests and facilitates digital document or artwork file submission for prepress inspection.
+   * **Input:** Customer order details, fulfillment mode preference (pickup/counter handoff), optional production notes, and digital document files (PDF, DOCX, or high-resolution images).
+   * **Process:** Validates file MIME types and size constraints, transfers uploaded files to an encrypted private storage disk with tokenized filenames, writes the parent order record to the database, and generates a unique tracking code (e.g., `ORD-2026-001`).
+   * **Output:** Instantiated pending order record, generated tracking code, and visual order submission confirmation.
+
+6. **Print Attribute and Finishing Specification**
+   * **Use Case Mapping:** UC-05 (`<<include>>` dependency of UC-04)
+   * **Description:** Mandates the capture and technical validation of detailed print configuration attributes required to fulfill an active order.
+   * **Input:** Paper dimensions (Short, A4, Long), paper thickness (70 gsm, 80 gsm, 100 gsm), print orientation (simplex single-sided or duplex back-to-back), and binding finishes (spiral coil, sliding cover, softbound, or hardbound foil stamping).
+   * **Process:** Encapsulates submitted attributes into a structured line-item specification record, verifies technical feasibility (e.g., maximum page limits for specific binding styles), and calculates exact physical sheet requirements ($\lceil \text{pages}/2 \rceil \times \text{copies}$ for duplex).
+   * **Output:** Validated `order_items` specification entity inextricably linked to the parent order.
+
+7. **Customer-Supplied Substrate Declaration ("Dala ang Papel")**
+   * **Use Case Mapping:** UC-06 (`<<extend>>` dependency of UC-04)
+   * **Description:** Conditionally extends the order placement workflow when a client elects to supply their own physical paper, adjusting financial calculations and tagging production requirements.
+   * **Input:** Customer-supplied substrate toggle activation, provided paper description, and declared sheet count.
+   * **Process:** Subtracts shop raw paper material charges from the running price quotation, designates line-item fulfillment as `cover_only`, and appends an "Awaiting Paper Delivery" intake flag to the digital job ticket.
+   * **Output:** Discounted order total and an intake-tagged digital job ticket for workshop counter tracking.
+
+8. **Proof of Payment Submission**
+   * **Use Case Mapping:** UC-07 (Base Use Case)
+   * **Description:** Enables customers to submit manual payment verification references for counter cash transactions or mobile wallet remittances (GCash / Maya).
+   * **Input:** Selected payment channel, alphanumeric transaction reference number, and a graphic screenshot of the remittance receipt.
+   * **Process:** Validates image file structure, attaches the proof payload to the pending order record, flags order payment status as `pending_verification`, and alerts shop staff of pending billing audits.
+   * **Output:** Payment submission acknowledgment and updated pending verification status badge on the client portal.
+
+9. **Live Order Progress and Status Tracking**
+   * **Use Case Mapping:** UC-08 (Base Use Case)
+   * **Description:** Provides transparent, real-time telemetry displaying the operational progression of customer orders across workshop milestones.
+   * **Input:** Customer Order ID, tracking code, or authenticated client dashboard session.
+   * **Process:** Queries active production status flags in the database and renders an illuminated, color-coded 5-stage visual stepper reflecting milestone progression and stage completion timestamps.
+   * **Output:** Real-time visual progress stepper indicating current order stage (Queue, Printing, Finishing, QC, Ready for Pickup) and estimated fulfillment date.
+
+10. **Payment Transaction Auditing and Verification**
+    * **Use Case Mapping:** UC-09 (Base Use Case)
+    * **Description:** Empowers production staff and business administrators to audit customer-submitted payment proofs against billing ledgers and update order financial states.
+    * **Input:** Staff audit decision (Approve or Reject), cross-referenced reference numbers, and optional rejection remarks.
+    * **Process:** Verifies transaction validity against shop financial ledgers, transitions `payment_status` to `verified_paid` (or `rejected`), records the verifying staff ID and verification timestamp, and transitions the order into the active production queue.
+    * **Output:** Updated order financial status and automated payment confirmation notification broadcast to the customer dashboard.
+
+11. **Production Floor 5-Stage Kanban Queue Management**
+    * **Use Case Mapping:** UC-10 (Base Use Case)
+    * **Description:** Organizes workshop production orders into an interactive visual 5-stage Kanban board to direct job scheduling, operator delegation, and machine allocation.
+    * **Input:** Assigned staff operator ID, assigned printing machine designation, stage progression triggers, and optional quality control (QC) rework remarks.
+    * **Process:** Moves active orders across five sequential workshop stages (1. In Queue $\rightarrow$ 2. Printing Pages $\rightarrow$ 3. Finishing & Assembly $\rightarrow$ 4. Quality Inspection $\rightarrow$ 5. Ready for Pickup), logs transition timestamps, synchronizes customer tracking steppers, or executes step-back transitions upon QC failure.
+    * **Output:** Interactive visual Kanban board, updated digital job ticket states, and synchronized customer progress updates.
+
+12. **Automated Bill of Materials (BOM) Inventory Deduction**
+    * **Use Case Mapping:** UC-11 (`<<include>>` dependency of UC-10)
+    * **Description:** Automatically decrements raw material inventories based on linked service BOM recipes as print jobs advance into production or pickup stages.
+    * **Input:** Active order line-item parameters (page count, paper dimensions, duplex flags, binding consumables, copy quantity) and stage advance trigger.
+    * **Process:** Evaluates item fulfillment status; if designated as "Dala ang Papel", raw paper sheet deduction is completely bypassed. For standard orders, computes exact consumption based on duplex math ($\lceil \text{pages}/2 \rceil \times \text{copies}$) and finishing multipliers, decrements `inventory_items.current_stock`, and records immutable audit entries in `stock_movements`.
+    * **Output:** Decremented physical stock balances and recorded inventory transaction audit trails.
+
+13. **Customer-Supplied Substrate Counter Inspection**
+    * **Use Case Mapping:** UC-12 (`<<extend>>` dependency of UC-10)
+    * **Description:** Conditionally extends the production queue workflow when an order contains customer-supplied paper, requiring staff to inspect physical stock before machine processing begins.
+    * **Input:** Physical paper bundle presented at the counter, physical sheet count verification, grammage/condition inspection, and "Mark Paper Received" staff confirmation.
+    * **Process:** Cross-references physical stock against digital job ticket parameters; upon staff confirmation, updates order state to `is_paper_received = true`, logs the receiving staff ID, and releases the job ticket from intake hold into the active printing queue.
+    * **Output:** Verified substrate receipt status on the job ticket and release into active machine production.
+
+14. **Material Spoilage Logging and Stock Adjustments**
+    * **Use Case Mapping:** UC-13 (Base Use Case)
+    * **Description:** Allows production operators to record physical material waste and accidental damage resulting from printer jams, paper misfeeds, or binding errors.
+    * **Input:** Damaged inventory item selection, wasted quantity, and specific operational failure explanation.
+    * **Process:** Validates numeric quantity limits, decrements the item's on-hand stock balance, appends an audit entry to `stock_movements` tagged as `spoilage`, records the reporting operator's ID, and checks remaining stock against reorder thresholds.
+    * **Output:** Adjusted on-hand inventory levels, recorded waste audit logs, and dynamic replenishment threshold evaluation.
+
+15. **Dynamic Service and Rate Configuration**
+    * **Use Case Mapping:** UC-14 (Base Use Case)
+    * **Description:** Allows business owners to dynamically define, modify, or retire service offerings, pricing structures, and rate tariffs without altering application source code.
+    * **Input:** Service key, descriptive name, active status toggle, base setup fee, monochrome/color per-page rates, paper profile limits, rush fee multipliers, and finishing add-on prices.
+    * **Process:** Validates input parameters against numeric boundaries, writes updated configuration records to `shop_services` and JSON attribute schemas, clears cached application pricing models, and exposes new configurations to the client ordering interface.
+    * **Output:** Updated service catalog, active pricing formulas, and instant administrative configuration confirmation.
+
+16. **Bill of Materials (BOM) Recipe Definition**
+    * **Use Case Mapping:** UC-15 (`<<include>>` dependency of UC-14)
+    * **Description:** Mandates the relational mapping between dynamic shop services and physical inventory stock items to govern automated material depletion formulas.
+    * **Input:** Configured service identifier, linked inventory item IDs, applicable variant bindings (hardbound, softbound, spiral comb, sliding folder), and unit consumption coefficients.
+    * **Process:** Enforces relational integrity across services and inventory items, stores recipe mappings in `service_boms` and configuration tables, and validates formula mathematical logic.
+    * **Output:** Relational Bill of Materials (BOM) recipe linking dynamic services to automated inventory consumption.
+
+17. **Inventory Oversight and Dynamic Reorder Point (ROP) Alerting**
+    * **Use Case Mapping:** UC-16 (Base Use Case)
+    * **Description:** Monitors physical stock balances, computes rolling consumption velocity, and triggers visual replenishment warnings when supplies reach critical levels.
+    * **Input:** Historical stock movement logs, rolling daily consumption data, supplier lead times, and baseline safety stock levels.
+    * **Process:** Computes the daily material burn rate ($\text{Burn Rate} = \frac{\text{Total Material Consumed}}{\text{Time Period in Days}}$), derives the dynamic Reorder Point threshold ($\text{ROP} = (\text{Daily Burn Rate} \times \text{Lead Time}) + \text{Safety Stock}$), evaluates current stock against the threshold, and flags items requiring replenishment.
+    * **Output:** Real-time stock health summaries, visual low-stock badges on the Inventory Hub, and automated restocking banners on the Owner Master Dashboard.
+
+18. **Sales, Cashflow, and Operational Analytics Generation**
+    * **Use Case Mapping:** UC-17 (Base Use Case)
+    * **Description:** Aggregates transaction data, service volume, material expenses, and revenues to generate interactive business intelligence and exportable reports.
+    * **Input:** Date range selection parameters, service category filters, and CSV report export commands.
+    * **Process:** Aggregates database transactions across orders, computes gross revenues, net margins, material consumption expenses, spoilage costs, and rush revenue, rendering visual trend charts and formatted tabular ledgers.
+    * **Output:** Interactive visual charts, service product mix reports, and exportable financial CSV audit ledgers.
 
 #### Software Requirements Specification
 

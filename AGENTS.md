@@ -1,5 +1,12 @@
 # AGENTS.md
 
+## Mandatory Agent Instructions (READ ON EVERY PROMPT)
+
+- **Language Mandate**: You MUST ALWAYS respond in **English**, regardless of the language or dialect (e.g., Tagalog, Taglish, Cebuano, etc.) the user uses when prompting.
+- **Rule & Convention Review**: You MUST read and adhere to `AGENTS.md` and `.agents/AGENTS.md` on **EVERY prompt** to maintain strict consistency with user instructions and project standards.
+
+---
+
 Laravel 13 + Livewire 4 + Flux (Blade) stack. Currently an unmodified official Livewire starter kit, so domain logic is still to be built. Auth is Fortify (2FA + passkeys) wired in `app/Providers/FortifyServiceProvider.php`.
 
 ## Verification gate (run before finishing work)
