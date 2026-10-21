@@ -1,0 +1,4239 @@
+=====PAGE 1=====
+PRINTIFY: INTEGRATED DYNAMIC ORDER, JOB 
+ SCHEDULING, AND INVENTORY MANAGEMENT SYSTEM FOR 
+ PRINTING SERVICES WITH AUTOMATED REPLENISHMENT 
+ CHRISTIAN JAMES J. PEREZ 
+ KAYE P. COMISSION 
+ BACHELOR OF SCIENCE IN INFORMATION SYSTEMS 
+ OCTOBER   2026 
+=====PAGE 2=====
+PRINTIFY: INTEGRATED DYNAMIC ORDER, JOB SCHEDULING, AND 
+ INVENTORY MANAGEMENT SYSTEM FOR PRINTING SERVICES WITH 
+ AUTOMATED REPLENISHMENT 
+ CHRISTIAN JAMES J. PEREZ 
+ KAYE P. COMISSION 
+ Thesis Outline Submitted to the Department of   Computing and Library 
+ Information Science ,   College of   Engineering and Information Technology , 
+ University of Southern Mindanao,   Kabacan, Cotabato in Partial Fulfilment of the 
+ Requirements for the Degree of 
+ BACHELOR OF SCIENCE IN INFORMATION SYSTEMS 
+ OCTOBER   2026 
+=====PAGE 3=====
+ACADEMIC INTEGRITY STATEMENT 
+ I hereby declare that the contents of this paper is within the permissive 
+ standards of the University of Southern Mindanao and does not in any way, go 
+ against institutional policies. 
+ All use of Artificial Intelligence (AI) tools in this thesis 
+ (outline/manuscript) is fully disclosed, clearly specified in the AI 
+ disclosure statement, and carefully verified for accuracy. Further, such use is 
+ solely to improve word choice, language clarity, grammar and coherence, 
+ generating or correcting computer c ode, brainstorming, idea framing, 
+ transcription and translation, assisting in interpretation of data, and/or 
+ summarization. AI tools were NOT used to fabricate citations, create fictitious 
+ references, generate unsupported claims, misrepresent sources, or i nterpret 
+ datasets containing personal information. All references included in this paper 
+ were manually verified and sourced from legitimate academic materials. All 
+ cited statements in the manuscript were carefully checked to ensure that they 
+ are accurately   supported by and directly based on the referenced sources. 
+ Furthermore, no part of the work submitted has been made in an 
+ unethical and inappropriate manner, whether by plagiarizing, infringing on any 
+ third person's copyright, or falsifying data, and that no part of the Manuscript 
+ submitted has been used for any o ther paper in another higher education or 
+ research institution. 
+ CHRISTIAN JAMES J. PEREZ 
+ Printed Name and Signature 
+ KAYE P. COMISSION 
+ Printed Name and Signature 
+ _____________ 
+ Date 
+ USM - EDR - F24 - Rev.0.2026.07.15 
+=====PAGE 4=====
+UNIVERSITY OF SOUTHERN MINDANAO 
+ Kabacan, Cotabato 
+ Philippines 
+ APPROVAL OF THESIS   OUTLINE 
+ Name   CHRISTIAN JAMES J. PEREZ, KAYE P. COMISSION 
+ Major   N/A 
+ Degree Sought   BACHELOR OF SCIENCE IN INFORMATION SYSTEMS 
+ Specialization   N/A 
+ Thesis Title   
+INTEGRATED DYNAMIC ORDER, JOB SCHEDULING, AND INVENTORY MANAGEMENT SYSTEM FOR PRINTING 
+ SERVICES WITH AUTOMATED REPLENISHMENT 
+ APPROVED BY THE GUIDANCE COMMITTEE 
+ DANILYN A. FLORES 
+ Adviser   Co - Adviser 
+ (Optional) 
+ ______________   _____________ 
+ Date   Date 
+ ____________________________   CATHERINE C. DAFFON 
+ Statistician   Department   Research   Coordinator 
+ (Optional) 
+ ______________   _____________ 
+ Date   Date 
+ RYAN   Z . GONZAGA 
+ Department Chairperson 
+ ______________ 
+ Date 
+ _ ________________________   ______________________ 
+ College Research Coordinator   Dean 
+ ______________________   ______________________ 
+ Date   Date 
+ Study No:   Study No: Dept - YYYY - ###   (Sample: Chem - 2022 - 001) 
+ Index No: ________________ 
+ Recorded by: _____________ 
+ RECORDED: 
+ _________________________________ 
+ Head, Academic Research and Monitoring Unit 
+ _________________ 
+ Date 
+ Recorded by: __________ 
+ USM - EDR - F04 - Rev.4.2020.11.16 
+=====PAGE 5=====
+TABLE OF CONTENTS 
+ PRELIMINARIES   Page 
+ Title Page   i 
+ Approval of Thesis Outline   ii 
+ Table of Contents   iii 
+ List of Dummy Tables   v 
+ List of Figures   vi 
+ List of Appendices   vii 
+ INTRODUCTION   1 
+ Significance of the Project   3 
+ Statement of the Problem   4 
+ Objectives of the Project   6 
+ Expected Output of the Project   7 
+ Scope and Limitations of the Study   9 
+ Operational Definition of Terms   11 
+ Conceptual Framework   1 4 
+ REVIEW OF RELATED LITERATURE   1 7 
+ Dynamic Order   1 7 
+ Job Scheduling   20 
+ Inventory Management System With Automated Replenishment   21 
+ METHODOLOGY   26 
+ Project Design   26 
+ Project Participants and Materials   27 
+=====PAGE 6=====
+Data Collection   28 
+ Data Analysis Procedure   29 
+ Validity   35 
+ Ethical Considerations   35 
+ Project Development Approach   36 
+ Project Timeline & Budget   39 
+ System Modules   42 
+ System Requirement Specifications   4 4 
+ Functional Requirements   4 4 
+ Software Requirements Specification   57 
+ Hardware Requirements Specification   5 8 
+ Use Case Diagram   5 9 
+ Class Diagram   62 
+ Project Design   6 4 
+ Entity Relationship Diagram   6 4 
+ Activity Diagram   6 8 
+ User Interface   8 9 
+ LITERATURE CITED   10 3 
+ APPENDICES   1 0 6 
+ Appendix A. Application for Research Adviser   10 7 
+ Appendix B. Application for Research Title   10 8 
+ Appendix C. Estimated Budget for the Research   10 9 
+ Appendix D. Application for Thesis Outline Defense   1 1 0 
+ Appendix E. Application for Group Research   1 11 
+=====PAGE 7=====
+Appendix F. Master Functional Test Cases   1 12 
+ Appendix G. Test Case Specification   1 1 5 
+ Appendix H. Task Allocation Matrix (TAM)   1 41 
+ Appendix I. Curriculum Vitae   1 4 9 
+=====PAGE 8=====
+LIST OF DUMMY TABLES 
+ Table   Title   Page 
+ 1   Functional Test Plan and Requirements Traceability Matrix   3 2 
+ 2   Estimated Project Development Budget   40 
+ 3   Mapping of Project Objectives, System Modules, and Functional 
+ Requirements   43 
+ 4   Software Requirements Specification   5 7 
+ 5   Hardware Requirements Specification   5 8 
+=====PAGE 9=====
+LIST OF FIGURES 
+ Figure   Title   Page 
+ 1   Conceptual Frame w ork   1 6 
+ 2   Agile Model   3 7 
+ 3   Gantt Chart   3 9 
+ 4   Use Case Diagram   61 
+ 5   Class Diagram   6 3 
+ 6   Entity Relationship Diagram   6 7 
+ 7   User Account Registration   6 8 
+ 8   User Authentication   6 9 
+ 9   User Profile Management   7 0 
+ 10   Session Termination and Logout   71 
+ 11   Service Catalog Browsing and Quotation   Calculation   72 
+ 12   Print Order Placement and Document Upload   7 3 
+ 13   Print Attribute and Finishing Specification   7 4 
+ 14   Customer - Supplied Substrate Declaration   7 5 
+ 15   Proof of Payment Submission   7 6 
+ 16   Live Order Progress and Status Tracking   7 7 
+ 17   Payment Transaction Auditing and Verification   7 8 
+ 18   Production Floor 5 - Stage   Kanban Queue   7 9 
+ 19   Automated Bill of Materials (BOM) Inve n tory Deduction   80 
+=====PAGE 10=====
+20   Customer - Supplied Substrate Intake and   C ounter   V erificatio n 
+ 82 
+ 21   Material Spoilage Logging and Stock Adjustments   8 3 
+ 22   Dynamic Service and Rate Configuration Workflow   8 4 
+ 23   Bill of Materials (BOM) Recipe Definition   8 5 
+ 24   Inv e ntory Oversight and Dynamic Reorder Point Alerting   8 7 
+ 25   Sales, Cashflow, and Operational Analytics Generation   8 8 
+ 26   Landing Page of Printify   8 9 
+ 27   Registration Interface   90 
+ 28   Login Interface   91 
+ 29   Business Owner Setup Wizard   9 2 
+ 30   Business Owner Setup Wizard   9 2 
+ 31   Business Owner Master Dashboard   9 3 
+ 32   Application and Service Management Interface   9 4 
+ 33   Dynamic Service Configuration Hub   9 5 
+ 34   Dynamic Service Configuration Hub   9 6 
+ 35   Customer Ordering Wizard and Live 
+ Five - Stage Progress Stepper   9 7 
+ 36   Customer Ordering Wizard and Live 
+ Five - Stage Progre s s Stepper   9 7 
+ 37   Customer Ordering Wizard and Live 
+ Five - Stage Progress Steppe r   9 8 
+=====PAGE 11=====
+38   Staff Production Kanban Console   9 9 
+ 39   Re port Spoilage Interface   100 
+ 40   Inventory Hu b   with Automated Restock Alerts   101 
+ 41   Sales and Financial Analytics Hub   102 
+=====PAGE 12=====
+LIST OF APPENDICES 
+ Appendix   Title   Page 
+ A   Application for Research Adviser   1 0 7 
+ B   Application for Research Title   1 0 8 
+ C   Estimated Budget for the Research   1 0 9 
+ D   Application for Thesis Outline Defense   1 1 0 
+ E   Application for Group Research   1 11 
+ F   Master Functional Test Cases   1 12 
+ G   Test Case Specification   11 5 
+ H   Task Allocation Matrix (TAM)   1 41 
+ I   Curriculum Vitae   1 4 9 
+=====PAGE 13=====
+1 
+ INTRODUCTION 
+ The commercial printing and binding sector operates within a fast - paced 
+ environment   catering to   diverse customer demands,   ranging   from   routine 
+ document   printing   and   seasonal   thesis   binding   to   commercial   marketing 
+ collaterals.   As   academic   institutions   and   l ocal   commercial   enterprises 
+ continuously   generate   demand,   printing   service   providers   face   persistent 
+ hurdles in sustaining operational efficiency and consistent turnaround times 
+ (Saragih et al., 2026; Susila et al., 2025). Despite handling complex custom j ob 
+ specifications, many local printing establishments continue to rely on manual, 
+ paper - based workflows or fragmented spreadsheet tracking systems (Apriadi & 
+ Dewi, 2026; Tanaman et al., 2023). These unintegrated setups create severe 
+ operational bottlenecks , especially during peak academic semester deadlines 
+ when order volumes surge rapidly (Jebbor et al., 2021; Kurniawan et al., 2025). 
+ Without   a   synchronized   management   framework,   delegating   tasks   across 
+ workshop   machinery   and   production   personnel   becomes   di sorganized 
+ (Smagowicz et al., 2024), while the absence of real - time material monitoring 
+ frequently results in unexpected stockouts of essential supplies like paper 
+ stocks, toner, and binding covers, leading to costly delays and compromised 
+ customer satisfa ction (Abu Zwaida et al., 2021; Albayrak Ünal et al., 2023). 
+ To   resolve   these   operational   limitations,   conventional   software 
+ approaches   prove   inadequate   because   they   are   often   rigidly   hardcoded, 
+ preventing shop owners from introducing new service variations or modifying 
+=====PAGE 14=====
+2 
+ dynamic pricing rules without modifying underlying application source code 
+ (Joshi et al., 2026; Saragih et al., 2026). In response, this capstone project 
+ develops   the   Integrated   Dynamic   Order,   Job   Scheduling,   and   Inventory 
+ Management System for Printing Se rvices with Automated Replenishment 
+ (Printify).   The   platform   introduces   a   modular   web   architecture   enabling 
+ administrators to configure service catalogs, page rates, and linked Bill of 
+ Materials   (BOM)   recipes   dynamically   through   an   intuitive   interface.   To 
+ streamline   shop   floor   productivity ,   an   integrated   job   scheduling   console 
+ organizes active orders into a visual production queue, systematically allocating 
+ machinery and labor to maintain delivery schedules (Smagowicz et al., 2024; 
+ Zonta et al., 2022). Furthermore, instead of relying on lon g - term predictive 
+ models requiring extensive historical datasets, the system calculates the real - 
+ time consumption burn rate of raw materials directly from active sales volume, 
+ automatically triggering restocking alerts when inventory levels reach critical 
+ reorder thresholds (Jebbor et al., 2021; Ugbebor et al., 2024). Uniting dynamic 
+ order intake, visual floor tracking, and automated material replenishment within 
+ a centralized web platform modernizes print shop operations, ensuring punctual 
+ fulfillment, bal anced labor allocation, and data - driven inventory control (Apriadi 
+ & Dewi, 2026; Bhaktha et al., 2023). 
+=====PAGE 15=====
+3 
+ Significance of the Project 
+ The realization of this project will profoundly benefit various stakeholders 
+ within the printing and binding industry by transforming disjointed manual 
+ processes   into   a   streamlined,   automated   workflow.   Primarily,   Business 
+ Owners and Management   will gain a dynamic and highly adaptable platform 
+ that allows them to effortlessly configure, add, or modify printing services and 
+ pricing   structures   without   needing   complex   source   code   alterations. 
+ Furthermore, the automated inventory replenishment modul e will eliminate the 
+ guesswork in restocking, calculating real - time material burn rates to prevent 
+ costly   stockouts   and   maximize   potential   revenue,   especially   during   peak 
+ seasons. 
+ For   Employees and Production Staff , the system will significantly 
+ reduce the chaos associated with sudden influxes of orders. The dedicated job 
+ scheduling module will provide a clear, visual queue of assigned tasks and 
+ deadlines, preventing overlapping duties and allowing staff to focus ef ficiently 
+ on production rather than manual coordination. Consequently,   Customers and 
+ Clients   will experience highly reliable service. With optimized order tracking, 
+ systematic job delegation, and guaranteed raw material availability, clients will 
+ benefit from faster turnaround times, strict adherence to deadlines, and an 
+ overall enhanced customer   experience. 
+ Finally, this study will serve as a substantial foundation for   Future 
+ Researchers and Developers . The integration of a dynamic, configurable 
+=====PAGE 16=====
+4 
+ service   architecture   combined   with   a   short - term,   data - driven   material 
+ replenishment logic provides a modern software framework. Future IT and 
+ Information Systems scholars can utilize this project as a baseline reference for 
+ designing scalable, industry - spe cific management systems that do not rely on 
+ long - term, data - heavy predictive machine learning models. 
+ Statement of the Problem 
+ This study addresses the overarching problem of how to design and 
+ develop   an   Integrated   Dynamic   Order,   Job   Scheduling,   and   Inventory 
+ Management System for Printing Services with Automated Replenishment to 
+ effectively resolve the manual operational bottlene cks experienced by printing 
+ establishments. Currently, the reliance on disjointed, traditional processes 
+ creates significant frustrations for all primary stakeholders. For customers, the 
+ absence of real - time order tracking leads to the inconvenience of rep eatedly 
+ visiting or contacting the establishment just to check the status of their print jobs, 
+ often resulting in dissatisfaction when orders are unexpectedly delayed. For 
+ production staff and employees, depending on manual, paper - based queuing 
+ systems cre ates a chaotic workflow where physical job tickets are easily 
+ misplaced, miscommunicated, or improperly prioritized, leading to overlapping 
+ duties   and   unfulfilled   deadlines.   Meanwhile,   business   owners   and 
+ administrators are hindered by rigid software that   cannot adapt to new services, 
+=====PAGE 17=====
+5 
+ and they are forced to rely on pure guesswork and intuition to manage inventory, 
+ which inevitably leads to unexpected material stockouts and lost revenue during 
+ peak seasons. 
+ To resolve these interconnected operational challenges, the project must 
+ explicitly address how to formulate a dynamic order management architecture 
+ that allows administrators to configure services, pricing tariffs, and consumable 
+ requirements   on   the   fly   w ithout   modifying   application   source   cod e,   while 
+ enabling customers to configure print specifications, obtain instant quotations, 
+ and submit orders online . Furthermore, it must establish how to engineer an 
+ interactive production floor scheduling module that digitizes workshop queues, 
+ visually tracks order progression across five defined stages, and systematically 
+ delegates   machinery   and   labor.   Concurrently,   it   must   determine   how   to 
+ implement an automated inventory replenishment module that computes daily 
+ material burn rates , records material spoilage,   and triggers timely replenishment 
+ alerts at dynamic reorder points. Finally, the project must answer how to 
+ integrate these targeted modules into a single, cohesive web - based platform 
+ governed by role - based access control , and how to conduct rigorous software 
+ functional testing and system verification using a structured Test Plan to 
+ empirically validate that all functional requirements execute accurately on a 
+ pass - or - fail basis. 
+=====PAGE 18=====
+6 
+ Objectives of the Project 
+ The   general   objective   of   the   project   is   to   design   and   develop   an 
+ Integrated Dynamic Order, Job Scheduling, and Inventory Management System 
+ for   Printing   Services   with   Automated   Replenishment   to   modernize   and 
+ automate   the   operational   workflows   of   printing   es tablishments,   from 
+ customizable order intake and production tracking to data - driven inventory 
+ maintenance. 
+ Specifically, this study aims to: 
+ 1.   create   a   dynamic   order   management   module   that   enables 
+ administrators to configure, add, or modify printing services, pricing 
+ variables, and material requirements without altering the source code , 
+ and allows customers to configure print specifications, receive real - 
+ time quotations, and submit print orders online; 
+ 2.   develop a job scheduling module that digitizes the production queue, 
+ visually tracks order progress, and systematically allocates labor and 
+ machinery to ensure timely fulfillment ; 
+ 3.   implement   an   automated   inventory   replenishment   module   that 
+ calculates the real - time burn rate of materials based on active sales 
+ volume ,   records material spoilage,   and   triggers alerts at   critical 
+ reorder   points ,   and   generates   sales   and   material   consumption 
+ summary reports; 
+=====PAGE 19=====
+7 
+ 4.   integrate   the   dynamic   ordering,   job   scheduling,   and   inventory 
+ replenishment modules into a single, cohesive web - based platform 
+ secured   by   role - based   access   control   for   the   business   owner, 
+ production staff, and customers ; and 
+ 5.   conduct comprehensive functional testing and system verification of 
+ the developed platform using a structured Test Plan and discrete Test 
+ Cases to validate that all 1 9   functional requirements satisfy their 
+ specified operational parameters, boundary conditions, and database 
+ transactions on a pass - or - fail basis and execute operational user 
+ acceptance walkthroughs with printing shop stakeholders. 
+ Expected Outputs of the Project 
+ The expected output of the project will include the following: 
+ 1.   A fully functional web - based platform that integrates dynamic order 
+ configuration, job scheduling, and inventory replenishment tailored 
+ specifically for printing and binding service operations , with secure 
+ role - based   access   for   business   owners,   production   staff,   and 
+ customers . 
+ 2.   A   dynamic   order   management   module   that   grants   business 
+ administrators the flexibility to seamlessly create, customize, and 
+=====PAGE 20=====
+8 
+ modify   various   printing   services   and   pricing   structures   without 
+ needing backend code alterations. 
+ 3.   A customer - facing portal that provides an intuitive interface for clients 
+ to easily submit their specific printing requirements and track the real - 
+ time   progress of   their orders, eliminating the   need   for frequent 
+ physical follow - ups . 
+ 4.   A digital job scheduling module that equips production staff with a 
+ visual, organized queue of pending and ongoing tasks, allowing for 
+ the efficient allocation of labor and machinery to meet strict fulfillment 
+ deadlines. 
+ 5.   An automated inventory replenishment module that continuously 
+ tracks material consumption and calculates real - time burn rates 
+ based on active sales, providing management with data - driven alerts 
+ before essential printing supplies reach critical depletion le vels. 
+ 6.   A comprehensive software quality assurance report comprising the 
+ Functional   Test   Plan,   Requirements   Traceability   Matrix,   and 
+ executed   Test   Case   execution   ledgers   demonstrating   100% 
+ verification across all 1 9   functional   requirements   on a pass - or - fail 
+ basis. 
+=====PAGE 21=====
+9 
+ Scope and Limitations of the Study 
+ The scope of this project is strictly bounded to the order configuration, 
+ job scheduling, and inventory replenishment of printing services. The 
+ system is not designed to function as a full - scale Enterprise Resource 
+ Planning (ERP) software; thus, it complet ely excludes comprehensive 
+ financial   accounting,   third - party   logistics   or   courier   integration,   and 
+ Human Resource modules such as payroll and biometric employee 
+ attendance.   The sales and consumption reports generated by the system 
+ are limited to operational summaries derived from recorded orders, 
+ material usage, and spoilage; they do not constitute formal bookkeeping, 
+ tax   computation,   or   audited   financial   statements.   Furthermore,   the 
+ system relies on manual payment verificat ion (e.g., uploading of GCash 
+ receipts) and does not integrate with automated bank APIs or live 
+ payment gateways. Lastly, the software is purely web - based and does 
+ not feature Internet of Things (IoT) capabilities; it will not directly interface 
+ with physi cal printing or binding machines to automatically read hardware 
+ statuses or ink levels. 
+ Peopl e 
+ The system is designed to facilitate seamless interaction among three primary 
+ users: 
+ ●   Administrators / Business Owners:   They have full access to the 
+ dynamic configuration of the system. They are responsible for setting 
+=====PAGE 22=====
+10 
+ up the types of printing services offered, managing pricing structures, 
+ monitoring the real - time inventory burn rate, and verifying customer 
+ payments. 
+ ●   Production Staff / Employees:   They utilize the job scheduling 
+ module to view their assigned tasks, update the production progress 
+ of each order, and systematically deduct raw materials from the digital 
+ inventory as jobs are completed. 
+ ●   Customers / Clients:   They access the customer - facing web portal to 
+ easily   browse   offered   printing   services,   submit   specific   order 
+ requirements, upload necessary files, and track the real - time status 
+ of their print jobs without needing physical follow - ups. 
+ Data 
+ The system will process, store, and manage essential operational data 
+ to ensure smooth transactions. This includes customer profiles and contact 
+ details, transaction histories, and uploaded print files. On the administrative 
+ side, the database will handle   the dynamic service configurations (custom 
+ pricing and variations), real - time job order statuses, and automated inventory 
+ records, specifically the current stock levels, material burn rates, and reorder 
+ point thresholds. 
+=====PAGE 23=====
+11 
+ Process 
+ The system automates the core operational workflow of the printing 
+ establishment. The process begins with dynamic order intake, where customers 
+ select services configured by the admin. It proceeds to manual payment 
+ verification, followed by the automated r outing of the confirmed order into the 
+ digital job scheduling queue. During production, the system systematically 
+ allocates tasks to specific staff members. As production progresses, the system 
+ processes inventory deductions based on material consumption,   ultimately 
+ triggering automated restocking alerts when supplies reach critical levels. 
+ Hardware 
+ To effectively run and access the web - based system, users only require 
+ standard web - capable devices such as desktop computers, laptops, tablets, or 
+ smartphones.   A   stable   internet   connection   is   required   for   all   actors 
+ (administrators, staff, and customers)   to access the cloud - hosted platform and 
+ synchronize data in real - time. 
+ Operational Definition of Terms 
+ To ensure clarity and establish a shared understanding of the concepts 
+ discussed throughout this study, the following terms are operationally defined. 
+ These definitions reflect how each technical and business - specific term is 
+=====PAGE 24=====
+12 
+ explicitly   utilized   within   the   context   of   the   developed   system's   dynamic 
+ architecture, modules, and workflows, rather than   their general dictionary 
+ meanings: 
+ Administrator   -   Refers to the business owner or authorized management 
+ personnel   who   has   full   access   to   the   system.   They   are   responsible   for 
+ dynamically   configuring   printing   services,   managing   pricing   variables, 
+ monitoring the inventory burn rate, and verifying customer p ayments. 
+ Automated   Replenishment   -   Refers   to   the   specific   system module   that 
+ eliminates   manual   stock   guesswork   by   calculating   real - time   material 
+ consumption and automatically triggering alerts when supplies reach a critical 
+ level. 
+ Burn Rate   -   In this study, it refers to the calculated velocity or speed at which 
+ specific raw printing materials (e.g., paper, ink, binding covers) are consumed 
+ based on active, short - term sales volume. 
+ Customer   -   Refers to the clients or end - users who utilize the customer - facing 
+ web   portal   to   browse   offered   printing   services,   submit   specific   order 
+ requirements, upload files, and visually track the real - time status of their print 
+ jobs. 
+ Dynamic Configuration   -   Refers to the core architectural feature of the system 
+ that allows administrators to seamlessly create, add, or modify printing services 
+=====PAGE 25=====
+13 
+ and pricing structures through the user interface without requiring continuous 
+ modifications to the backend source code. 
+ Inventory Management   -   Refers to the digital tracking system used to monitor 
+ the availability, quantity, and depletion of raw materials required for production, 
+ which automatically updates as production staff complete their assigned tasks. 
+ Job Scheduling   -   Refers to the digital production queue that replaces physical 
+ job tickets. It visually tracks the progress of each order and systematically 
+ allocates labor and machinery to ensure fulfillment deadlines are met. 
+ Printing Services   -   Refers to the customizable products and services offered 
+ by the establishment (e.g., hardbound binding, document printing, customized 
+ merchandise)   which   are   dynamically   defined   and   categorized   by   the 
+ administrator within the system. 
+ Production Staff   -   Refers to the shop employees who utilize the job scheduling 
+ module to view their assigned tasks, update the production progress of specific 
+ orders, and initiate the digital deduction of consumed raw materials. 
+ Reorder Point   -   Refers to the specific, data - driven stock level threshold 
+ calculated   by   the   system   which,   when   reached,   immediately   notifies   the 
+ administrator that new raw materials must be purchased from suppliers. 
+=====PAGE 26=====
+14 
+ Conceptual Framework 
+ The   Figure   illustrates the conceptual framework of the capstone project, 
+ detailing the operational flow of the platform across the Input, Process, Output, 
+ Outcome, and Impact stages. The Input encompasses stakeholder profiles 
+ (business   owners,   production   staff,   and   c ustomers),   modular   service 
+ parameters (dynamic pricing formulas, media dimensions, substrate types, and 
+ finishing rules), customer digital assets (PDF manuscripts, vector artwork, and 
+ remittance proofs), and raw consumables inventory baselines. The central 
+ Process executes real - time multi - attribute cost computation, manual payment 
+ auditing,   5 - stage   workshop   Kanban   queue   scheduling,   customer - supplied 
+ paper   tracking,   automated   stage - based   Bill   of   Materials   (BOM)   inventory 
+ deductions, and rolling consumption v elocity calculations to evaluate dynamic 
+ Reorder Points (ROP). 
+ The primary   Outputs   include the integrated role - segregated web - to - print 
+ platform, interactive customer self - service ordering wizards with live five - stage 
+ visual progress tracking, workshop floor Kanban digital job tickets, automated 
+ replenishment   alert   banners,   and   multi - ser vice   business   intelligence 
+ summaries.   Consequently,   the   immediate   Outcomes   eliminate   manual 
+ calculation errors, eradicate lost paper job tickets, provide 24/7 transparent 
+ order tracking for clients, prevent unexpected stockouts during peak academic 
+ rushes, and establish data - driven procurement based on true sales burn rates. 
+=====PAGE 27=====
+15 
+ In the long term, the framework achieves significant organizational   Impact   by 
+ maximizing enterprise productivity and profitability, strengthening market trust, 
+ providing code - free business adaptability for shop proprietors, and establishing 
+ a validated information systems benchmark for lightweight job - shop printing 
+ automation. 
+=====PAGE 28=====
+16 
+ Figure 1. Conceptual Framework of Printify 
+=====PAGE 29=====
+REVIEW RELATED LITERATURE 
+ Dynamic Order 
+ Apriadi and Dewi (2026) highlighted that many small and medium - sized 
+ printing businesses still rely on manual or semi - digital processes, resulting in 
+ miscommunication, data inconsistencies, and inefficient workflow management. 
+ To address these challenges,   the researchers developed a web - based printing 
+ service   system   that   integrates   order   management,   inventory   control,   and 
+ production workflow into a unified platform. The findings demonstrated that an 
+ integrated   information   system   can   reduce   operational   error s,   improve 
+ communication   between   departments,   and   enhance   overall   operational 
+ efficiency. Similarly, Susila et al. (2025) identified limitations in order recording, 
+ cost estimation, and production monitoring, where manual processes can cause 
+ delays and err ors. Their study developed a web - based system with online 
+ ordering, automated cost estimation, job tracking, and real - time updates, which 
+ improved production efficiency and customer satisfaction. Saragih et al. (2026) 
+ likewise emphasized the increasing dem and for efficiency and accuracy in 
+ service industries and noted that many organizations, particularly small and 
+ medium - sized enterprises such as printing services, still rely on manual or semi - 
+ digital   processes.   Their   study   addressed   operational   inefficien cies,   data 
+ inconsistencies,   and   communication   gaps   through   the   design   and 
+ implementation of a web - based information system for digital printing services. 
+=====PAGE 30=====
+18 
+ These studies support the use of an integrated web - based platform for printing - 
+ service operations, particularly in managing orders and connecting different 
+ operational processes. 
+ Kurniawan et al. (2025) found that the use of unintegrated spreadsheets 
+ across divisions in a Production Planning and Inventory Control (PPIC) system 
+ at an Indonesian packaging manufacturer resulted in production inaccuracies, 
+ scheduling errors, and additi onal time spent on repetitive manual processes. To 
+ address   these   problems,   the   researchers   developed   a   web - based   data 
+ integration system that enabled real - time data synchronization and reduced 
+ manual data entry. The findings demonstrate the importance of c onnecting 
+ information across production - related activities to improve coordination and 
+ data availability. Joshi et al. (2026) similarly demonstrated how web - based 
+ services have contributed to the modernization of document handling and 
+ printing processes. T raditional printing was described as being limited by 
+ manual   coordination,   physical   presence,   and   tightly   coupled   backend 
+ infrastructure. The study introduced Zaprint, a remote printing management 
+ system that allows users to submit print jobs through a web   application while 
+ local print shops manage and process the jobs through a desktop application. 
+ The system uses Supabase for authentication, database management, file 
+ storage, and communication, with a cloud - based data layer enabling real - time 
+ connectivity   between users and print shops. The findings showed that the 
+ system was more efficient and easier to use than traditional print management 
+=====PAGE 31=====
+19 
+ systems. These findings support the present study's use of an integrated web - 
+ based system for coordinating printing - service activities. 
+ Bhaktha et al. (2023) developed an online order management system 
+ that provides sellers with an overview of their orders and inventory, allowing 
+ them to manage products through a centralized system. The platform includes 
+ order   tracking,   stock   management,   a nd   customer   management   features 
+ accessible through a single dashboard. These features support the present 
+ study's development of an integrated web - based system for printing services, 
+ particularly   its   Dynamic   Order   Management   and   Inventory   Management 
+ compon ents, which aim to centralize order information, monitor inventory, and 
+ improve   the   efficiency   of   printing - service   operations.   Dhiman   (2021) 
+ demonstrated how the Online Food Ordering Management System can simplify 
+ order management by allowing customers to   submit their requirements through 
+ an online interface. The system records orders in a centralized database, places 
+ them in a queue, and provides real - time updates through the administrative 
+ panel.   This   enables   staff   to   monitor   incoming   orders   and   process   t hem 
+ systematically,   reducing   errors   and   improving   workflow   efficiency.   These 
+ features are relevant to the present study because the proposed printing service 
+ system similarly integrates digital order intake with a centralized job queue and 
+ real - time order   tracking. Hernada et al. (2024) developed a web - based design 
+ and   print   ordering   system   to   improve   customer   service   efficiency   and 
+ effectiveness.   The   system   demonstrated   how   web - based   technology   can 
+=====PAGE 32=====
+20 
+ streamline ordering processes in digital printing businesses. Together, these 
+ studies present web - based ordering as a means of organizing customer orders, 
+ centralizing order information, and improving the efficiency of printing - related 
+ services. 
+ Job Scheduling 
+ Smagowicz et al. (2024) presented a method for developing production 
+ schedules based on a printing company's operational processes and production 
+ technologies. The approach considered production resources and business 
+ requirements to support resource - balan ced production decisions. The study is 
+ relevant to the present research because it demonstrates the importance of 
+ systematic production scheduling in printing operations. Zonta et al. (2022) 
+ likewise highlighted the importance of connectivity and data avai lability in 
+ supporting decision - making within production processes. The study proposed 
+ an   integrated   approach   to   production   scheduling   that   considers   available 
+ resources and uses data to improve scheduling decisions. These findings 
+ support the present stud y's Job Scheduling module, which organizes printing 
+ orders into a digital production queue, tracks job progress, and allocates labor 
+ and machinery to support timely order fulfillment. 
+ Jiang et al. (2022) discussed how changes in production systems and 
+ technological development have influenced the methods used for production 
+ scheduling. The study highlighted the evolution of scheduling approaches in 
+=====PAGE 33=====
+21 
+ response to changing production environments and emerging technologies. 
+ This supports the present study's development of a digital job scheduling 
+ module for printing services, which aims to organize production queues, track 
+ order progress, and allocate lab or and machinery systematically to improve 
+ production efficiency. Destouet et al. (2023) examined various approaches for 
+ supporting scheduling decisions in evolving production environments. The 
+ study emphasized the challenges of coordinating machines and o perators in 
+ flexible production scheduling. These findings support the present study's Job 
+ Scheduling module, which organizes printing jobs and systematically allocates 
+ production staff and machinery to improve workflow and ensure timely order 
+ fulfillment.   Hernada et al. (2024) developed a web - based design and print 
+ ordering system that demonstrated how web - based technology can streamline 
+ ordering processes in digital printing businesses. This supports the present 
+ study's use   of   a   web - based   platform   for pri nting   services,   particularly its 
+ dynamic order management and customer - facing ordering functions. However, 
+ the present study extends beyond online ordering by integrating job scheduling, 
+ inventory management, and automated replenishment into a single syste m. 
+ Inventory Management System with Automated Replenishment 
+ Tanaman et al. (2023) developed a web - based inventory management 
+ system for a small business enterprise in Pagadian City, Zamboanga del Sur, 
+ Philippines. The study identified challenges associated with the manual use of 
+=====PAGE 34=====
+22 
+ paper - based   inventory   records,   including   data   inaccuracy   and   process 
+ inefficiency in recording and distributing inventory and sales reports. To address 
+ these issues, the researchers developed an automated web - based solution that 
+ electronically recorded and   processed inventory data and generated reports. 
+ The study demonstrated how web - based automation can improve inventory 
+ management efficiency and convenience. Jebbor et al. (2023) demonstrated 
+ that automated and integrated inventory management can help orga nizations 
+ address inventory and replenishment problems, particularly during periods of 
+ high demand. Their study on hospital logistics proposed an automated and 
+ integrated   inventory   and   replenishment   management   system   that   uses   a 
+ proactive, real - time replen ishment policy. This approach demonstrates the 
+ potential of automated replenishment in maintaining the availability of essential 
+ resources and reducing inventory - related problems. Asim and Arbaiy (2026) 
+ similarly demonstrated that a computerized inventory   management system can 
+ help   businesses   address   problems   associated   with   manual   inventory 
+ operations, particularly inaccurate stock levels and delays in replenishment. 
+ Their study on Alfudullallah Co. developed an inventory management system 
+ that provides re al - time inventory tracking and supports inventory, warehouse, 
+ ordering, reporting, and analysis management. 
+ Ugbebor   et   al.   (2024)   examined   the   role   of   automated   inventory 
+ management systems integrated with Internet of Things (IoT) technology in 
+ improving inventory management among small and medium - sized enterprises 
+=====PAGE 35=====
+23 
+ (SMEs). The development of automated solutions, such as IoT sensors, real - 
+ time   data   analytics, and   cloud - based   applications that   enhance   inventory 
+ control, was also identified in their review of the literature. According to the 
+ study, the use of IoT in aut omation has improved inventory accuracy, decreased 
+ stockouts, and decreased carrying costs for SMEs. The research also identified 
+ reverse logistics systems with intuitive demand forecasting for optimal stock 
+ replenishment, automation of reordering systems   while efficiently managing 
+ working capital, and decreased downtime from real - time tracking as operational 
+ improvements. Rolf et al. (2023) identified inventory management as a common 
+ application of data - driven decision - making in supply chain management. Th eir 
+ literature   review   on   reinforcement   learning   in   supply   chain   management 
+ emphasized the importance of inventory management in coordinating supply 
+ chain operations. The study also highlighted the potential of real - time, data - 
+ driven decision - making in mana ging complex and dynamic operations. These 
+ findings support the present study's approach of using real - time inventory data, 
+ particularly   material   consumption   and   burn   rate,   to   support   automated 
+ replenishment decisions in printing services. 
+ Munyaka and Yadavalli (2022) explained that inventory is one of the 
+ main   management   tasks   and   a   fundamental   component   of   material 
+ management, logistics, and supply chain management. Warehouse inventory 
+ may be required to meet customer or humanitarian deman ds, depending on the 
+ organization's   goals.   Inventory   control   is   essential   to   both   organizational 
+=====PAGE 36=====
+24 
+ performance and operational success. In light of the growing demands of 
+ human   needs,   the   study   examined   inventory   management   concepts   and 
+ applications and noted that inventory treatment is influenced by demand, which 
+ is a crucial variable in the inventory   control system. Albayrak Ünal et al. (2023) 
+ reported   that   organizations   seeking   to   keep   pace   with   technological 
+ advancements and globalization must efficiently manage their supply chains to 
+ achieve superior quality, enhanced efficiency, and reduced costs.   The diverse 
+ needs of customers, along with competition from global players and market 
+ rivalry, have prompted companies to focus more on inventory management. 
+ Their article presented a systematic literature review of the use of Artificial 
+ Intelligence (AI)   in inventory management, concentrating on research papers 
+ from two academic databases published between 2012 and 2022, with a total 
+ of 59 articles identified for detailed examination. The current state of inventory 
+ management and potential future direction s were also outlined, with the findings 
+ indicating a rising interest in AI techniques in recent years. 
+ Abu   Zwaida   et   al.   (2021) highlighted   that   drug   shortages pose   a 
+ significant challenge for inventory management within healthcare systems, as 
+ they   can   lead   to   various   adverse   effects.   In   the   realm   of   supply   chain 
+ management, achieving optimization is closel y linked to controlling inventory in 
+ order to address problems associated with the supply, management, and 
+ utilization of medications. The study noted that identifying a shortage scenario 
+ in a hospital can be challenging due to numerous unpredictable facto rs, such 
+=====PAGE 37=====
+25 
+ as manufacturing issues, fluctuations in supply and demand, and problems with 
+ raw materials. To mitigate the risk of shortages in hospitals, effective inventory 
+ management is essential to maintain sustainable operations and maximize 
+ organizational performa nce within the Hospital Supply Chain (HSC). 
+ The reviewed literature addresses several operational needs related to 
+ the development of the Printify system. The studies discuss digital order 
+ management,   production   scheduling,   inventory   control,   automated 
+ replenishment, and customer service in printing   and other operational settings. 
+ Apriadi and Dewi (2026) and Susila et al. (2025) demonstrate the use of web - 
+ based   systems   for   improving   order   management   and   production - related 
+ processes, while Smagowicz et al. (2024) and Zonta et al. (2022) emphasize 
+ syst ematic scheduling and the use of production information for scheduling 
+ decisions. Tanaman et al. (2023) and Jebbor et al. (2023) demonstrate the role 
+ of automated inventory management and replenishment, while Rolf et al. (2023) 
+ highlights the use of real - t ime inventory data for data - driven decision - making. 
+ These studies provide the literature - based support for the operational features 
+ of Printify, including order management, job scheduling, inventory monitoring, 
+ stock replenishment, and reporting. 
+=====PAGE 38=====
+26 
+ METHODOLOGY 
+ This   chapter   outlines   the   research   procedures   and   engineering 
+ techniques employed in designing, constructing, and evaluating the Integrated 
+ Dynamic   Order,   Job   Scheduling,   and   Inventory   Management   System   for 
+ Printing Services with Automated Replenishment. I t details the research design, 
+ operational characterization of participants, project materials, empirical data 
+ collection techniques, statistical analysis procedures, system validity measures, 
+ and ethical safeguards. Furthermore, it presents the architectu ral requirements 
+ and software modeling diagrams that guided the systematic implementation and 
+ quality assessment of the platform. 
+ Project Design 
+ This study employs a Developmental Research Design, a methodology 
+ centered on the systematic analysis, design, development, implementation, and 
+ evaluation of an instructional or technological solution to address operational 
+ problems. This research design   is suited for this study because the primary 
+ objective is to engineer a functional, integrated web - based information system 
+ that   unites   dynamic   order   management,   floor   job   scheduling,   inventory 
+ management, and automated replenishment. 
+ Through   the   developmental   framework,   the   project   developers 
+ systematically   establish   operational   requirements   from   real - world   printing 
+=====PAGE 39=====
+27 
+ workflows, translate these requirements into modular software components, 
+ conduct   rigorous   verification,   and   evaluate   the   final   system   through   a 
+ comprehensive Software Quality Assurance (SQA) and Functional Testing 
+ protocol. This ensures that the resulting   software artifact is practically grounded, 
+ technically sound, and empirically validated against all specified functional 
+ requirements on a pass - or - fail basis. 
+ Project Participants and Materials 
+ The project participants include the business owners, production staff or 
+ workshop employees, and customers or retail clients of the printing - service 
+ establishment. The business owners and administrators provide authoritative 
+ operational   requirements   conce rning   dynamic   service   definitions,   pricing 
+ formulas, material attributes, baseline stock levels, and commercial policies, 
+ while evaluating administrative controls, inventory telemetry, and reporting 
+ modules   during   system   assessment.   The   production   staff   an d   workshop 
+ employees   supply   operational   insights   regarding   job   queueing,   prepress 
+ inspection, task bottlenecks, machinery capacity, and raw material waste, while 
+ testing the practical usability of the five - stage production Kanban console and 
+ digital job ti ckets. Furthermore, customers and clients — comprising university 
+ students, faculty members, institutional organizations, and walk - in patrons — 
+ provide essential qualitative feedback regarding counter ordering hurdles, file 
+ submission issues, and tracking diff iculties, while evaluating the customer self - 
+=====PAGE 40=====
+28 
+ service portal, the dynamic ordering wizard, and the live visual progress 
+ stepper. 
+ The materials required for the research and development of the system 
+ encompass both physical and digital resources. Hardware materials include 
+ development workstations, laptops, and mobile smartphones equipped with 
+ internet connectivity to evaluate respon sive layouts across various screen 
+ viewports. Software tools include integrated development environments, local 
+ web servers, database management systems, and web application frameworks 
+ (PHP, Laravel, Livewire, and Tailwind CSS) necessary for designing, bui lding, 
+ and deploying the platform. In addition, the researchers utilize operational 
+ documents from the partner printing establishment — such as manual paper job 
+ tickets,   physical   order   receipts,   pricing   tariffs,   and   inventory   ledgers — as 
+ empirical reference m aterials to ensure that the system accurately models real - 
+ world business workflows. 
+ Data Collection 
+ The researchers will gather data using interviews, direct workplace 
+ observations, document reviews, and survey questionnaires to understand the 
+ operational requirements of the printing business. 
+ First, semi - structured interviews will be conducted with the business 
+ owners and production staff to identify current operational challenges, service 
+ pricing   rules,   job   scheduling   workflows,   and   inventory   restocking   habits. 
+=====PAGE 41=====
+29 
+ Second, direct observations of daily shop activities will be carried out to observe 
+ counter order intake, task delegation across workstations, and material handling 
+ on the workshop floor. Third, the researchers will examine existing business 
+ documents, inc luding sample receipts, manual job order slips, supplier invoices, 
+ and price lists, to accurately model pricing formulas and material consumption 
+ in the system .   Finally, a formal Software Quality Assurance and Functional 
+ Testing protocol will be conducted during the evaluation phase. The project 
+ developers will execute a structured Test Plan consisting of discrete test cases 
+ mapped directly to the 1 9   functional requirements, recording binary evaluation 
+ outcomes (Pass or Fail) across boundary inputs, database persistence, and 
+ operational workflows. Additionally, operational user acceptance testing (UAT) 
+ will be conducted with the shop owner and product ion personnel to verify real - 
+ world task execution without reliance on subjective numerical Likert rating 
+ scales. 
+ Data Analysis Procedure 
+ 1.   System Testing and Functional Verification Plan 
+ To rigorously evaluate the software without introducing subjective 
+ evaluation bias, the project developers implemented a formal Software 
+ Quality Assurance (SQA) and Functional Verification protocol. Rather 
+ than relying on perceptual survey ratings, system   verification is governed 
+=====PAGE 42=====
+30 
+ by empirical, binary evaluation criteria (Pass or Fail) modeled after IEEE 
+ 829 software test documentation standards. 
+ 2.   Multi - tier testing Strategy 
+ The system evaluation follows a two - tier verification architecture: 
+ Tier   1:   Developer   Functional   and   Automated   System   Testing 
+ (Primary   Verification):   The   project   developers   execute   discrete 
+ functional test cases covering normal, boundary, and exceptional input 
+ conditions across all 1 9   Functional Requirements (FR - 01 to FR - 1 9 ). In 
+ addition,   core   computational   routines — including   dynamic   pricing 
+ algorithms, duplex paper calculations, automated Bill of Materials (BOM) 
+ inventory   deductions,   and   rolling   Reorder   Point   (ROP)   alerts — are 
+ continuously verified using automated unit and f eature test suites built on 
+ the Pest/PHPUnit testing framework. 
+ Tier 2: Stakeholder Operational Walkthrough (User Acceptance 
+ Testing):   Printing shop   owners and production personnel execute end - 
+ to - end   operational   scenarios   simulating   daily   commercial   activities, 
+ including customer counter intake, job ticket delegation across Kanban 
+ columns, material spoilage adjustments, and financial report exports. 
+ Th e walkthrough validates task completion success, business workflow 
+ alignment, and operational ergonomics. 
+=====PAGE 43=====
+31 
+ 3.   Technical Testing Environment 
+ Functional testing is conducted across the project’s standardized 
+ runtime environment: 
+ Backend Runtime:   PHP 8.5 executing on the Laravel 13 framework. 
+ Reactive Frontend Engine:   Livewire 4 with Alpine.js client - side state 
+ synchronization. 
+ Database & Persistence:   Relational database management system 
+ with ACID transaction guarantees and foreign key referential integrity 
+ constraints. 
+ Client   Workstations:   Modern   web   browsers   (Google   Chrome, 
+ Microsoft Edge, Brave, Mobile Safari) simulating desktop administration 
+ and mobile customer order submission 
+ 4.   Pass/Fail Evaluation Criteria 
+ Each functional test case is evaluated against deterministic binary 
+ criteria: 
+ PASS:   The   actual   system   execution,   state   mutation,   database 
+ transaction, and user interface response exactly conform to the defined 
+ expected output with zero unhandled exceptions. 
+ FAIL:   The   system   produces   an   execution   halt,   unhandled   runtime 
+ exception,   database   integrity   violation,   incorrect   mathematical 
+ computation, unauthorized state transition, or fails to render expected 
+ user telemetry. 
+=====PAGE 44=====
+32 
+ To achieve production readiness, the platform mandates a 100%   Pass 
+ rate across all 1 9   core functional modules, ensuring zero critical defects prior to 
+ deployment. 
+ Table 1. Functional Test Plan and Requirements Traceability Matrix 
+ Test 
+ Suite 
+ ID 
+ Linked 
+ Functional 
+ Requirement 
+ Module 
+ Scope 
+ Verification 
+ Method 
+ Evaluation 
+ Metric 
+ TS - 
+ 01 
+ FR - 0 1 : User 
+ Account 
+ Registration 
+ Customer 
+ Onboarding 
+ Automated 
+ Feature Test & 
+ Form Boundary 
+ Validation 
+ Pass / Fail 
+ TS - 
+ 02 
+ FR - 0 2 : User 
+ Authentication 
+ (Login) 
+ Security & 
+ Access 
+ Control 
+ Credential 
+ Validation & 
+ Role - Based 
+ Route Gate 
+ Pass / Fail 
+ TS - 
+ 03 
+ FR - 0 3 :   User 
+ Profile 
+ Management 
+ User Profile 
+ & Settings 
+ Field Validation, 
+ Bcrypt Hash 
+ Check & Profile 
+ Mutation 
+ Pass / Fail 
+ TS - 
+ 0 4 
+ FR - 04 : 
+ Session 
+ Termination & 
+ Logout 
+ Session 
+ Management 
+ Token 
+ Invalidation & 
+ Browser Storage 
+ Eviction Test 
+ Pass / Fail 
+ TS - 
+ 0 5 
+ FR - 05 : Service 
+ Catalog & 
+ Quotation 
+ Pricing 
+ Engine 
+ Reactive Livewire 
+ Formula 
+ Interrogation & 
+ Price 
+ Recalculation 
+ Pass / Fail 
+ TS - 
+ 0 6 
+ FR - 06 : Print 
+ Order 
+ Placement & 
+ Upload 
+ Ordering & 
+ Storage 
+ Document MIME 
+ Validation, Disk 
+ Tokenization, & 
+ Order Creation 
+ Pass / Fail 
+ TS - 
+ 0 7 
+ FR - 07 : Print 
+ Attribute 
+ Specification 
+ Job Modeling 
+ Attribute 
+ Constraint 
+ Checking & 
+ Pass / Fail 
+=====PAGE 45=====
+33 
+ Test 
+ Suite 
+ ID 
+ Linked 
+ Functional 
+ Requirement 
+ Module 
+ Scope 
+ Verification 
+ Method 
+ Evaluation 
+ Metric 
+ Duplex Sheet 
+ Math ( ⌈ 𝑃 / 2 ⌉   ×   𝐶 ) 
+ TS - 
+ 0 8 
+ FR - 08 : 
+ Substrate 
+ Declaration 
+ Order 
+ Extension 
+ Cover - Only 
+ Pricing Flagging 
+ & Intake Delivery 
+ Tagging 
+ Pass / Fail 
+ TS - 
+ 0 9 
+ FR - 09 : Proof 
+ of Payment 
+ Submission 
+ Billing Intake 
+ Payment Proof 
+ Image Upload & 
+ Pending Status 
+ Transition 
+ Pass / Fail 
+ TS - 
+ 10 
+ FR - 1 0 : Live 
+ Order 
+ Progress 
+ Tracking 
+ Customer 
+ Telemetry 
+ Real - Time 
+ Production 
+ Milestone 
+ Telemetry 
+ Stepper Query 
+ Pass / Fail 
+ TS - 
+ 1 1 
+ FR - 1 1 : 
+ Payment 
+ Auditing & 
+ Verification 
+ Billing Audit 
+ Staff Ledger 
+ Cross - Reference 
+ & Order Queue 
+ Release 
+ Pass / Fail 
+ TS - 
+ 1 2 
+ FR - 1 2 : 5 - 
+ Stage Kanban 
+ Floor Queue 
+ Workshop 
+ Scheduling 
+ Interactive 5 - 
+ Stage Transition 
+ & QC Rework 
+ Step - Back Loops 
+ Pass / Fail 
+ TS - 
+ 1 3 
+ FR - 1 3 : 
+ Automated 
+ BOM Stock 
+ Deduction 
+ Inventory 
+ Automation 
+ Automated 
+ Consumption 
+ Decrement & 
+ Customer - Paper 
+ Bypass Rule 
+ Pass / Fail 
+ TS - 
+ 1 4 
+ FR - 14 : 
+ Substrate 
+ Counter 
+ Inspection 
+ Production 
+ Intake 
+ Sheet 
+ Count/Condition 
+ Physical Audit & 
+ Intake Hold 
+ Release 
+ Pass / Fail 
+ TS - 
+ 1 5 
+ FR - 15 : 
+ Material 
+ Stock 
+ Adjustment 
+ Scrap Inventory 
+ Decrement &   
+Pass / Fail 
+=====PAGE 46=====
+34 
+ Test 
+ Suite 
+ ID 
+ Linked 
+ Functional 
+ Requirement 
+ Module 
+ Scope 
+ Verification 
+ Method 
+ Evaluation 
+ Metric 
+ Spoilage 
+ Logging 
+ Waste Audit 
+ Ledger Entry 
+ TS - 
+ 1 6 
+ FR - 16 : 
+ Dynamic 
+ Service 
+ Configuration 
+ Admin 
+ Management 
+ No - Code 
+ Parameter 
+ Injection   & 
+ Relational Rate 
+ Persistence 
+ Pass / Fail 
+ TS - 
+ 1 7 
+ FR - 17 : BOM 
+ Recipe 
+ Definition 
+ Inventory 
+ Mapping 
+ Service - to - Item 
+ Consumable 
+ Mapping & 
+ Recipe 
+ Coefficient Setup 
+ Pass / Fail 
+ TS - 
+ 1 8 
+ FR - 18 : 
+ Inventory 
+ Oversight & 
+ ROP Alert 
+ Inventory 
+ Analytics 
+ Rolling Burn Rate 
+ Calculation & 
+ Dynamic ROP 
+ Threshold 
+ Warning 
+ Pass / Fail 
+ TS - 
+ 1 9 
+ FR - 19 : 
+ Analytics & 
+ Financial 
+ Reporting 
+ Business 
+ Intelligence 
+ Transaction 
+ Aggregation, 
+ Profit Metrics, & 
+ CSV Ledger 
+ Export 
+ Pass / Fail 
+=====PAGE 47=====
+35 
+ Validity 
+ The validity of the project is established through structured software 
+ verification and stakeholder operational validation to determine whether the 
+ developed   platform   satisfies   its   intended   objectives   and   functional 
+ requirements. System validity is verifie d through a two - tiered protocol: first, 
+ technical functional verification conducted by the project developers using 
+ formal test cases mapped to the 1 9   functional requirements to verify algorithmic 
+ accuracy, data integrity, and error handling on a pass - or - fail basis; and second, 
+ operational   user   acceptance   validation   conducted   by   the   printing - service 
+ business owner and workshop staff. Stakeholders evalua te the system during 
+ practical operational walkthroughs, validating digital job ticketing, counter paper 
+ intake, dynamic rate updates, and inventory tracking. The qualitative feedback 
+ and defect logs gathered during testing serve as the basis for refining   and 
+ optimizing the platform prior to production deployment. 
+ Ethical Considerations 
+ The researchers will maintain strict adherence to ethical protocols and 
+ statutory mandates throughout the undertaking, specifically complying with 
+ Republic Act No. 10173, otherwise known as the Data Privacy Act of 2012. Prior 
+ to field inquiries, formal adm inistrative clearance and a certificate to conduct the 
+=====PAGE 48=====
+36 
+ project will be secured from the University Ethics Review Committee alongside 
+ written endorsements from proprietor management. Participation across all 
+ interviews,   workflow   observations,   and   usability   trials   will   remain   entirely 
+ voluntary, substantiated by   executed informed consent agreements outlining 
+ participant rights and withdrawal procedures without institutional penalty. 
+ Data   confidentiality   and   digital   intellectual   property   safeguards   are 
+ rigorously   enforced   within   the   system   architecture.   Customer - uploaded 
+ documents notably academic theses, capstone manuscripts, and proprietary 
+ creative artwork are stored in access - restr icted server directories utilizing 
+ secure   tokenized   hashes   to   prevent   unauthorized   access.   Furthermore, 
+ transaction   proofs   and   payment   reference   screenshots   submitted   through 
+ mobile wallet gateways are encrypted at rest and accessible exclusively to 
+ authen ticated business owners and assigned billing personnel. All collected 
+ project telemetry will be anonymized, reported strictly in aggregated academic 
+ formats, and retained securely on encrypted media before scheduled disposal 
+ upon formal manuscript acceptan ce. 
+ Project Developmental Approach 
+ This   capstone   project   adopts   the   Agile   Software   Development 
+ Methodology   as   its   developmental   framework.   Agile   is   an   iterative   and 
+ incremental   approach   that   emphasizes   modular   engineering,   continuous 
+=====PAGE 49=====
+37 
+ stakeholder collaboration, and rapid adaptability. This methodology is suited for 
+ engineering   the   Printify   platform,   which   integrates   dynamic   service 
+ configuration, production job scheduling, automated Bill of Materials (BOM) 
+ inventory deductions, and busi ness analytics. 
+ Figure 2. Development Methodology 
+ Plan.   Requirements   elicitation   was   conducted   through   structured 
+ interviews and observational studies at partner printing shops to establish 
+ operational workflows, pricing   algorithms,   job   scheduling   bottlenecks,   and 
+ inventory tracking constraints. 
+ Design.   Software modeling diagrams, specifically the Entity Relationship 
+ Diagram (ERD), Class Diagram, Use Case Diagram, and operational Activity 
+=====PAGE 50=====
+38 
+ Diagrams were constructed alongside responsive user interface wireframes to 
+ define structural constraints and interaction flows. 
+ Develop.   The   platform   was   built   iteratively   across   four   targeted 
+ development sprints: 
+ -   Sprint 1: User authentication, role - based access controls (RBAC), and the 
+ Business Owner Onboarding Setup Wizard. 
+ -   Sprint 2: The Dynamic Service Configuration Hub, universal ordering engine, 
+ artwork file upload handling, and manual payment verification. 
+ -   Sprint 3: The 5 - stage workshop production Kanban console, digital job 
+ ticketing, and the automated Bill of Materials (BOM) inventory deduction engine. 
+ -   Sprint 4: The Material Spoilage Logging console, dynamic Reorder Point 
+ (ROP) burn - rate alerting, and the Sales and Financial Analytics Hub. 
+ Test.   Functional   unit   and   integration   testing   were   conducted 
+ continuously   during   each   sprint,   verifying   database   transactional   integrity, 
+ reactive   Livewire   component   states,   file   upload   validation,   and   inventory 
+ deduction formulas. 
+ Release.   The stabilized web application was deployed to a cloud staging 
+ environment, allowing authenticated business owners, production personnel, 
+ and retail customers to interact with the platform during usability testing. 
+ Feedback.   Qualitative   observations   and   structured   evaluator 
+ assessments gathered during user acceptance testing were analyzed to guide 
+ final code refinements and optimize user interface responsiveness. 
+=====PAGE 51=====
+39 
+ Project Timeline & Budget 
+ Figure 3. Gantt Chart 
+ The Gantt chart presents the overall timeline of the project from July to 
+ December 2026, showing how each phase of the study connects and builds on 
+ the one before it. The process begins with problem elicitation and field inquiries, 
+ followed by literature r eview, methodology formulation, and system architecture 
+ design. Once the groundwork is set, development proceeds through a series of 
+ Agile   sprints   covering   core   system   functions,   customer   ordering,   staff 
+ production tools, and inventory management features.   After development, the 
+ system undergoes quality assurance and automated testing before moving into 
+ deployment,   user   acceptance   testing,   and   final   evaluation.   The   timeline 
+ concludes with the completion of the manuscript and the capstone oral defense. 
+=====PAGE 52=====
+40 
+ Table 2.   Estimated Project Development Budget 
+ Budget Category / Item   Detailed Description   Estimated 
+ Total Cost 
+ 1.   Requirements Analysis 
+ a. Transportation & Site 
+ Visits 
+ Field travel to partner print 
+ shops . 
+ 500 
+ 2.   Design 
+ a.   Figma Professional 
+ Subscription 
+ Design software subscription 
+ for system mockups . 
+ 1,160 
+ 3.   Development 
+ a.   AI Coding Assistance & 
+ Tooling 
+ Google   Gemini   and   developer 
+ code   models   are   utilized   as 
+ pair−programming   assistants 
+ for   backend   query   optimization . 
+ 1,150.00 
+ b.   JetBrains PhpStorm Pro 
+ License 
+ Provides professional - grade 
+ PHP static analysis, database 
+ introspection, and automated 
+ refactoring tools . 
+ 1,000.00 
+ c.   SMS Gateway API 
+ Prepaid Credit 
+ An initial credit bundle for SMS 
+ gateways budgeted early to 
+ prepare automated SMS 
+ dispatching when customer 
+ orders transition stages . 
+ 5 00 
+ 4.   Integration 
+ a. Payment Gateway 
+ Sandbox   Integration 
+ GCash and PayMongo 
+ developer sandbox 
+ environments do not charge 
+ setup fees or require live 
+ deposit balances. Test API 
+ keys are issued free of charge 
+ for staging and academic 
+ research. 
+ 0 
+ 5. Testing 
+=====PAGE 53=====
+41 
+ a.   Multi - Tier Automated 
+ SQA Testing 
+ Testing is executed using 
+ open - source tools . F unctional 
+ verification is automated 
+ programmatically rather than 
+ distributed via physical survey 
+ questionnaires, no consumable 
+ survey expenses are incurred. 
+ 0 
+ 6. Connectivity 
+ a. Internet Broadband 
+ Connectivity 
+ Reflects the standard monthly 
+ billing plan for a home   fiber 
+ internet connection   for   system 
+ development and testing . 
+ 1, 499 .00 
+ 7. Paper Supplies 
+ a. Documentation Printing 
+ Materials 
+ 2 reams of b ond paper and 
+ printer   ink for report s, draft and 
+ revision   iterations . 
+ 800 
+ 8. Administrative Costs 
+ a. Evaluator Honoraria   Token of appreciation   allocated 
+ for   the   expert panelists 
+ 1, 0 00.00 
+ b. Outline   Defense 
+ Copies 
+ Draft printing and binding for 
+ multiple copies distributed to 
+ panel   members and the project 
+ adviser. 
+ 1, 9 00.00 
+ Total   9,509 .00 
+=====PAGE 54=====
+42 
+ System Modules 
+ To realize the objectives of the project, Printify is organized into five (5) 
+ functional modules. Each module groups related functional requirements and is 
+ directly traceable to a specific objective, as presented in Table   3 . 
+ Module   1:   User   Onboarding,   Authentication,   and   Role - Based 
+ Access Control (RBAC).   This module serves as the shared security layer of 
+ the   integrated   platform.   It   handles   customer   registration,   credential 
+ authentication, profile management, and session termination, and it restricts 
+ each actor (business owner, production staff, and custom er) to their designated 
+ interfaces. 
+ Module   2:   Dynamic   Service   Configuration   and   Catalog   Pricing 
+ Engine.   This module allows business owners to create and modify printing 
+ services, pricing variables, print attributes, and Bill of Materials (BOM) recipes 
+ through the user interface without altering source code, and it computes real - 
+ time multi - attribute quotatio ns. 
+ Module   3:   Customer   Self - Service   Ordering   and   Prepress 
+ Intake.   This module provides the customer - facing portal for placing print orders, 
+ uploading   print - ready   documents,   declaring   customer - supplied   paper, 
+ submitting proof of payment, and tracking order progress through a live five - 
+ stage status stepper. 
+=====PAGE 55=====
+43 
+ Module   4:   Production   Floor   5 - Stage   Kanban   Scheduling   and 
+ Counter Intake.   This module digitizes the production queue through a five - 
+ stage Kanban board, supports payment verification and customer - supplied 
+ paper inspection at the counter, and assigns jobs to production staff. 
+ Module   5:   Automated   Inventory   Replenishment,   Spoilage,   and 
+ Sales Reporting.   This module automatically deducts consumables based on 
+ BOM recipes, records material spoilage, computes rolling burn rates and 
+ dynamic reorder points (ROP) to trigger low - stock alerts, and generates sales 
+ and consumption summary reports. 
+ Table   3 . Mapping of Project Objectives, System Modules, and Functional 
+ Requirements 
+ Objective   System Module   
+Functional 
+ Requirements 
+ Objective 
+ 1 
+ Module 2: Dynamic Service 
+ Configuration and Catalog Pricing 
+ Engine 
+ FR - 0 5 , FR - 0 7 , FR - 
+ 1 6 , FR - 1 7 
+ Objective 
+ 1 
+ Module 3: Customer Self - Service 
+ Ordering and Prepress Intake 
+ FR - 0 6 , FR - 0 8 , FR - 
+ 0 9 , FR - 1 0 
+ Objective 
+ 2 
+ Module 4: Production Floor 5 - Stage 
+ Kanban Scheduling and Counter 
+ Intake 
+ FR - 1 1 , FR - 1 2 , FR - 
+ 1 4 
+ Objective 
+ 3 
+ Module 5: Automated Inventory 
+ Replenishment, Spoilage, and Sales 
+ Reporting 
+ FR - 1 3 , FR - 1 5 , FR - 
+ 1 8 , FR - 1 9 
+ Objective 
+ 4 
+ Module 1: User Onboarding, 
+ Authentication, and RBAC 
+ FR - 01, FR - 02, FR - 
+ 03 , FR - 04 
+ Objective 
+ 5   
+All Modules   FR - 01 to FR - 1 9 
+=====PAGE 56=====
+44 
+ System Requirement Specifications 
+ This section defines the functional and technical requirements of the 
+ Integrated   Dynamic   Order,   Job   Scheduling,   and   Inventory   Management 
+ System. It outlines the specific behavioral functions of the platform alongside 
+ the minimum and recommended software an d hardware environments required 
+ for development, hosting, and end - user access. 
+ Functional Requirements 
+ 1.   User Account Registration 
+ o   Description:   Provides self - service client account registration 
+ for customers wishing to transact through the platform. 
+ o   Input:   Customer full name, valid email address, mobile phone 
+ number, and a secure password with confirmation. 
+ o   Process:   Validates   form   syntax   and   email   uniqueness, 
+ hashes the password securely using bcrypt, initializes a user 
+ record assigned with the default customer role, and persists 
+ the entity in the database. 
+ o   Output:   Account creation confirmation alert and automatic 
+ redirection to the authentication interface. 
+=====PAGE 57=====
+45 
+ 2.   User Authentication   (Login) 
+ o   Description:   Authenticates registered credentials, establishes 
+ secure stateful sessions, enforces role - based access control 
+ (RBAC),   and   directs   actors   to   their   designated   portal 
+ interfaces. 
+ o   Input:   Registered   email   address,   password,   optional 
+ "remember me" flag, and optional two - factor authentication 
+ (2FA) one - time token. 
+ o   Process:   Cross - references   submitted   credentials   against 
+ bcrypt - hashed database records, evaluates account active 
+ status, resolves the user role (Customer, Production Staff, or 
+ Business Owner), issues session tokens, and executes route 
+ redirection to authorized das hboard hubs. 
+ o   Output:   Authenticated   user   session,   role - gated   interface 
+ routing, or invalid credential error prompts. 
+ Session Termination and Logout 
+ 3.   User Profile Management 
+ o   Description:   Allows authenticated users across all roles to 
+ inspect,   modify,   and   maintain   personal   account 
+ information,   security   credentials,   and   communication 
+ preferences. 
+=====PAGE 58=====
+46 
+ o   Input:   Updated full name, mobile contact number, profile 
+ avatar file,   current   password,   and   new password   with 
+ confirmation. 
+ o   Process:   Validates form syntax, enforces uniqueness on 
+ contact identifiers, verifies current password authenticity 
+ prior to credential modification, re - hashes new passwords 
+ using bcrypt, updates user entity records in the database, 
+ and dispatches status feedback. 
+ o   Output:   Updated database profile entity, success flash 
+ alerts, and updated session profile display. 
+ 4.   Session Termination and Logout 
+ o   Description:   Securely   invalidates   active   authentication 
+ tokens   and   terminates   user   sessions   to   prevent 
+ unauthorized device   access. 
+ o   Input:   Logout command trigger from the user navigation 
+ interface. 
+ o   Process:   Flushes   authenticated   session   storage, 
+ invalidates   security tokens, regenerates the CSRF token, 
+ and destroys   cookie references. 
+ o   Output:   Redirection   to   the   public   landing   page 
+ accompanied by a session termination confirmation. 
+ 1.   5.   Service Catalog Browsing and Quotation Calculation 
+=====PAGE 59=====
+47 
+ o   Description:   Enables customers to explore active printing 
+ services   and   calculate   real - time   itemized price   quotations 
+ based on selected operational parameters. 
+ o   Input:   Selected print service category, document dimensions, 
+ page counts, color mode (monochrome/color), paper stock, 
+ binding finishing, and copy volume. 
+ o   Process:   Interrogates database pricing formulas in real time, 
+ applies   dynamic   rate   multipliers   via   reactive   Livewire 
+ component   state,   and   computes   cost   subtotals   without 
+ reloading the page. 
+ o   Output:   Dynamic, itemized quotation breakdown reflecting 
+ base   costs,   per - page   rates,   finishing   surcharges,   and 
+ estimated totals. 
+ 2.   6.   Print Order Placement and Document Upload 
+ o   Description:   Captures finalized customer print requests and 
+ facilitates   digital   document   or   artwork   file   submission   for 
+ prepress inspection. 
+ o   Input:   Customer order details, fulfillment mode preference 
+ (pickup/counter handoff), optional production notes, and digital 
+ document files (PDF, DOCX, or high - resolution images). 
+ o   Process:   Validates file MIME types and size constraints, 
+ transfers uploaded files to an encrypted private storage disk 
+=====PAGE 60=====
+48 
+ with tokenized filenames, writes the parent order record to the 
+ database, and generates a unique tracking code (e.g., ORD - 
+ 2026 - 001). 
+ o   Output:   Instantiated pending order record, generated tracking 
+ code, and visual order submission confirmation. 
+ 3.   7.   Print Attribute and Finishing Specification 
+ o   Description:   Mandates the capture and technical validation of 
+ detailed print configuration attributes required to fulfill an active 
+ order. 
+ o   Input:   Paper dimensions (Short, A4, Long), paper thickness 
+ (70 gsm, 80 gsm, 100 gsm), print orientation (simplex single - 
+ sided or duplex back - to - back), and binding finishes (spiral coil, 
+ sliding cover, softbound, or hardbound foil stamping). 
+ o   Process:   Encapsulates submitted attributes into a structured 
+ line - item specification record, verifies technical feasibility (e.g., 
+ maximum   page   limits   for   specific   binding   styles),   and 
+ calculates exact physical sheet requirements (ceil (pages / 2) 
+ * copies for dup lex). 
+ o   Output:   Validated line - item specification entity inextricably 
+ linked to the parent order. 
+ 4.   8.   Customer - Supplied Substrate Declaration 
+=====PAGE 61=====
+49 
+ o   Description:   Conditionally   extends   the   order   placement 
+ workflow when a client elects to supply their own physical 
+ paper, adjusting financial calculations and tagging production 
+ requirements. 
+ o   Input:   Customer - supplied   substrate   toggle   activation, 
+ provided paper description, and declared sheet count. 
+ o   Process:   Subtracts shop raw paper material charges from the 
+ running price quotation, designates line - item fulfillment as 
+ cover - only, and appends an "Awaiting Paper Delivery" intake 
+ flag to the digital job ticket. 
+ o   Output:   Discounted order total and an intake - tagged digital job 
+ ticket for workshop counter tracking. 
+ 5.   9.   Proof of Payment Submission 
+ o   Description:   Enables customers to submit manual payment 
+ verification references for counter cash transactions or mobile 
+ wallet remittances (GCash / Maya). 
+ o   Input:   Selected payment channel, alphanumeric transaction 
+ reference number, and a graphic screenshot of the remittance 
+ receipt. 
+ o   Process:   Validates image file structure, attaches the proof 
+ payload to the pending order record, flags order payment 
+=====PAGE 62=====
+50 
+ status as pending verification, and alerts shop staff of pending 
+ billing audits. 
+ o   Output:   Payment submission acknowledgment and updated 
+ pending verification status badge on the client portal. 
+ 10.   Live Order Progress and Status Tracking 
+ o   Description:   Provides   transparent,   real - time   telemetry 
+ displaying the operational progression of customer orders 
+ across workshop milestones. 
+ o   Input:   Customer Order ID, tracking code, or authenticated 
+ client dashboard session. 
+ o   Process:   Queries   active   production   status   flags   in   the 
+ database and renders an illuminated, color - coded 5 - stage 
+ visual   stepper   reflecting   milestone   progression   and   stage 
+ completion timestamps. 
+ o   Output:   Real - time visual progress stepper indicating current 
+ order stage (Queue, Printing, Finishing, QC, Ready for Pickup) 
+ and estimated fulfillment date. 
+ 6.   11.   Payment Transaction Auditing and Verification 
+ o   Description:   Empowers   production   staff   and   business 
+ administrators to audit customer - submitted payment proofs 
+ against billing ledgers and update order financial states. 
+=====PAGE 63=====
+51 
+ o   Input:   Staff   audit   decision   (Approve   or   Reject),   cross - 
+ referenced reference numbers, and optional rejection remarks. 
+ o   Process:   Verifies transaction validity against shop financial 
+ ledgers,   transitions   payment   status   to   verified   paid   (or 
+ rejected),   records   the   verifying   staff   ID   and   verification 
+ timestamp, and transitions the order into the active production 
+ queue. 
+ o   Output:   Updated   order   financial   status   and   automated 
+ payment confirmation notification broadcast to the customer 
+ dashboard. 
+ 7.   12.   Production Floor 5 - Stage Kanban Queue Management 
+ o   Description:   Organizes workshop production orders into an 
+ interactive   visual   5 - stage   Kanban   board   to   direct   job 
+ scheduling, operator delegation, and machine allocation. 
+ o   Input:   Assigned staff operator ID, assigned printing machine 
+ designation, stage progression triggers, and optional quality 
+ control (QC) rework remarks. 
+ o   Process:   Moves   active   orders   across   five   sequential 
+ workshop stages (1. In Queue   - > 2. Printing Pages   - > 3. 
+ Finishing & Assembly   - > 4. Quality Inspection   - > 5. Ready for 
+ Pickup), logs transition timestamps, synchronizes customer 
+=====PAGE 64=====
+52 
+ tracking steppers, or executes step - back transitions upon QC 
+ failure. 
+ o   Output:   Interactive visual Kanban board, updated digital job 
+ ticket states, and synchronized customer progress updates. 
+ 8.   13.   Automated Bill of Materials (BOM) Inventory Deduction 
+ o   Description:   Automatically   decrements   raw   material 
+ inventories based on linked service BOM recipes as print jobs 
+ advance into production or pickup stages. 
+ o   Input:   Active order line - item parameters (page count, paper 
+ dimensions, duplex flags, binding consumables, copy quantity) 
+ and stage advance trigger. 
+ o   Process:   Evaluates item fulfillment status; if designated as 
+ customer - supplied   paper,   raw   paper   sheet   deduction   is 
+ completely bypassed. For standard orders, computes exact 
+ consumption based on duplex math (ceil(pages / 2) * copies) 
+ and finishing multipliers, decre ments physical inventory stock 
+ balances, and records immutable audit entries in the stock 
+ movement ledger. 
+ o   Output:   Decremented physical stock balances and recorded 
+ inventory transaction audit trails. 
+ 9.   14.   Customer - Supplied Substrate Counter Inspection 
+=====PAGE 65=====
+53 
+ o   Description:   Conditionally   extends   the   production   queue 
+ workflow when an order contains customer - supplied paper, 
+ requiring   staff   to   inspect   physical   stock   before   machine 
+ processing begins. 
+ o   Input:   Physical   paper   bundle   presented   at   the   counter, 
+ physical   sheet   count   verification,   grammage/condition 
+ inspection, and staff verification confirmation. 
+ o   Process:   Cross - references physical stock against digital job 
+ ticket parameters; upon staff confirmation, updates order state 
+ to paper received, logs the receiving staff ID, and releases the 
+ job ticket from intake hold into the active printing queue. 
+ o   Output:   Verified substrate receipt status on the job ticket and 
+ release into active machine production. 
+ 10.   15.   Material Spoilage Logging and Stock Adjustments 
+ o   Description:   Allows production operators to record physical 
+ material waste and accidental damage resulting from printer 
+ jams, paper misfeeds, or binding errors. 
+ o   Input:   Damaged inventory item selection, wasted quantity, 
+ and specific operational failure explanation. 
+ o   Process:   Validates numeric quantity limits, decrements the 
+ item's on - hand stock balance, appends an audit entry to the 
+ stock   movement   ledger   tagged   as   spoilage,   records   the 
+=====PAGE 66=====
+54 
+ reporting operator's ID, and checks remaining stock against 
+ reorder thresholds. 
+ o   Output:   Adjusted on - hand inventory levels, recorded waste 
+ audit logs, and dynamic replenishment threshold evaluation. 
+ 11.   16.   Dynamic Service and Rate Configuration 
+ o   Description:   Allows business owners to dynamically define, 
+ modify, or retire service offerings, pricing structures, and rate 
+ tariffs without altering application source code. 
+ o   Input:   Service key, descriptive name, active status toggle, 
+ base   setup   fee,   monochrome/color   per - page   rates,   paper 
+ profile limits, rush fee multipliers, and finishing add - on prices. 
+ o   Process:   Validates   input   parameters   against   numeric 
+ boundaries, writes updated configuration records to service 
+ entities   and   JSON   attribute   schemas,   clears   cached 
+ application pricing models, and exposes new configurations to 
+ the client ordering interface. 
+ o   Output:   Updated service catalog, active pricing formulas, and 
+ instant administrative configuration confirmation. 
+ 12.   17.   Bill of Materials (BOM) Recipe Definition 
+ o   Description:   Mandates   the   relational   mapping   between 
+ dynamic shop services and physical inventory stock items to 
+ govern automated material depletion formulas. 
+=====PAGE 67=====
+55 
+ o   Input:   Configured service identifier, linked inventory item IDs, 
+ applicable   variant   bindings   (hardbound,   softbound,   spiral 
+ comb, sliding folder), and unit consumption coefficients. 
+ o   Process:   Enforces relational integrity across services and 
+ inventory   items,   stores   recipe   mappings   in   configuration 
+ tables, and validates formula mathematical logic. 
+ o   Output:   Relational Bill of Materials recipe linking dynamic 
+ services to automated inventory consumption. 
+ 13.   18.   Inventory Oversight and Dynamic Reorder Point (ROP) Alerting 
+ o   Description:   Monitors   physical   stock   balances,   computes 
+ rolling consumption velocity, and triggers visual replenishment 
+ warnings when supplies reach critical levels. 
+ o   Input:   Historical   stock   movement   logs,   rolling   daily 
+ consumption data, supplier lead times, and baseline safety 
+ stock levels. 
+ o   Process:   Computes the daily material burn rate (Burn Rate = 
+ Total Material Consumed / Time Period in Days), derives the 
+ dynamic Reorder Point threshold (ROP = (Daily Burn Rate * 
+ Lead Time) + Safety Stock), evaluates current stock against 
+ the threshold, and flags i tems requiring replenishment. 
+=====PAGE 68=====
+56 
+ o   Output:   Real - time stock health summaries, visual low - stock 
+ badges   on   the   Inventory   Hub,   and   automated   restocking 
+ banners on the Owner Master Dashboard. 
+ 14.   19.   Sales, Cashflow, and Operational Analytics Generation 
+ o   Description:   Aggregates transaction data, service volume, 
+ material   expenses,   and   revenues   to   generate   interactive 
+ business intelligence and exportable reports. 
+ o   Input:   Date   range selection parameters, service   category 
+ filters, and report export commands. 
+ o   Process:   Aggregates database transactions across orders, 
+ computes gross revenues, net margins, material consumption 
+ expenses, spoilage costs, and rush revenue, rendering visual 
+ trend charts and formatted tabular ledgers. 
+ o   Output:   Interactive visual charts, service product mix reports, 
+ and exportable financial audit ledgers. 
+=====PAGE 69=====
+57 
+ Software Requirements Specification 
+ Table   4   outlines the software environment and developer toolchains 
+ utilized in designing, developing, and operating the web - based system. 
+ Table   4 . Software Requirements Specification 
+ Component   Minimum Requirement   Recommended 
+ Requirement 
+ Operating System   Windows 10 / Ubuntu 
+ 20.04 LTS / macOS 12 
+ Windows 11 / Ubuntu 
+ 22.04 LTS / macOS 
+ 14 
+ Web Server   Apache 2.4 / Nginx 1.18+ 
+ / PHP Built - in Server 
+ Nginx 1.24+ / Apache 
+ 2.4+ 
+ Database Server   MySQL 8.0 / SQLite 3   MySQL 8.0+ / 
+ MariaDB 10.6+ 
+ Programming 
+ Language / Runtime 
+ PHP 8.2   PHP 8.3 or higher 
+ Backend Framework   Laravel 11.x   Laravel 11.x / 13.x 
+ Frontend Reactive 
+ Stack 
+ Livewire 3.x / Alpine.js   Livewire 4.x / Flux UI 
+ CSS Framework & 
+ Bundler 
+ Tailwind CSS v3 / Vite   Tailwind CSS v4 via 
+ Vite 
+ Web Browser   Modern Browser 
+ (Chrome, Firefox, Edge, 
+ Safari) 
+ Latest Google 
+ Chrome / Brave / 
+ Microsoft Edge 
+=====PAGE 70=====
+58 
+ Hardware Requirements Specification 
+ Table   5   details the minimum and recommended hardware specifications 
+ for the development workstations, hosting servers, and client access devices. 
+ Table   5 . Hardware Requirements Specification 
+ Category   Specification   Minimum 
+ Requirement 
+ Recommended 
+ Requirement 
+ Development 
+ Workstation 
+ Processor 
+ Memory 
+ (RAM) 
+ Storage 
+ Display 
+ Dual - Core 2.0 GHz 
+ Processor 
+ 8 GB RAM 
+ 256 GB SSD 
+ 1366 × 768 
+ Resolution 
+ Quad - Core 3.0 
+ GHz or higher 
+ 16 GB RAM or 
+ higher 
+ 512 GB NVMe 
+ SSD 
+ 1920 × 1080 Full 
+ HD Display 
+ Web Server 
+ (Hosting) 
+ Processor 
+ Memory 
+ (RAM) 
+ Storage 
+ Bandwidth 
+ 1 vCPU (Cloud VM 
+ or Dedicated) 
+ 1 GB RAM 
+ 20 GB Storage 
+ 10 Mbps Internet 
+ Connection 
+ 2 vCPUs or higher 
+ 2 GB   –   4 GB RAM 
+ 50 GB SSD 
+ Storage 
+ 50 Mbps+ High - 
+ Speed Internet 
+ Client 
+ Devices 
+ (Users) 
+ Device Type 
+ Memory 
+ (RAM) 
+ Connectivity 
+ Any Web - Capable 
+ Device (PC, 
+ Smartphone) 
+ 2 GB RAM 
+ Standard 3G/4G/Wi - 
+ Fi Connection 
+ Smartphone / 
+ Laptop / Desktop 
+ PC 
+ 4 GB RAM or 
+ higher 
+ Stable 
+ 4G/5G/Broadband 
+ Internet 
+=====PAGE 71=====
+59 
+ Use Case Diagram 
+ This figure illustrates the Use Case Diagram of the Integrated Dynamic 
+ Order, Job Scheduling, and Inventory Management System. The diagram 
+ defines the system boundary and visualizes how external actors interact with 
+ core   system   functions   across   administrat ive,   production,   and   customer 
+ domains. Three primary actors govern platform activity: the Business Owner, 
+ the   Production   Staff,   and   the   Customer.   Access   privileges   are   strictly 
+ segregated through role - based authentication, directing each actor to dedicated 
+ operational interfaces upon system entry. 
+ The Customer initiates transaction lifecycles through the client - facing 
+ ordering interface. Customers browse the active service catalog, configure print 
+ specifications, and generate instant price quotations before placing orders and 
+ uploading digital artwo rk. The ordering workflow inherently requires configuring 
+ technical print parameters — such as paper dimensions, GSM weight, color 
+ mode, and binding options — represented through an   <<include>>   relationship. 
+ In contrast, the option to declare customer - supplied substrates "Dala ang Papel” 
+ extends the ordering workflow conditionally via an   <<extend>>   dependency, 
+ dynamically discounting service totals and bypassing raw material allocations. 
+ Following order placement, customers submit transaction reference numbers 
+ and payment proof, subsequently tracking the real - time stage progression of 
+ their print jo bs through to pickup readiness. 
+=====PAGE 72=====
+60 
+ The Production Staff and Business Owner govern floor execution and 
+ enterprise   management   from   internal   authenticated   interfaces.   Production 
+ operators supervise jobs across a visual five - stage Kanban board (Queue, 
+ Printing, Finishing/Assembly, Quality Check , and Ready for Pickup). Advancing 
+ a job across these production stages automatically triggers an   <<include>> 
+ dependency   for   automated   Bill   of   Materials   (BOM)   inventory   deductions, 
+ decrementing physical stock levels in real time. When an order involves 
+ customer - supplied materials, staff verify the delivered paper at the shop counter 
+ through   an   <<extend>>   verification   procedure   before   machine processing 
+ begins.   At   the   managerial   level,   the   Business   Owner   oversees   system 
+ configuration. Owners dynamically configure print services and their underlying 
+ BOM recipes   <<include>> , adjust inventory safety thresholds, track material 
+ burn rates against dynamic reorder point thresholds, and generate business 
+ analytics to evaluate financial and operational performance. 
+=====PAGE 73=====
+61 
+ Figure 4: Use Case Diagram of Printify 
+=====PAGE 74=====
+62 
+ Class Diagram 
+ This figure illustrates the Class Diagram of the Integrated Dynamic 
+ Order, Job Scheduling, and Inventory Management System. The diagram 
+ models the static structure of the platform, defining system entities, internal 
+ state attributes, operational methods, a nd structural relationships.   System 
+ actors are formalized through an object - oriented inheritance hierarchy rooted in 
+ the   generalized   User   superclass.   This   superclass   encapsulates   shared 
+ authentication   states   and   profile   management   operations,   which   are 
+ subsequently   specialized   into   three   distinct   subclasses:   BusinessOwner , 
+ ProductionStaff , and   Customer . Each specialized subclass defines role - 
+ specific behaviors, ensuring that administrative configuration, workshop floor 
+ job handling, and client order placement remain modular and structurally 
+ isolated. 
+ The domain model operationalizes print shop transactions and inventory 
+ replenishment   through   interconnected   entity   classes.   A   BusinessOwner 
+ manages   a   single   PrintShop   aggregate   root   (1:1),   which   anchors   the 
+ establishment's catalog of   ShopService   offerings and physical   InventoryItem 
+ supplies. Customers initiate transactions by placing an   Order   (1:M), which 
+ establishes a composite aggregation with one or more   OrderItem   instances to 
+ encapsulate itemized production parameters and document attachments. As 
+ production operators in the   ProductionStaff   role advance active orders across 
+ workshop stages, the system queries linked   ServiceBom   consumption recipes 
+=====PAGE 75=====
+63 
+ to calculate exact raw material usage. These material deductions directly 
+ decrement stock balances in   InventoryItem   and write immutable audit records 
+ to   StockMovement ,   preserving   strict   inventory   traceability   and   providing 
+ reliable telemetry for automated reorder alerts. 
+ Figure 5. Class Diagram of Printify 
+=====PAGE 76=====
+64 
+ Project Design 
+ The project design translates the operational requirements and technical 
+ constraints into actionable architectural blueprints. This stage bridges business 
+ rules with software implementation. Structurally, it defines the normalized data 
+ models and relationa l constraints that synchronize incoming print orders with 
+ automated Bill of Materials (BOM) inventory deductions. Behaviorally, it outlines 
+ how business owners, production operators, and customers interact across core 
+ functional modules, tracking jobs as t hey advance through workshop queues 
+ from intake to final handoff. The succeeding discussions present the logical 
+ database schema through an Entity Relationship Diagram (ERD), followed by 
+ behavioral use case models and operational workflow diagrams that dir ect daily 
+ print shop operations. 
+ Entity Relationship Diagram 
+ This Figure illustrates the Entity Relationship Diagram (ERD) of the 
+ system, detailing the logical entities, primary keys, and foreign key constraints 
+ across the normalized database tables. At the architectural center is the   Users 
+ table (user_id), governing authentication and role - based access control (RBAC) 
+ across business owners, workshop staff, and customers. A single registered 
+ business owner manages an enterprise instance in the   PrintShops   table 
+=====PAGE 77=====
+65 
+ (print_shop_id)   through   a   strict   one - to - one   relationship   (owner_user_id), 
+ anchoring all tenant - level operations. Each print shop maintains its dynamic 
+ service catalog through the   ShopServices   table (service_id, referenced via 
+ print_shop_id 1:N). Rather than relying on separate tables for each print 
+ offering, this unified entity encapsulates production lead times, daily shop floor 
+ capacity quotas, and custom pricing rules within a structured se ttings JSON 
+ attribute, allowing owners to update service parameters without altering the 
+ underlying database schema. 
+ Customer transactions and workshop scheduling converge in the   Orders 
+ table (order_id, referenced from print_shop_id 1:N). This entity links to   Users 
+ through two distinct foreign keys: customer_user_id for order placement and 
+ assigned_staff_user_id for production delegation. It tracks human - readable 
+ tracking codes, verified payment receipts, and the active workstation state 
+ across a five - stage Kanban p ipeline ( Queue ,   Printing ,   Finishing/Assembly , 
+ Quality Check , and   Ready for Pickup ). Each order contains individual line items 
+ captured in the   OrderItems   table (order_item_id, referenced via order_id 1:N). 
+ To avoid hardcoding product variations, OrderItems employs a universal line - 
+ item   design   with   a   specifications   JSON   attribute.   This   structure   flexibly 
+ accommodates varying parameters — such as page counts,   paper dimensions, 
+ binding finishes, or garment sizes — while preserving strict relational integrity 
+ with the parent transaction. 
+=====PAGE 78=====
+66 
+ Material resources and consumables are tracked in the   InventoryItems 
+ table (inventory_item_id, referenced via print_shop_id 1:N), which maintains 
+ verified stock levels, unit acquisition costs, and dynamic Reorder Point (ROP) 
+ thresholds. Automated material deduction is governed by the   ServiceBoms 
+ table (bom_id), establishing a unified Bill of Materials repository. ServiceBoms 
+ decouples   services   from   physical   stock   by   mapping   service_id   to 
+ inventory_item_id (1:N) alongside conditional usage formulas. Whenever an 
+ order progresses into production, re quired materials are automatically deducted 
+ and   recorded   in   the   StockMovements   table   (movement_id).   This   entity 
+ maintains   an   append - only   audit   ledger   linked   to   inventory_item_id, 
+ logged_by_user_id,   and   order_id   (1:N).   By   preserving   prior   and   resulting 
+ balances   alongside   order   references,   the   ledger   guarantees   complete 
+ accountability   and provides real - time data for rolling burn rate and stockout risk 
+ calculations. 
+=====PAGE 79=====
+67 
+ Figure 6. Entity Relationship Diagram of Printify 
+=====PAGE 80=====
+68 
+ Activity Diagram 
+ Figure   7   illustrates   the   User   Account   Registration   process,   where 
+ prospective   customers   provide   their   name,   email,   mobile   number,   and 
+ password. The system validates the submitted information and checks if the 
+ email is already registered. If errors are foun d, the user is prompted to correct 
+ the information. Once validated, the password is securely hashed, a customer 
+ account is created with the default customer role, and the data is saved. The 
+ process ends with a confirmation message and redirection to the lo gin page. 
+ Figure 7. User Account Registration 
+=====PAGE 81=====
+69 
+ Figure   8   illustrates   the   operational   activity   diagram   for   User 
+ Authentication   (Login).   The   process   begins   when   an   actor   (Customer, 
+ Production Staff, or Business Owner) submits their registered email address 
+ and password into the authentication portal. The authentic ation guard cross - 
+ references the submitted credentials against bcrypt password hashes stored in 
+ the database. If the credentials fail validation or the account is inactive, the 
+ system increments the failed login counter and displays an authentication error 
+ alert. Upon successful verification, the system initializes an authenticated 
+ session token, determines the actor's role - based access level, and redirects the 
+ user to their designated portal: the Customer Dashboard, Staff Production 
+ Console, or Owner Maste r Hub. 
+ Figure 8.   User Authentication (Login) 
+=====PAGE 82=====
+70 
+ Figure 9 illustrates the operational activity diagram for User Profile 
+ Management. The workflow begins when an authenticated user accesses the 
+ account settings interface to modify personal details, contact information, or 
+ security credentials. The user inp uts their updated attributes, providing current 
+ password verification if a password change is requested. The system validates 
+ syntactic constraints and checks mobile number uniqueness. If password 
+ alteration is submitted, the backend verifies the current p assword hash before 
+ encrypting the new password via bcrypt. Upon successful validation, the system 
+ executes an atomic database transaction updating the user entity, flushes the 
+ cached session state, and renders an update confirmation notification. 
+ Figure 9. User Profile Management 
+=====PAGE 83=====
+71 
+ Figure   10   illustrates the activity diagram for Session Termination and 
+ Logout process, where users log out through the navigation bar. The system 
+ clears session data, invalidates security tokens, and removes authentication 
+ cookies. This prevents further access to p rotected pages and redirects the user 
+ to the public landing page, helping protect the account from unauthorized 
+ acces s. 
+ Figure   10 . Session Termination and Logout 
+=====PAGE 84=====
+72 
+ The figure 1 1   shows the activity diagram for Service Catalog Browsing 
+ and Quotation Calculation depicts the interactive estimation process on the 
+ customer storefront. The c ustomer   navigates through available service offerings 
+ (e.g., document printing, thesis binding, merchandise) and adjusts operational 
+ parameters, including page quantities, color profiles (monochrome or full color), 
+ paper   grammage,   and   copy   volume.   The   reactive   Li vewire   component 
+ intercepts each parameter change without triggering a manual browser reload. 
+ The engine interrogates database pricing formulas, computes unit sheet rates, 
+ incorporates finishing surcharges, and renders an illuminated, itemized cost 
+ subtota l in real time, providing transparent pricing before order commitment . 
+ Figure 1 1 . Service Catalog Browsing and Quotation   Calculation 
+=====PAGE 85=====
+73 
+ As shown in Figure 1 2   the activity diagram presents the process of 
+ placing an order and uploading files through the system. The customer begins 
+ by selecting the required printing service specifications and submitting the 
+ necessary files. The order system then calculates the qu otation and validates 
+ the uploaded document and checkout information. Once the information is 
+ successfully   validated,   the   file   storage   component   saves   the   uploaded 
+ document and payment proof when applicable. At the same time, the orders 
+ database records th e order and its corresponding order item. The process is 
+ completed when the system displays the order confirmation to the customer. 
+ Figure 1 2 . Print Order Placement and Document Upload 
+=====PAGE 86=====
+74 
+ Figure 1 3   shows t he activity diagram for Print Attribute and Finishing 
+ Specification models the structural parameterization of custom print jobs. The 
+ customer configures exact technical attributes: paper dimensions (Short, A4, 
+ Long), paper thickness (70, 80, 100 gsm), prin t orientation (simplex single - sided 
+ or duplex double - sided), and binding finishes (plastic comb, sliding folder, 
+ softbound, or hardbound foil stamping). The specification engine inspects page 
+ counts against physical binding thresholds (e.g., maximum page l imits for 
+ sliding folders) and executes duplex mathematical calculations where physical 
+ sheet requirements equal   ⌈ Pages / 2 ⌉   ×   Copies . The system encapsulates these 
+ attributes into structured JSON specifications within the   order_items   entity. 
+ Figure 1 3.   Print Attribute and Finishing Specification 
+=====PAGE 87=====
+75 
+ Figure   1 4   shows   activity   diagram   for   Customer - Supplied   Substrate 
+ Declaration illustrates the client checkout extension for "Dala ang Papel" orders. 
+ When placing an order, the customer activates the substrate declaration toggle, 
+ specifying their paper brand, type, a nd sheet volume. The pricing engine detects 
+ the flag, zeroes out shop raw paper material fees from the running subtotal, and 
+ designates the line item as cover - only fulfillment. Upon order submission, the 
+ system attaches an "Awaiting Paper Delivery" intake   flag to the digital job ticket, 
+ ensuring that shop paper is not billed while alerting the client to deliver their 
+ paper bundle to the counter. 
+ Figure 1 4.   Customer - Supplied Substrate Declaration 
+=====PAGE 88=====
+76 
+ Figure 1 5   shows the activity diagram for Proof of Payment Submission 
+ models client remittance submission. Following order placement, the customer 
+ navigates to the payment step, selecting either counter cash settlement or 
+ mobile wallet options (GCash or Maya). For d igital transactions, the customer 
+ scans the shop payment QR code, inputs the transaction reference number, 
+ and uploads a screenshot of the remittance receipt. The server validates image 
+ dimensions and file formats, stores the receipt file on a private disk , updates the 
+ order payment status to "pending_verification", and alerts workshop staff for 
+ audit . 
+ Figure 1 5 . Proof of Payment Submission 
+=====PAGE 89=====
+77 
+ Figure 1 6   shows the Live Order Progress and Status Tracking depicts 
+ real - time operational telemetry available to clients. The customer accesses their 
+ dashboard or inputs their unique tracking code. The tracking subsystem queries 
+ active order records from the databa se, extracts current production flags, and 
+ checks stage transition timestamps. The system renders an illuminated, color - 
+ coded five - stage stepper component (Queue, Printing, Finishing/Assembly, 
+ Quality   Inspection,   Ready   for   Pickup).   Completed   milestones   dis play 
+ checkmarks   and   recorded   timestamps,   the   active   milestone   displays   an 
+ illuminated   pulse   badge,   and   estimated   fulfillment   times   are   updated 
+ dynamically. 
+ Figure 1 6 . Live Order Progress and Status Tracking 
+=====PAGE 90=====
+78 
+ Figure 1 7   illustrates the process of recording and verifying customer 
+ payment information. The customer provides a payment reference and payment 
+ proof when applicable, after which the system stores the submitted payment 
+ details and current payment status in the ord er record. A production staff 
+ member or business owner then reviews the payment information through the 
+ job ticket or analytics order list. If the payment is verified, the system records 
+ the verified status, verification time, and verifying user. Otherwise , the existing 
+ payment status remains unchanged . 
+ Figure 1 7 . Payment Transaction Auditing and Verification 
+=====PAGE 91=====
+79 
+ The activity diagram in Figure 1 8   is for Production Floor 5 - Stage Kanban 
+ Queue Management process organizes workshop orders through five stages: 
+ In Queue, Printing Pages, Finishing and Assembly, Quality Inspection, and 
+ Ready for Pickup. Staff claim orders, assign machinery, record product ion 
+ details, and move each ticket through the stages. During quality inspection, 
+ defects may send the order back for rework in Printing or Finishing. Once 
+ approved, the order is marked Ready for Pickup, while each stage transition 
+ updates the customer’s tr acking information in real time . 
+ Figure 1 8 . Production Floor 5 - Stage Kanban Queue   Management 
+=====PAGE 92=====
+80 
+ Figure 1 9   illustrates the Automated Bill of Materials (BOM) Inventory 
+ Deduction process, where the system automatically calculates and deducts 
+ materials as an order enters production. For customer - supplied paper, paper 
+ deduction is skipped, while standard orders ca lculate paper usage based on 
+ pages and copies. Finishing materials such as ring spines, PVC covers, and 
+ backings are deducted based on their defined quantities. The system then 
+ updates inventory levels and records each deduction for tracking and auditing . 
+ Figure 1 9 . Automated Bill of Materials (BOM) Inventory Deduction 
+=====PAGE 93=====
+81 
+ The activity diagram in Figure   20   illustrates the operational workflow 
+ governing customer - supplied paper handling ("Cover only"). When a customer 
+ elects to supply their own pre - printed or blank paper stock during online order 
+ submission, the system flags the resulting digital job ticket w ith an "Awaiting 
+ Paper Delivery" alert and zeroes out the raw paper material cost from the 
+ transaction subtotal. The customer subsequently brings the physical paper 
+ bundle to the shop service counter. Upon arrival, production personnel inspect 
+ the physica l stock to verify sheet quantity, standard paper grammage (GSM), 
+ and sheet physical condition against the specifications stated on the digital 
+ ticket. If the delivered stock is damaged, crumpled, or insufficient in quantity, 
+ staff reject the submission and   prompt the client to supply supplemental sheets 
+ or switch to in - house shop paper. Once the paper is verified, the staff member 
+ marks the job ticket as "Paper Received" within the production console. This 
+ administrative verification unlocks the order in th e Kanban queue, automatically 
+ transitioning its operational state from intake hold to the active printing and 
+ finishing queue . 
+=====PAGE 94=====
+82 
+ Figure   20 . Customer - Supplied Substrate   Counter Inspection 
+=====PAGE 95=====
+83 
+ Figure 2 1   shows the process of recording material waste and checking 
+ inventory levels. Staff record damaged materials by selecting the item, entering 
+ the wasted quantity, and providing the reason. The system then deducts the 
+ wasted amount from inventory and records   the transaction for tracking. After 
+ updating the stock, the system checks the remaining quantity against the 
+ Reorder Point (ROP). If the stock reaches or falls below the threshold, the 
+ system   automatically   displays   a   low - stock   warning   and   recommends 
+ reple nishment to the business owner. 
+ Figure 2 1 . Material Spoilage logging and Stock Adjustments 
+=====PAGE 96=====
+84 
+ The activity diagram in Figure 2 2   depicts the administrative procedure for 
+ dynamically configuring service offerings and their underlying Bill of Materials 
+ (BOM) recipes without modifying application source code. The business owner 
+ accesses the   authenticated   Dynamic   Service   Configuration   Hub   from   the 
+ administrative console. The owner initiates the workflow by selecting an existing 
+ service category or establishing a new print service catalog entry. 
+ The   configuration   workflow   requires   defining   baseline   commercial 
+ parameters, including service titles, base preparation fees, incremental per - 
+ page rates for monochrome and full - color print passes, paper dimension profiles 
+ (Short, A4, Long), paper thickness   options (70, 80, 100 gsm), and binding style 
+ surcharges.   Crucially,   the   owner   links   operational   service   parameters   to 
+ physical inventory stock items through the ServiceBoms mapping interface. The 
+ owner assigns unit consumption coefficients — such as one pla stic ring spine per 
+ bound volume, two PVC clear cover sheets per booklet, or duplex paper 
+ consumption formulas. Upon submission, the platform performs data validation 
+ against   numeric   boundaries   and   relational   foreign   key   constraints   before 
+ persisting the c onfiguration parameters into the database. These updated rates 
+ and material recipes are instantaneously ingested by the client - facing ordering 
+ engine, dynamically recalibrating real - time price calculations and inventory 
+ deduction rules across the entire pl atform . 
+=====PAGE 97=====
+85 
+ Figure 2 2 . Dynamic Serv i ce   and Rate Configuration 
+=====PAGE 98=====
+86 
+ Figure 2 3   shows the activity diagram for Bill of Materials (BOM) Recipe 
+ Definition depicts the administrative linking between commercial services and 
+ inventory   consumables.   The   business   owner   accesses   the   BOM   Recipe 
+ Manager, selects a target service (e.g., Thesis H ardbound), and maps required 
+ raw stock items (e.g., chipboard, book cloth, foil ribbon, end - sheets) from the 
+ inventory catalog. The owner defines consumption coefficients (such as 2 
+ sheets per book or 1 coil per booklet). The system validates foreign key 
+ r elationships, writes recipe mappings to the   service_boms   configuration table, 
+ and binds the operational consumption rules to automated floor deduction 
+ routines. 
+ Figure 2 3.   Bill of Materials (BOM) Recipe Definition 
+=====PAGE 99=====
+87 
+ Figure   2 4   shows   the   activity   diagram   for   Inventory   Oversight   and 
+ Dynamic Reorder Point (ROP) Alerting models continuous stock monitoring and 
+ proactive replenishment alerting. The automated inventory monitor computes 
+ material   daily   burn   rates   based   on   rolling   consumption   velo city:   B urn 
+ Rate=Total Consumed/Days.   The system derives the dynamic Reorder Point 
+ threshold   using   ROP=(Daily Burn Rate×Lead Time)+Safety Stock ,   and 
+ evaluates current on - hand stock balances against this threshold. If on - hand 
+ stock falls to or below the dynamic ROP, the platform flags the inventory item 
+ with a visual low - stock badge on the Inventory Hub and renders a high - priority 
+ restocking recom mendation banner on the Owner Master Dashboard. 
+ Figure 2 4 . Inventory Oversight and Dynamic Reorder Point (ROP) Alerting 
+=====PAGE 100=====
+88 
+ As seen in Figure 2 5   the activity diagram outlines how the business 
+ owner generates and reviews operational and financial reports. The owner first 
+ selects the reporting period and available filters. The analytics system then 
+ processes order, payment, inventory, and spoilage i nformation to calculate 
+ sales, order counts, costs, profit, margins, and other related metrics. These 
+ results are presented through the report interface for review. If the owner 
+ chooses to export the report, the system generates a CSV ledger and sends it 
+ t o the browser for download. Otherwise, the process ends after the report has 
+ been reviewed. 
+ Figure 2 5.   Sales, Cashflow, and Operational Analytics Generation 
+=====PAGE 101=====
+89 
+ User Interface 
+ Figure 2 6   and 2 7   illustrates the user interface of the landing page and 
+ registration page of Printify. The registration interface collects the required 
+ account information, including the user's name, email address, password, and 
+ password confirmation. Validation messages   are presented when information is 
+ incomplete or incorrect, allowing the user to correct the form before submitting 
+ the registration. After successful registration, the system creates the user 
+ account and applies the default customer role, after which the u ser may log in 
+ to access the appropriate portal. This arrangement supports accurate account 
+ creation and controlled access to the Printify system. 
+ Figure 2 6 . Landing page of Printify 
+=====PAGE 102=====
+90 
+ Figure 2 7 . Registration Interface 
+ Figure 2 8   illustrates the user interface of the Login page. The interface 
+ authenticates registered users through their email address and password. 
+ Validation messages are presented when credentials are missing or incorrect, 
+ allowing the user to correct the form bef ore proceeding. After successful 
+ authentication, the system establishes the user session and applies role - based 
+ routing, directing business owners, production staff, and customers to their 
+ respective portals. This arrangement provides a controlled and stra ightforward 
+ entry point to the Printify system. 
+=====PAGE 103=====
+91 
+ Figure 2 8 . Login Interface 
+ Figure 2 9   &   30   illustrates the user interface of the Business Owner Setup 
+ Wizard. This screen represents the initial configuration and onboarding stage 
+ for a newly registered business owner. The wizard first collects the shop identity 
+ and then presents the available pri nting services for selection. The owner can 
+ choose the services relevant to the shop's business requirements before 
+ completing setup, while validation prevents an incomplete shop name or an 
+ empty   service   selection   from   being   saved.   The   selected   services   ar e 
+ synchronized   with   the   shop   profile   and   determine   the   applications   and 
+ customer - orderable services that become available in the system. Therefore, 
+ the   setup   wizard   establishes   the   initial   modular   configuration   instead   of 
+ assuming that every shop operates   with the same fixed service set. 
+=====PAGE 104=====
+92 
+ Figure 2 9 . Business Owner Setup Wizard 
+ Figure   30 . Business Owner Setup Wizard 
+=====PAGE 105=====
+93 
+ Figure 3 1   illustrates the user interface of the Business Owner Master 
+ Dashboard. The dashboard serves as the central administrative workspace for 
+ managing the printing business. It consolidates access to shop setup, service 
+ management, order monitoring, inventory o versight, and sales analytics within 
+ a role - restricted interface. Summary information and operational shortcuts 
+ enable the owner to review current business activity and move directly to the 
+ area requiring attention. The dashboard also supports the owner se tup state by 
+ directing an incompletely configured shop to the setup workflow before normal 
+ operations are displayed. As the primary management screen, it provides a 
+ consolidated view of the system's operational modules without   exposing staff - 
+ only or customer - only controls. 
+ Figure 3 1 . Business Owner Master Dashboard 
+=====PAGE 106=====
+94 
+ Figure   3 2   illustrates   the   user   interface   for   managing   the   shop's 
+ applications and services. Through the More Services or service - management 
+ panel, the business owner can browse the service catalog, install or activate 
+ optional applications, and deactivate optional   services that are no   longer 
+ needed. Deactivation removes an optional service from the active workspace 
+ and customer - facing service choices without removing its catalog definition. The 
+ interface distinguishes these configurable services from core applicatio ns that 
+ are required by the platform and cannot be removed. After an optional service 
+ is activated or deactivated, the launcher refreshes its installed - application list so 
+ that the owner's workspace reflects the updated configuration. This interface 
+ provid es the clearest visual evidence of the platform's modular installation, 
+ management, and deactivation capabilities. 
+ Figure 3 2 . Application and Service Management Interface 
+=====PAGE 107=====
+95 
+ Figure 3 3   &   3 4   shows the   user interface of   the   Dynamic Service 
+ Configuration Hub. The hub enables the business owner to define and maintain 
+ the services offered by the printing shop without changing the application's 
+ source code. Through the configuration interface, the   owner can manage 
+ service availability, pricing parameters, options, limits, document - printing rules, 
+ thesis - binding settings, and bill - of - material relationships where applicable. The 
+ hub validates submitted values before saving them and provides feedback   when 
+ a configuration requires correction. These settings are subsequently used by 
+ the ordering wizard to present current service choices and calculate quotations. 
+ Consequently,   the   interface   establishes   a   direct   connection   between 
+ administrative configurat ion and the customer - facing ordering experience. 
+ Figure 3 3 . Dynamic Service Configuration Hub 
+=====PAGE 108=====
+96 
+ Figure 3 4 . Dynamic Service Configuration Hub 
+ Figure 3 5 , 3 6 , 3 7   illustrates the user interface of the Customer Ordering 
+ Wizard and Live Five - Stage Progress Stepper. The ordering wizard guides 
+ customers through the preparation and submission of a printing or thesis - 
+ binding   order.   The   interface   presents   service - specific   selections   such   as 
+ document specifications, binding options, paper, finishing, copies, uploaded 
+ files, and payment information in a structured sequence. As the customer 
+ changes applicable options, the system recalculates the quotation and displays 
+ validat ion feedback for incomplete or invalid entries. After submission, the 
+ progress stepper communicates the order's production status through the 
+ stages of Queue, Printing, Binding or Assembly, Quality Check, and Ready for 
+ Pickup. This combination reduces info rmation overload during order entry and 
+ gives customers a clear view of progress after the order has entered production. 
+=====PAGE 109=====
+97 
+ Figure 3 5 .   Customer Ordering Wizard and Live Five - Stage Progress Stepper 
+ Figure 3 6 .   Customer Ordering Wizard and Live Five - Stage Progress Stepper 
+=====PAGE 110=====
+98 
+ Figure 3 7   . Customer Ordering Wizard and Live Five - Stage Progress Stepper 
+ Figure 3 8   shows the user interface of the Staff Production Kanban 
+ Console. The console is the operational interface used by production personnel 
+ to organize and advance active customer orders. It displays digital job cards 
+ according to their current production stag e and provides search and filtering 
+ controls for locating work by service, rush status, fulfillment method, binding, or 
+ other relevant attributes. Staff members can open a job ticket to review order 
+ details,   record   customer - supplied   paper   intake,   assign   a   machine,   add 
+ production   notes,   and   update   the   order   stage.   The   five - stage   Kanban 
+ arrangement makes workflow status visible at a glance and supports orderly 
+ movement from Queue through Printing, Binding or Assembly, Quality Check, 
+ and Ready for Pickup. When   quality control is unsuccessful, the interface allows 
+=====PAGE 111=====
+99 
+ the staff member to record the reason and return the order to an earlier stage 
+ for corrective action. 
+ Figure 3 8 . Staff Production Kanban Console 
+ Figure 3 9   illustrates the user interface of the Report Spoilage function 
+ available to production staff. The interface allows staff to immediately record 
+ damaged or wasted material while the incident is still known on the production 
+ floor. The staff member selects t he affected inventory item, enters the quantity 
+ wasted, and provides a reason or note before confirming the deduction. After 
+ submission, the system reduces the item's stock quantity, creates a spoilage or 
+ waste movement containing the previous and resultin g stock values, and 
+ records the   reporting user. The spoilage record remains available   in the 
+ Inventory Hub and contributes to the spoilage - loss information used by the 
+=====PAGE 112=====
+100 
+ Analytics Hub. This separate interface supports timely and traceable inventory 
+ reporting without interrupting the order's Kanban stage progression. 
+ Figure 3 9 . Report Spoilage Interface 
+ Figure   40   illustrates   the   user   interface   of   the   Inventory   Hub   with 
+ Automated Restock Alerts.   The hub provides the business owner with a 
+ consolidated   view   of   materials,   quantities   on   hand,   reorder   levels,   stock 
+ movements, and restocking priorities. Inventory quantit ies may be adjusted 
+ through authorized management actions, while production - related consumption 
+ is   recorded   through   the   system's   BOM - based   deduction   process   when 
+ applicable. The interface evaluates current stock against the configured reorder 
+ level and mar ks materials requiring attention with a low - stock or restock alert. It 
+ also   presents   movement   information   to   support   traceability   of   additions, 
+=====PAGE 113=====
+101 
+ deductions, and adjustments. The restock alert is therefore an operational 
+ decision - support   feature:   it   identifies   supplies   that   require   review   and 
+ replenishment planning based on recorded inventory conditions, while the 
+ actual purchase or supplier transac tion remains a business - owner action. 
+ Figure   40 . Inventory Hub with Automated Restock Alerts 
+ Figure 4 1   shows the user interface of the Sales and Financial Analytics 
+ Hub. The hub transforms recorded order, payment, inventory, and production 
+ information into an organized management report. The business owner can 
+ select a reporting period and apply available   service or fulfillment filters before 
+ reviewing key performance indicators, order summaries, sales trends, product 
+ mix, costs, profit, margins, rush revenue, and payment status information. The 
+ interface also supports payment verification for displayed ord ers and provides 
+ a CSV export for transaction - level reporting. By combining operational and 
+=====PAGE 114=====
+102 
+ financial measures in one screen, the hub helps the owner evaluate service 
+ performance, monitor revenue and cost behavior, and support procurement or 
+ pricing decisions using recorded business data rather than informal estimates. 
+ Figure 4 1 . Sales and Financial Analytics Hub 
+=====PAGE 115=====
+LITERATURE CITED 
+ Albayrak Ünal, Ö., Erkayman, B., & Usanmaz, B. (2023). Applications of 
+ Artificial   Intelligence   in   Inventory   Management:   A   Systematic 
+ Review of the Literature. Archives of Computational Methods in 
+ Engineering. 
+ Apriadi, D., & Dewi, A. R. (2026). Design and Implementation of a Web - Based 
+ Printing Service System Using UML and Waterfall: A Case Study 
+ of   Business   Process   Optimization.   Journal   of   Information 
+ Technology and Systems Engineering ,   1 (1), 1 – 7. 
+ Asim, I., & ARBAIY, N. . (2026). Business Inventory Management System for 
+ Alfudullallah Co.   Applied Information Technology And Computer 
+ Science ,   7 (1), 1324 - 1338. 
+ Bhaktha, Ankith & Raj, Akshay & N, Devika & Paul, Gripsy. (2023). Online Order 
+ Management   System.   International   Journal   for   Research   in 
+ Applied   Science   and   Engineering   Technology.   11.   1 - 10. 
+ 10.22214/ijraset.2023.54265. 
+ Destouet, C., Tlahig, H., Bettayeb, B., & Mazari, B. (2023). Flexible job shop 
+ scheduling   problem   under   Industry   5.0:   A   survey   on   human 
+ reintegration,   environmental   consideration   and   resilience 
+ improvement. Journal of Manufacturing Systems, 67, 155 – 173. 
+ Dhiman, K., & Phansikar, M. (2021). Online food ordering management system. 
+ International   Journal   for   Research   in   Applied   Science   and 
+ Engineering Technology ,   9 (7), 2096 - 2107. 
+ Jebbor, S., Chiheb, R., El Afia, A., & Gallab, M. (2023). Designing a fully 
+ automated and integrated inventory and replenishment system for 
+ hospitals. International Journal of Systems Science: Operations & 
+ Logistics, 10(1), 1962429. 
+=====PAGE 116=====
+104 
+ Jiang, Z., Yuan, S., Ma, J., & Wang, Q. (2022). The evolution of production 
+ scheduling from Industry 3.0 through Industry 4.0. International 
+ Journal of Production Research, 60(11), 3534 – 3554. 
+ Joshi, S., Ekhande, R., Kazi, I., Naik, T., & Chintawar, S. (2026). Zaprint   –   A 
+ Remote Printing Management System.   International Journal For 
+ Multidisciplinary Research . 
+ Kurniawan, I., Saraswati, T., & Ongkopratama, P. D. P. (2025). Enhancing 
+ production   planning   and   inventory   control   with   a   web - based 
+ system: A case study in an Indonesian packaging manufacturer 
+ company.   Jurnal Teknik Industri ,   26 (1), 105 - 126. 
+ Munyaka, J. B., & Yadavalli, V. S. S. (2022). Inventory management concepts 
+ and implementations: A systematic review. South African Journal 
+ of Industrial Engineering, 33(2), 15 – 36. 
+ Oktavian,   E.   H.,   Sumarno,   S.,   Jamaaluddin,   J.,   &   Sumartik,   S.   (2024). 
+ Enhancing   design   and   print   services:   A   web - based   ordering 
+ system   for   InDesign   digital   printing   store.   AIP   Conference 
+ Proceedings, 3167 (1), 040025. 
+ Rolf, B., Jackson, I., Müller, M., Lang, S., Reggelin, T., & Ivanov, D. (2023). A 
+ review on reinforcement learning algorithms and applications in 
+ supply chain management.   International Journal of Production 
+ Research ,   61 (20), 7151 – 7179. 
+ Saragih, R., Cynthia, E. P., & Cynthia, M. M. (2026). Improving Operational 
+ Efficiency   in   Digital   Printing   Services   Through   a   Web - Based 
+ Information   System:   An   Empirical   Case   Study.   Journal   of 
+ Information Technology and Systems Engineering ,   1 (1), 8 – 14. 
+ Smagowicz,   J., Szwed,   C.,   &   Berlec,   T. (2024). An   Assortment – Quantity 
+ Optimization   Problem   in   Printing   Industry   Using   Simulation 
+ Modelling.   Sustainability ,   16 (4), 1693. 
+ Susila, M. N., Haryanto, H., Fridayanthie, E. W., & Budiyono, P. (2025). 
+ Development of a Web - Based Printing Service Application Using 
+=====PAGE 117=====
+105 
+ the Waterfall Model.   Jurnal Multidisiplin Sahombu ,   5 (08), 2832 – 
+ 2839. Retrieved from 
+ Tanaman, M.T., Lloyd, J., Baylosis, A., Abiles, B.J., Lester, M., Catungal, P., & 
+ Encarnacion, D.P. (2023). Web - based Inventory Management 
+ System.   International Journal of Science and Applied Information 
+ Technology . 
+ Ugbebor,   F.   .,   Adeteye,   M.,   &   Ugbebor,   J.   (2024).   Automated   Inventory 
+ Management Systems with IoT Integration to Optimize Stock 
+ Levels and Reduce Carrying Costs for SMEs: A Comprehensive 
+ Review.   Journal of Artificial Intelligence General Science (JAIGS) 
+ ISSN:3006 - 4023 ,   6 (1), 306 – 340. 
+ Zonta, T., Da Costa, C. A., Zeiser, F. A., Ramos, G. de O., Kunst, R., & Righi, 
+ R. da R. (2022). A predictive maintenance model for optimizing 
+ production   schedule   using   deep   neural   networks.   Journal   of 
+ Manufacturing Systems, 62, 450 – 462. 
+ Zwaida, T.A.; Pham, C.; Beauregard, Y. Optimization of Inventory Management 
+ to Prevent Drug Shortages in the Hospital Supply Chain. Appl. Sci. 
+ 2021, 11, 2726 . 
+=====PAGE 118=====
+APPENDICES 
+=====PAGE 119=====
+107 
+ UNIVERSITY OF SOUTHERN MINDANAO 
+ Kabacan, Cotabato 
+ Philippines 
+ APPLICATION FOR RESEARCH ADVISER 
+ February 06,2026 
+ DANILYN   A.   FLORES 
+ Department of Computing and Library Information Science 
+ College of Engineering and Information Technology 
+ USM, Kabacan, Cotabato 
+ Madam: 
+ We   would like to request that you will be   our   Research adviser effective 2 
+nd   
+semester, 
+ SY   2025 - 2026.   I   intend   to   work   on   “ PRINTIFY:   INTEGRATED   DYNAMIC   ORDER,   JOB 
+ SCHEDULING, AND INVENTORY MANAGEMENT SYSTEM FOR PRINTING SERVICES WITH 
+ AUTOMATED REPLENISHMENT ” 
+ We are   hoping for your most favorable approval on this request. Thank you very much. 
+ Very truly yours, 
+ CHRISTIAN JAMES J. PEREZ 
+ Printed Name and Signature of Student 
+ APPROVED 
+ DANILYN   A.   FLORES 
+ Adviser 
+ ____________________ 
+ Date 
+ USM - EDR - F01 - Rev.4.2022.10.18 
+ Appendix A.   Application for Research Adviser 
+ Application for Research Adviser 
+=====PAGE 120=====
+108 
+ UNIVERSITY OF SOUTHERN MINDANAO 
+ Kabacan, Cotabato 
+ Philippines 
+ APPLICATION FOR RESEARCH TITLE 
+ March 18, 2026 
+ JANICE T. PALMAERA 
+ Chairperson, Department of   Computing and Library Information Science 
+ MADAM : 
+ We   would like to request your office to allow   us   to research on the study entitled   “ PRINTIFY: 
+ INTEGRATED DYNAMIC ORDER, JOB SCHEDULING, AND INVENTORY MANAGEMENT SYSTEM 
+ FOR PRINTING SERVICES WITH AUTOMATED REPLENISHMENT ” 
+ The study has the following objectives: 
+ 1.   create a dynamic order management module that enables administrators to configure, add, or modify printing services, 
+ pricing variables, and material requirements without altering the source code, and allows customers to configure print 
+ specifications, rece ive real - time quotations, and submit print orders online; 
+ 2.   develop a job scheduling module that digitizes the production queue, visually tracks order progress, and systematically 
+ allocates labor and machinery to ensure timely fulfillment; 
+ 3. implement an automated inventory replenishment module that calculates the real - time burn rate of materials based on active 
+ sales volume, records material spoilage, and triggers alerts at critical reorder points, and generates sales and material 
+ consumpt ion summary reports; 
+ 4. integrate the dynamic ordering, job scheduling, and inventory replenishment modules into a single, cohesive web - based 
+ platform secured by role - based access control for the business owner, production staff, and customers; and 
+ 5. conduct comprehensive functional testing and system verification of the developed platform using a structured Test Plan an d 
+ discrete Test Cases to validate that all 19 functional requirements satisfy their specified operational parameters, boundary 
+ cond itions, and database transactions on a pass - or - fail basis and execute operational user acceptance walkthroughs with printing 
+ shop stakeholders. 
+ Very   truly   yours, 
+ CHRISTIAN JAMES J. PEREZ   Printed 
+ Name   and   Signature   of   Student 
+ NOTED 
+ DANILYN   A.   FLORES 
+ Adviser   Date 
+ CATHERINE   C.   DAFFON 
+ Department   Research   Coordinator   Date 
+ ANITA   C.   SORNITO 
+ College   Research   Coordinator   Date 
+ APPROVED 
+ JANICE T. PALMAERA 
+ Department   Chairperson 
+ Date 
+ USM - EDR - F02 - Rev.4.2021.11.04 
+ Appendix B.   Application for Research Title 
+ Appendix B. Application for Research Title 
+=====PAGE 121=====
+109 
+ UNIVERSITY OF SOUTHERN MINDANAO 
+ Kabacan, Cotabato z 
+ Philippines 
+ ESTIMATED BUDGET OF THE RESEARCH 
+ Title of Study 
+ PRINTIFY: INTEGRATED DYNAMIC ORDER, JOB SCHEDULING, AND INVENTORY 
+ MANAGEMENT SYSTEM FOR PRINTING SERVICES WITH AUTOMATED REPLENISHMENT 
+ ITEMS/DESCRIPTION   E STIMATED COST 
+ Transportation   600.00 
+ Bond Papers   (3 Reams)   570.00 
+ Ink   1,200.00 
+ Clips(6 pcs)   50.00 
+ Wifi   1,499.00 
+ Adviser   500.00 
+ Examining Committee   900.00 
+ Department Research Coordinator   250.00 
+ Grand Total   5,569.00 
+ Prepared and submitted by: 
+ CHRISTIAN JAMES J. PEREZ 
+ Printed   Name   and   Signature   of   Student 
+ NOTED 
+ DANILYN A. FLORES 
+ Adviser 
+ __________________________ 
+ Date 
+ CATHERINE C. DAFFON 
+ Department Research Coordinator 
+ __________________________ 
+ Date 
+ RYAN Z. GONZAGA 
+ Department Chairperson 
+ __________________________ 
+ Date 
+ Appendix C.   Estimated Budget of the Research 
+ Appendix C. Estimated Budget of the Research 
+ USM - EDR - F06 - Rev.3.2020.02.24 
+=====PAGE 122=====
+110 
+ UNIVERSITY OF SOUTHERN MINDANAO 
+ Kabacan, Cotabato 
+ Philippines 
+ APPLICATION FOR THESIS OUTLINE DEFENSE 
+ Name   CHRISTIAN JAMES J. PEREZ, KAYE P. COMISSION 
+ Degree/Major   BACHELOR OF SCIENCE IN INFORMATION SYSTEMS 
+ Thesis Title   INTEGRATED DYNAMIC ORDER, JOB SCHEDULING, AND INVENTORY 
+ MANAGEMENT SYSTEM FOR PRINTING SERVICES WITH AUTOMATED 
+ REPL   ENISHMENT 
+ Date of Examination 
+ Time 
+ Place 
+ MEMBERS OF THE EXAMINING COMMITTEE 
+ Name   Signature   Date 
+ ELIZABETH   R.   GENOTIVA   __________________   _____________ 
+ RYAN Z. GONZAGA   __________________   _____________ 
+ NELSON   G.   BALNEG JR.   __________________   _____________ 
+ RECOMMENDING APPROVAL: 
+ DANILYN   A.   FLORES   _______________________________ 
+ Adviser   Co - Adviser (Optional) 
+ APPROVED: 
+ _______________________________   RYAN Z. GONZAGA 
+ College Statistician   Department Chairperson 
+ (Optional) 
+ CATHERINE C. DAFFON 
+ Department Research Coordinator 
+ REPORT ON THE RESULT OF EXAMINATION 
+ Name   Signature   Remarks 
+ ELIZABETH R. G ENOTIVA   __________________   _____________ 
+ RYAN Z. GONZAGA   __________________   _____________ 
+ NELSON G. BALNEG JR.   __________________   _____________ 
+ APPROVED: 
+ CATHERINE C. DAFFON 
+ Department Research Coordinator 
+ ____________________ 
+ Date 
+ Appendix D.   Application for Thesis Outline Defense 
+ Appendix D. Application for Thesis Outline Defense 
+ USM - EDR - F07 - Rev.3.2020.02.24 
+=====PAGE 123=====
+111 
+ Appendix E.   Application for Group Research 
+ UNIVERSITY OF SOUTHERN MINDANAO 
+ Kabacan, Cotabato 
+ Philippines 
+ APPLICATION FOR GROUP RESEARCH 
+ October 1 9 , 2026 
+ DANILYN FLORES 
+ Department of Computing and Library Information Science 
+ College of Engineering and Information Technology 
+ USM, Kabacan, Cotabato 
+ Madam: 
+ We would like to request that you allow us to work on our research by group. It is within our understanding that 
+ working as a group is of our own choice and each bears equal responsibility in completing the output, as indicated in the 
+ task allocation matri x. 
+ We, the undersigned, do hereby certify and declare that   Christian James J. Perez and Kaye P. Comission   is duly 
+ authorized to process, on behalf of the group, all outline -   and manuscript - related forms, including but not limited to the 
+ Application for Research Adviser ,   Application for Research Title ,   Acceptance of Thesis , and   Budgetary Requirements 
+ (Estimated Budget and Actual Budget) . The aforementioned member’s name and signature shall serve as the official 
+ representation of the group for such purposes. 
+ Should some group member/s decide not to continue with the thesis due to unforeseeable circumstances, e.g. 
+ transfer to another university, file a leave of absence, and etc., the remaining members shall proceed with the study without 
+ the inclusion of additi onal members. 
+ We are hoping for your most favorable approval on this request. Thank you very much. 
+ Very truly yours, 
+ CHRISTIAN   JAMES   J.   PEREZ 
+ KAYE   P.   COMISSION 
+ Printed   Name   and   Signature   of   Student 
+ APPROVED 
+ DANILYN   A.   FLORES 
+ Adviser 
+ ____________________ 
+ Date 
+ USM - EDR - F19 - Rev.0.2025.09.08 
+ USM - EDR - F07 - Rev.3.2020.02.24 
+=====PAGE 124=====
+112 
+ MASTER FUNCTIONAL TEST CASES 
+ Below is the complete, expanded set of   2 6   discrete Test Cases   covering 
+ both   positive   scenarios (happy path)   and   negative/boundary scenarios (validation, 
+ constraints, and error handling)   across all 5 Core Modules. 
+ Master Test Case Traceability Table 
+ Test 
+ Case 
+ ID 
+ Module   
+Linked 
+ Requirement 
+ Test Case Title / 
+ Scenario 
+ Test 
+ Type 
+ Test 
+ Case 
+ ID 
+ TC - 
+ MOD1 - 
+ 01 
+ Module 1: 
+ User Account 
+ & Access 
+ Management 
+ FR - 01:   User 
+ Account 
+ Registration 
+ Customer Registration 
+ with Valid Inputs   
+Positive 
+ TC - 
+ MOD1 - 
+ 01 
+ TC - 
+ MOD1 - 
+ 02 
+ Module 1: 
+ User Account 
+ & Access 
+ Management 
+ FR - 01:   User 
+ Account 
+ Registration 
+ Customer Registration 
+ with Duplicate Email   
+Negative 
+ TC - 
+ MOD1 - 
+ 02 
+ TC - 
+ MOD1 - 
+ 03 
+ Module 1: 
+ User Account 
+ & Access 
+ Management 
+ FR - 02:   User 
+ Authentication 
+ (Login) 
+ Multi - Role Login & 
+ RBAC Route Guard 
+ Positive / 
+ Security 
+ TC - 
+ MOD1 - 
+ 03 
+ TC - 
+ MOD1 - 
+ 04 
+ Module 1: 
+ User Account 
+ & Access 
+ Management 
+ FR - 02:   User 
+ Authentication 
+ (Login) 
+ Login with Invalid 
+ Credentials & Rate 
+ Limiting 
+ Negative / 
+ Security 
+ TC - 
+ MOD1 - 
+ 04 
+ TC - 
+ MOD1 - 
+ 05 
+ Module 1: 
+ User Account 
+ & Access 
+ Management 
+ FR - 04:   Session 
+ Termination & 
+ Logout 
+ User Logout & Session 
+ Invalidation 
+ Positive / 
+ Security 
+ TC - 
+ MOD1 - 
+ 05 
+ TC - 
+ MOD1 - 
+ 06 
+ Module 1: 
+ User Account 
+ & Access 
+ Management 
+ FR - 03:   User 
+ Profile 
+ Management 
+ Customer Profile 
+ Information & Password 
+ Update 
+ Positive 
+ TC - 
+ MOD1 - 
+ 06 
+ TC - 
+ MOD2 - 
+ 01 
+ Module 2: 
+ Service 
+ Catalog & 
+ Dynamic 
+ Pricing Engine 
+ FR - 05:   Service 
+ Catalog & 
+ Quotation 
+ Interactive Price 
+ Quotation Calculation   
+Positive 
+ TC - 
+ MOD2 - 
+ 01 
+ TC - 
+ MOD2 - 
+ 02 
+ Module 2: 
+ Service 
+ Catalog & 
+ FR - 
+ 16:   Dynamic 
+ Admin Creation of New 
+ Print Service & Pricing 
+ Matrix 
+ Positive 
+ TC - 
+ MOD2 - 
+ 02 
+ Appendix F.   Master Functional Test Cases 
+ Appendix D. Application for Thesis Outline Defense 
+=====PAGE 125=====
+113 
+ Test 
+ Case 
+ ID 
+ Module   
+Linked 
+ Requirement 
+ Test Case Title / 
+ Scenario 
+ Test 
+ Type 
+ Test 
+ Case 
+ ID 
+ Dynamic 
+ Pricing Engine 
+ Service 
+ Configuration 
+ TC - 
+ MOD2 - 
+ 03 
+ Module 2: 
+ Service 
+ Catalog & 
+ Dynamic 
+ Pricing Engine 
+ FR - 17:   BOM 
+ Recipe 
+ Definition 
+ Admin Mapping of BOM 
+ Raw Material Deduction 
+ Ratios 
+ Positive 
+ TC - 
+ MOD2 - 
+ 03 
+ TC - 
+ MOD2 - 
+ 04 
+ Module 2: 
+ Service 
+ Catalog & 
+ Dynamic 
+ Pricing Engine 
+ FR - 07:   Print 
+ Attribute 
+ Specification 
+ Dynamic Filtering of 
+ Incompatible 
+ Material/Size Attributes 
+ Negative / 
+ Validation 
+ TC - 
+ MOD2 - 
+ 04 
+ TC - 
+ MOD3 - 
+ 01 
+ Module 3: 
+ Online Order 
+ & Job 
+ Specification 
+ Management 
+ FR - 06:   Print 
+ Order 
+ Placement & 
+ Upload 
+ Valid Artwork File 
+ Upload 
+ ( PDF / PNG / JPG / TIFF ) 
+ Positive 
+ TC - 
+ MOD3 - 
+ 01 
+ TC - 
+ MOD3 - 
+ 02 
+ Module 3: 
+ Online Order 
+ & Job 
+ Specification 
+ Management 
+ FR - 06:   Print 
+ Order 
+ Placement & 
+ Upload 
+ Artwork Upload with 
+ Invalid Format 
+ ( .exe / .docx ) or   > 50 MB 
+ Negative / 
+ Security 
+ TC - 
+ MOD3 - 
+ 02 
+ TC - 
+ MOD3 - 
+ 03 
+ Module 3: 
+ Online Order 
+ & Job 
+ Specification 
+ Management 
+ FR - 07:   Print 
+ Attribute 
+ Specification 
+ Complete Job Order 
+ Placement with Custom 
+ Specifications 
+ Positive 
+ TC - 
+ MOD3 - 
+ 03 
+ TC - 
+ MOD3 - 
+ 04 
+ Module 3: 
+ Online Order 
+ & Job 
+ Specification 
+ Management 
+ FR - 
+ 08:   Substrate 
+ Declaration 
+ Order Placement with 
+ Customer - Supplied 
+ Substrate Toggle 
+ Positive 
+ TC - 
+ MOD3 - 
+ 04 
+ TC - 
+ MOD3 - 
+ 05 
+ Module 3: 
+ Online Order 
+ & Job 
+ Specification 
+ Management 
+ FR - 09:   Proof of 
+ Payment 
+ Submission 
+ Digital Payment Receipt 
+ Upload & Reference 
+ Number Logging 
+ Positive 
+ TC - 
+ MOD3 - 
+ 05 
+ TC - 
+ MOD3 - 
+ 06 
+ Module 3: 
+ Online Order 
+ & Job 
+ Specification 
+ Management 
+ FR - 10:   Live 
+ Order Progress 
+ Tracking 
+ Real - Time Customer 
+ Order Status Tracker 
+ Updates 
+ Positive 
+ TC - 
+ MOD3 - 
+ 06 
+=====PAGE 126=====
+114 
+ Test 
+ Case 
+ ID 
+ Module   
+Linked 
+ Requirement 
+ Test Case Title / 
+ Scenario 
+ Test 
+ Type 
+ Test 
+ Case 
+ ID 
+ TC - 
+ MOD4 - 
+ 01 
+ Module 4: 
+ Production 
+ Workflow & 
+ Counter 
+ Operations 
+ FR - 
+ 11:   Payment 
+ Auditing & 
+ Verification 
+ Staff Approval of Valid 
+ Proof of Payment   
+Positive 
+ TC - 
+ MOD4 - 
+ 01 
+ TC - 
+ MOD4 - 
+ 02 
+ Module 4: 
+ Production 
+ Workflow & 
+ Counter 
+ Operations 
+ FR - 
+ 11:   Payment 
+ Auditing & 
+ Verification 
+ Staff Rejection of 
+ Fraudulent/Blurry 
+ Payment Receipt 
+ Negative 
+ TC - 
+ MOD4 - 
+ 02 
+ TC - 
+ MOD4 - 
+ 03 
+ Module 4: 
+ Production 
+ Workflow & 
+ Counter 
+ Operations 
+ FR - 12:   5 - Stage 
+ Kanban Floor 
+ Queue 
+ Sequential Kanban 
+ Stage Progression 
+ ( Pending   to   Completed ) 
+ Positive 
+ TC - 
+ MOD4 - 
+ 03 
+ TC - 
+ MOD4 - 
+ 04 
+ Module 4: 
+ Production 
+ Workflow & 
+ Counter 
+ Operations 
+ FR - 12:   5 - Stage 
+ Kanban Floor 
+ Queue 
+ Restricted Transition 
+ to   In Production   Without 
+ Verified Payment 
+ Negative / 
+ Business 
+ Rule 
+ TC - 
+ MOD4 - 
+ 04 
+ TC - 
+ MOD4 - 
+ 05 
+ Module 4: 
+ Production 
+ Workflow & 
+ Counter 
+ Operations 
+ FR - 
+ 14:   Substrate 
+ Counter 
+ Inspection 
+ Staff Acceptance & 
+ Rejection of Customer - 
+ Supplied Media 
+ Positive / 
+ Negative 
+ TC - 
+ MOD4 - 
+ 05 
+ TC - 
+ MOD5 - 
+ 01 
+ Module 5: 
+ BOM 
+ Inventory & 
+ Analytics 
+ Management 
+ FR - 
+ 13:   Automated 
+ BOM Stock 
+ Deduction 
+ Automatic Raw Material 
+ Deduction Upon   In 
+ Production   Trigger 
+ Positive 
+ TC - 
+ MOD5 - 
+ 01 
+ TC - 
+ MOD5 - 
+ 02 
+ Module 5: 
+ BOM 
+ Inventory & 
+ Analytics 
+ Management 
+ FR - 
+ 13:   Automated 
+ BOM Stock 
+ Deduction 
+ Zero Base - Substrate 
+ Deduction for Customer - 
+ Supplied Orders 
+ Positive / 
+ Business 
+ Rule 
+ TC - 
+ MOD5 - 
+ 02 
+ TC - 
+ MOD5 - 
+ 03 
+ Module 5: 
+ BOM 
+ Inventory & 
+ Analytics 
+ Management 
+ FR - 15:   Material 
+ Spoilage 
+ Logging 
+ Staff Logging of 
+ Damaged Materials & 
+ Reason Code Deduction 
+ Positive 
+ TC - 
+ MOD5 - 
+ 03 
+ TC - 
+ MOD5 - 
+ 04 
+ Module 5: 
+ BOM 
+ Inventory & 
+ Analytics 
+ Management 
+ FR - 
+ 18:   Inventory 
+ Oversight & 
+ ROP Alert 
+ Low - Stock Threshold 
+ Triggering Automated 
+ ROP Warning Alert 
+ Positive 
+ TC - 
+ MOD5 - 
+ 04 
+=====PAGE 127=====
+115 
+ DETAILED TEST CASE SPECIFICATION 
+ Module 1: User Onboarding, Authentication & Role - based Access Control 
+ (RBAC) 
+ Test Case ID: TC - MOD1 - 01 
+ Requirement Reference:   FR - 01: User Account Registration 
+ Test Description:   Verify self - service customer registration with valid credentials and 
+ database persistence. 
+ Preconditions:   Public registration portal accessible; database connection online. 
+ Test Input Data:   Full Name: "Juan Dela Cruz", Email: " juandelacruz@example.com ", 
+ Mobile: "09123456789", Password: "Password123!" 
+ Execution Steps: 
+ •   Access the   /register   route. 
+ •   Input valid registration details into corresponding form fields. 
+ •   Submit the registration request. 
+ Expected Output:   User record inserted into   users   table with password hashed via 
+ bcrypt; default role set to   customer; system redirects to login interface with account 
+ creation confirmation. 
+ Actual Result:   Account created successfully with hashed credentials; user redirected 
+ to login page. 
+ Status:   [ ] PASS   [   ] FAIL 
+ Tester / Date: _____________________________________ 
+ Appendix G.   Test Case Specification 
+ Appendix D. Application for Thesis Outline Defense 
+=====PAGE 128=====
+116 
+ Test Case ID: TC - MOD1 - 02 
+ Requirement Reference:   FR - 01: User Account Registration 
+ Test Description:   Validate duplicate email constraint handling and form validation 
+ error rendering. 
+ Preconditions:   User account with email   juandelacruz@example.com   already 
+ exists in the database. 
+ Test Input Data:   Full Name: "Juan Duplicate", Email: 
+ " juandelacruz@example.com ", Mobile: "09998887777", Password: 
+ "Password123!" 
+ Execution Steps: 
+ •   Access the   /register   route. 
+ •   Enter the duplicate email address and valid supplemental fields. 
+ •   Submit the registration form. 
+ Expected Output:   Submission intercepted by validation layer; database write 
+ prevented; inline error message rendered: "The email has already been taken." 
+ Actual Result:   Duplicate entry blocked; error message displayed without 
+ database mutation. 
+ Status:   [ ] PASS   [   ] FAIL 
+ Tester / Date: ______________________________________ 
+=====PAGE 129=====
+117 
+ Test Case ID: TC - MOD1 - 03 
+ Requirement Reference:   FR - 02: User Authentication 
+ Test Description:   Verify credential verification and role - based access control 
+ (RBAC) portal routing. 
+ Preconditions:   Three active accounts configured with distinct roles: Business 
+ Owner, Production Staff, and Customer. 
+ Test Input Data: 
+ Case A:   owner@printify.com   /   OwnerSecret123! 
+ Case B:   staff@printify.com   /   StaffSecret123! 
+ Case C:   customer@printify.com   /   CustomerSecret123! 
+ Execution Steps: 
+ •   Navigate to   /login. 
+ •   Authenticate sequentially using Case A, Case B, and Case C 
+ credentials. 
+ Expected Output: 
+ Case A routes strictly to   /owner/dashboard. 
+ Case B routes strictly to   /staff/dashboard. 
+ Case C routes strictly to   /customer/dashboard. 
+ Actual Result:   Authenticated sessions isolated; role middleware redirected each 
+ user to their designated portal. 
+ Status:   [ ] PASS   [   ] FAIL 
+ Tester / Date: ______________________________________ 
+=====PAGE 130=====
+118 
+ Test Case ID: TC - MOD1 - 04 
+ Requirement Reference:   FR - 02: User Authentication   (Login) 
+ Test Description:   Validate rejection of invalid credentials and unauthorized 
+ protected route access. 
+ Preconditions:   Unauthenticated browser session. 
+ Test Input Data:   Email:   owner@printify.com, Password:   WrongPassword999! 
+ Execution Steps: 
+ •   Attempt authentication with incorrect password. 
+ •   Attempt direct HTTP URL access to protected 
+ route   /owner/inventory. 
+ Expected Output:   Authentication fails with message "These credentials do not 
+ match our records"; unauthenticated URL request redirected to   /login   with HTTP 
+ 302. 
+ Actual Result:   Login rejected; direct access to protected administrative route 
+ successfully intercepted. 
+ Status: [ ] PASS   [   ] FAIL 
+ Tester / Date: ______________________________________ 
+=====PAGE 131=====
+119 
+ Test Case ID: TC - MOD1 - 05 
+ Requirement Reference:   FR - 0 4 : Session Termination and Logout 
+ Test Description:   Verify server - side session invalidation, CSRF token 
+ regeneration, and browser cookie eviction. 
+ Preconditions:   Active authenticated session on Customer Dashboard. 
+ Test Input Data:   User triggers "Log Out" action in navigation profile menu. 
+ Execution Steps: 
+ •   Click "Log Out". 
+ •   Attempt to return to dashboard using browser "Back" navigation. 
+ •   Attempt direct HTTP request to   /customer/dashboard. 
+ Expected Output:   Session flushed from memory; session cookie destroyed; 
+ CSRF token regenerated; subsequent requests redirected to public landing page. 
+ Actual Result:   Session destroyed; browser back navigation redirected to login. 
+ Status: [ ] PASS   [   ] FAIL 
+ Tester / Date: ______________________________________ 
+=====PAGE 132=====
+120 
+ Test Case ID: TC - MOD1 - 06 
+ Requirement Reference: FR - 03: User Profile Management 
+ Test Description: Verify user profile attribute modification, mobile number 
+ uniqueness enforcement, and current password verification during password 
+ update. 
+ Preconditions: Authenticated user session active (Customer, Staff, or Owner). 
+ Test Input Data: 
+ •   Updated Name = "Christian J. Perez (Updated)" 
+ •   Updated Mobile = "09123456789" 
+ •   Current Password = "CorrectOldPassword123" 
+ •   New Password = "NewSecurePassword456" 
+ •   New Password Confirmation = "NewSecurePassword456" 
+ Execution Steps: 
+ •   Access user settings interface via /user/profile. 
+ •   Modify full name and contact number fields. 
+ •   Enter current password and matching new password in credential 
+ update section. 
+ •   Submit profile update form. 
+ Expected Output: Form passes validation; database entity updated in 'users' 
+ table with re - hashed bcrypt password; session state refreshed; visual success 
+ notification "Profile Updated Successfully" rendered. 
+ Actual Result: User record mutated cleanly; password re - hashed via bcrypt; 
+ success toast displayed. 
+ Status: [ ] PASS   [   ] FAIL 
+ Tester / Date: ______________________________________ 
+=====PAGE 133=====
+121 
+ Module 2: Dynamic Service Configuration & Catalog Pricing Engine 
+ Test Case ID: TC - MOD2 - 01 
+ Requirement Reference:   FR - 0 5 : Service Catalog Browsing and Quotation 
+ Calculation 
+ Test Description:   Validate reactive Livewire quotation computation without full 
+ browser reloads. 
+ Preconditions:   Document Printing service configured with Base Fee = ₱10.00, 
+ Color Rate = ₱3.50/page, Comb Binding = ₱25.00. 
+ Test Input Data:   Page Count = 40, Copies = 2, Color Profile = Full Color, Binding 
+ = Spiral Comb. 
+ Execution Steps: 
+ •   Navigate to customer ordering wizard. 
+ •   Input 40 pages, 2 copies, Full Color, and Comb Binding. 
+ •   Observe computed subtotal display. 
+ Expected Output:   Dynamic formula evaluates:   ( ( Pages   ×   Rate )   +   BaseFee   + 
+ Finishing )   ×   Copies   =   ( ( 40   ×   3 . 50 )   +   10 . 00   +   25 . 00 )   ×   2   =   ₱ 350 . 00   rendered 
+ instantaneously. 
+ Actual Result:   Livewire component updated quotation subtotal to ₱350.00 without 
+ page refresh. 
+ Status: [ ] PASS   [   ] FAIL 
+ Tester / Date: ______________________________________ 
+=====PAGE 134=====
+122 
+ Test Case ID: TC - MOD2 - 02 
+ Requirement Reference:   FR - 1 6 : Dynamic Service and Rate Configuration 
+ Test Description:   Verify administrative dynamic rate updates without source code 
+ modification. 
+ Preconditions:   Business owner authenticated session. 
+ Test Input Data:   Modify Booklet Printing base preparation fee from ₱20.00 to 
+ ₱35.00 and color per - page rate from ₱4.00 to ₱5.00. 
+ Execution Steps: 
+ •   Access administrative Service Hub at   /owner/services. 
+ •   Update rate input fields and save changes. 
+ •   Open customer storefront ordering wizard in separate private 
+ window. 
+ Expected Output:   Updated rates persisted in   shop_services   table; customer 
+ storefront immediately recalculates quotations using updated ₱35.00 base fee 
+ and ₱5.00 page rate. 
+ Actual Result:   Database updated; customer quotation engine ingested new rates 
+ instantly. 
+ Status:   [ ] PASS   [   ] FAIL 
+ Tester / Date: ______________________________________ 
+=====PAGE 135=====
+123 
+ Test Case ID: TC - MOD2 - 03 
+ Requirement Reference:   FR - 1 7 : Bill of Materials (BOM) Recipe Definition 
+ Test Description:   Validate relational mapping between dynamic service offerings 
+ and raw inventory consumables. 
+ Preconditions:   Active service "Hardbound Thesis" and inventory items: 
+ Chipboard, Book Cloth, Foil Ribbon. 
+ Test Input Data:   Link Chipboard (2 sheets/unit), Book Cloth (1 sheet/unit), Foil 
+ Ribbon (1 meter/unit). 
+ Execution Steps: 
+ •   Open BOM Recipe Manager. 
+ •   Select Hardbound Thesis service. 
+ •   Map consumable items and assign consumption coefficients. 
+ •   Submit recipe mapping. 
+ Expected Output:   Foreign key relationships validated; recipe entries written 
+ to   service_boms   configuration table; floor deduction routines bound to recipe. 
+ Actual Result:   Relational recipe mappings saved; automated deduction bindings 
+ verified. 
+ Status:   [ ] PASS   [   ] FAIL 
+ Tester / Date: ______________________________________ 
+=====PAGE 136=====
+124 
+ Test Case ID: TC - MOD2 - 04 
+ Requirement Reference:   FR - 0 7 : Print Attribute and Finishing Specification 
+ Test Description:   Validate structural constraints preventing incompatible binding 
+ styles for excessive page counts. 
+ Preconditions:   Sliding Folder binding configured with physical threshold of 
+ maximum 50 sheets. 
+ Test Input Data:   Page Count = 120 pages, Orientation = Simplex (single - sided, 
+ requiring 120 sheets), Finishing = Sliding Folder. 
+ Execution Steps: 
+ •   Configure 120 single - sided pages. 
+ •   Select Sliding Folder binding finish. 
+ Expected Output:   System displays validation warning: "Sliding folder binding 
+ capacity exceeded (maximum 50 sheets). Please select Spiral Coil or 
+ Softbound." Checkout disabled. 
+ Actual Result:   Incompatible binding option blocked; user prompted to choose 
+ viable finishing method. 
+ Status:   [ ] PASS   [   ] FAIL 
+ Tester / Date: ______________________________________ 
+=====PAGE 137=====
+125 
+ Module 3: Customer Self - Service Ordering & Prepress Intake 
+ Test Case ID: TC - MOD3 - 01 
+ Requirement Reference:   FR - 0 6 : Print Order Placement and Document Upload 
+ Test Description:   Verify secure PDF manuscript upload, disk tokenization, and 
+ order instantiation. 
+ Preconditions:   Authenticated customer session; valid order attributes configured. 
+ Test Input Data:   Upload File:   manuscript_final.pdf   (6.2 MB). 
+ Execution Steps: 
+ •   Upload PDF file through ordering wizard. 
+ •   Finalize checkout and click "Submit Order". 
+ Expected Output:   File stored on private disk with tokenized hash filename; parent 
+ order inserted into   orders   table with unique code (ORD - 2026 - XXXX); order status 
+ initialized to   awaiting payment. 
+ Actual Result:   PDF stored securely; unique tracking code generated; order 
+ persisted in database. 
+ Status:   [ ] PASS   [   ] FAIL 
+ Tester / Date: ______________________________________ 
+=====PAGE 138=====
+126 
+ Test Case ID: TC - MOD3 - 02 
+ Requirement Reference:   FR - 0 6 : Print Order Placement and Document Upload 
+ Test Description:   Validate rejection of disallowed executable extensions and 
+ oversized file payloads. 
+ Preconditions:   Customer ordering wizard file upload step. 
+ Test Input Data:   File A:   malicious_script.exe   (1.5 MB); File 
+ B:   oversized_document.pdf   (65 MB, exceeding 50 MB threshold). 
+ Execution Steps: 
+ •   Attempt upload of   malicious_script.exe. 
+ •   Attempt upload of   oversized_document.pdf. 
+ Expected Output:   File A rejected: "The file must be a file of type: pdf, docx, png, 
+ jpg"; File B rejected: "The file size may not exceed 50 megabytes." 
+ Actual Result:   Both unauthorized files intercepted and rejected by server 
+ validation. 
+ Status:   [ ] PASS   [   ] FAIL 
+ Tester / Date: ______________________________________ 
+=====PAGE 139=====
+127 
+ Test Case ID: TC - MOD3 - 03 
+ Requirement Reference:   FR - 0 7 : Print Attribute and Finishing Specification 
+ Test Description:   Validate duplex physical sheet requirements calculation and 
+ JSON specification storage. 
+ Preconditions:   Customer order with duplex printing enabled. 
+ Test Input Data:   Pages = 55, Copies = 2, Orientation = Duplex (two - sided). 
+ Execution Steps: 
+ •   Select 55 pages and enable duplex printing for 2 copies. 
+ •   Submit order item. 
+ •   Inspect database   order_items   record. 
+ Expected Output:   System computes physical sheets:   ⌈ 55 / 2 ⌉   ×   2   =   28   ×   2   = 
+ 56   sheets; saves structured JSON:   {"duplex": true, "paper_size": "A4", "gsm": 80, 
+ "sheets_required": 56}. 
+ Actual Result:   Mathematical calculation verified; JSON parameters persisted 
+ accurately. 
+ Status:   [ ] PASS   [   ] FAIL 
+ Tester / Date: ______________________________________ 
+=====PAGE 140=====
+128 
+ Test Case ID: TC - MOD3 - 04 
+ Requirement Reference:   FR - 0 8 : Customer - Supplied Substrate Declaration ("Dala 
+ ang Papel") 
+ Test Description:   Verify price deduction and intake alert attachment for customer - 
+ supplied paper orders. 
+ Preconditions:   Standard in - house paper charge = ₱1.00/sheet. 
+ Test Input Data:   Enable "Dala ang Papel" toggle; declare paper brand = 
+ "PaperOne A4 80gsm", count = 100 sheets. 
+ Execution Steps: 
+ •   Toggle customer - supplied paper switch on. 
+ •   Enter paper brand and declared count. 
+ •   Submit order. 
+ Expected Output:   Raw paper material cost zeroed out from transaction subtotal; 
+ job ticket tagged with   awaiting_paper_delivery   alert; counter delivery instructions 
+ displayed to client. 
+ Actual Result:   Paper fees subtracted; job ticket flagged for physical counter 
+ intake. 
+ Status:   [ ] PASS   [   ] FAIL 
+ Tester / Date: ______________________________________ 
+=====PAGE 141=====
+129 
+ Test Case ID: TC - MOD3 - 05 
+ Requirement Reference:   FR - 0 9 : Proof of Payment Submission 
+ Test Description:   Verify digital payment receipt upload and order payment status 
+ transition. 
+ Preconditions:   Placed order with payment status   awaiting_payment. 
+ Test Input Data:   Payment Channel = GCash, Reference = "GCASH - 987654321", 
+ Receipt =   gcash_screenshot.jpg. 
+ Execution Steps: 
+ •   Access payment submission screen. 
+ •   Enter transaction reference number and upload receipt screenshot. 
+ •   Click "Submit Payment Proof". 
+ Expected Output:   Receipt image saved to private disk; order payment status 
+ transitioned to   pending_verification; billing audit task generated for production 
+ staff. 
+ Actual Result:   Image stored; payment status updated to   pending_verification. 
+ Status:   [ ] PASS   [   ] FAIL 
+ Tester / Date: ______________________________________ 
+=====PAGE 142=====
+130 
+ Test Case ID: TC - MOD3 - 06 
+ Requirement Reference:   FR - 0 10 : Live Order Progress and Status Tracking 
+ Test Description:   Verify real - time 5 - stage progress stepper synchronization on 
+ client interface. 
+ Preconditions:   Active   order   ORD - 2026 - 0042   advancing through workshop 
+ queues. 
+ Test Input Data:   Staff advances order status:   in_queue   →   printing   →   finishing. 
+ Execution Steps: 
+ •   Open client tracking interface   /track/ORD - 2026 - 0042. 
+ •   Advance order stage from staff console. 
+ •   Observe client tracking interface. 
+ Expected Output:   Five - stage stepper dynamically reflects milestones: completed 
+ stages show checkmarks and timestamps; current stage displays illuminated 
+ active indicator. 
+ Actual Result:   Stepper displayed real - time milestone transitions and timestamps. 
+ Status:   [ ] PASS   [   ] FAIL 
+ Tester / Date: ______________________________________ 
+=====PAGE 143=====
+131 
+ Module 4: Production Floor 5 - Stage Kanban Scheduling & Counter Intake 
+ Test Case ID: TC - MOD4 - 01 
+ Requirement Reference:   FR - 1 1 : Payment Transaction Auditing and Verification 
+ Test Description:   Verify staff auditing, approval, and order release into active 
+ production queue. 
+ Preconditions:   Order with   pending_verification   payment status. 
+ Test Input Data:   Staff auditor matches GCash reference number against 
+ merchant ledger and clicks "Approve". 
+ Execution Steps: 
+ •   Open Staff Billing Audit modal. 
+ •   Verify reference number and click "Approve Payment". 
+ Expected Output:   Order payment status updated to   paid; verifying staff user ID 
+ and timestamp logged; job ticket released to active Kanban "In Queue" column. 
+ Actual Result:   Payment verified; order successfully released into production 
+ queue. 
+ Status:   [ ] PASS   [   ] FAIL 
+ Tester / Date: ______________________________________ 
+=====PAGE 144=====
+132 
+ Test Case ID: TC - MOD4 - 02 
+ Requirement Reference:   FR - 1 1 : Payment Transaction Auditing and Verification 
+ Test Description:   Verify staff payment rejection handling and customer 
+ notification generation. 
+ Preconditions:   Order with illegitimate payment reference. 
+ Test Input Data:   Staff auditor clicks "Reject" with remark: "Reference number not 
+ found in merchant ledger." 
+ Execution Steps: 
+ •   Open Staff Billing Audit modal. 
+ •   Enter rejection remark and click "Reject Payment". 
+ Expected Output:   Payment status updated to   rejected; rejection reason recorded; 
+ alert rendered on customer dashboard prompting payment resubmission. 
+ Actual Result:   Rejection logged; customer alerted with resubmission form. 
+ Status:   [ ] PASS   [   ] FAIL 
+ Tester / Date: ______________________________________ 
+=====PAGE 145=====
+133 
+ Test Case ID: TC - MOD4 - 03 
+ Requirement Reference:   FR - 1 2 : Production Floor 5 - Stage Kanban Queue 
+ Management 
+ Test Description:   Verify job ticket progression across the five active Kanban 
+ columns. 
+ Preconditions:   Order ticket in "In Queue" stage. 
+ Test Input Data:   Operator claims ticket, assigns Printer #2, and transitions ticket 
+ across stages. 
+ Execution Steps: 
+ •   Move ticket: In Queue   →   Printing Pages. 
+ •   Move ticket: Printing Pages   →   Finishing & Assembly. 
+ •   Move ticket: Finishing & Assembly   →   Quality Inspection. 
+ •   Move ticket: Quality Inspection   →   Ready for Pickup. 
+ Expected Output:   Ticket transitions sequentially across columns; machine and 
+ operator assignments logged; customer tracking stepper updates in lockstep. 
+ Actual Result:   5 - stage progression executed reliably with full audit trails. 
+ Status:   [ ] PASS   [   ] FAIL 
+ Tester / Date: ______________________________________ 
+=====PAGE 146=====
+134 
+ Test Case ID: TC - MOD4 - 04 
+ Requirement Reference:   FR - 1 2 : Production Floor 5 - Stage Kanban Queue 
+ Management 
+ Test Description:   Verify Quality Inspection defect flagging and step - back rework 
+ loop. 
+ Preconditions:   Order ticket in "Quality Inspection" column. 
+ Test Input Data:   QC inspector detects misaligned binding; triggers "Flag Rework" 
+ with note: "Re - bind front cover". 
+ Execution Steps: 
+ •   Open QC inspection modal on Kanban board. 
+ •   Input rework note and click "Send Back for Rework". 
+ Expected Output:   Ticket automatically steps back to "Finishing & Assembly" 
+ column; defect note attached to ticket header; "Ready for Pickup" status 
+ prevented. 
+ Actual Result:   Ticket returned to previous production column with defect notice 
+ logged. 
+ Status:   [ ] PASS   [   ] FAIL 
+ Tester / Date: ______________________________________ 
+=====PAGE 147=====
+135 
+ Test Case ID: TC - MOD4 - 05 
+ Requirement Reference:   FR - 1 4 : Customer - Supplied Substrate Counter 
+ Inspection 
+ Test Description:   Validate staff counter paper inspection and release from intake 
+ hold. 
+ Preconditions:   Job ticket on intake hold with status   awaiting_paper_delivery. 
+ Test Input Data:   Customer presents 100 sheets of A4 paper at shop counter; 
+ staff verifies count and paper condition. 
+ Execution Steps: 
+ •   Staff locates ticket in Counter Intake console. 
+ •   Enters verified sheet count (100) and clicks "Confirm Paper 
+ Received". 
+ Expected Output:   Ticket status updated to   paper_received; intake hold unlocked; 
+ ticket automatically routed into active Kanban "In Queue" column. 
+ Actual Result:   Intake hold released; order advanced to active workshop queue. 
+ Status:   [ ] PASS   [   ] FAIL 
+ Tester / Date: ______________________________________ 
+=====PAGE 148=====
+136 
+ Module 5: Automated Inventory   Replenishment , Spoilage & Financial   Sales 
+ Reporting 
+ Test Case ID: TC - MOD5 - 01 
+ Requirement Reference:   FR - 1 3 : Automated Bill of Materials (BOM) Inventory 
+ Deduction 
+ Test Description:   Validate automated inventory decrement upon advancing a 
+ standard print job to production. 
+ Preconditions:   Standard Order: 50 pages duplex, 2 copies (requires 50 A4 
+ sheets, 1 coil). Initial Stock: A4 Paper = 500 sheets, Coils = 50 units. 
+ Test Input Data:   Operator advances order ticket to "Printing Pages". 
+ Execution Steps: 
+ •   Advance order status to active production. 
+ •   Inspect database   inventory_items   and   stock_movements   tables. 
+ Expected Output:   A4 Paper decremented by 50 (New Balance: 450); Coils 
+ decremented by 1 (New Balance: 49); immutable   stock_movements   record 
+ created for each deduction. 
+ Actual Result:   Inventory balances decremented accurately; stock movement 
+ ledger logged. 
+ Status:   [ ] PASS   [   ] FAIL 
+ Tester / Date: ______________________________________ 
+=====PAGE 149=====
+137 
+ Test Case ID: TC - MOD5 - 02 
+ Requirement Reference:   FR - 1 3 : Automated Bill of Materials (BOM) Inventory 
+ Deduction 
+ Test Description:   Validate automated raw paper deduction bypass rule for 
+ customer - supplied paper orders. 
+ Preconditions:   Order flagged as   customer_supplied_substrate = true. 
+ Consumables: 50 pages duplex, 2 copies, 1 coil. Initial Stock: A4 Paper = 450 
+ sheets, Coils = 49 units. 
+ Test Input Data:   Operator advances customer - supplied order to "Printing Pages". 
+ Execution Steps: 
+ •   Advance order to production stage. 
+ •   Inspect inventory stock balances. 
+ Expected Output:   Raw paper deduction completely bypassed (A4 Paper remains 
+ 450); non - paper finishing items deducted (Coils decremented to 48). 
+ Actual Result:   Paper bypass rule executed successfully; raw paper stock 
+ preserved. 
+ Status:   [ ] PASS   [   ] FAIL 
+ Tester / Date: ______________________________________ 
+=====PAGE 150=====
+138 
+ Test Case ID: TC - MOD5 - 03 
+ Requirement Reference:   FR - 1 5 : Material Spoilage Logging and Stock 
+ Adjustments 
+ Test Description:   Verify damaged material recording, stock deduction, and audit 
+ log generation. 
+ Preconditions:   Inventory item: Long 80gsm Paper with balance = 300 sheets. 
+ Test Input Data:   Spoilage Quantity = 15 sheets, Failure Reason = "Printer head 
+ jam during full - color pass". 
+ Execution Steps: 
+ •   Staff accesses Spoilage Report interface. 
+ •   Selects item, inputs quantity (15), and provides failure explanation. 
+ •   Submits spoilage report. 
+ Expected Output:   On - hand balance updated to 285 
+ sheets;   stock_movements   records audit entry tagged as   spoilage   with user ID, 
+ timestamp, and incident reason. 
+ Actual Result:   Inventory balance updated to 285; immutable waste record 
+ created. 
+ Status:   [ ] PASS   [   ] FAIL 
+ Tester / Date: ______________________________________ 
+=====PAGE 151=====
+139 
+ Test Case ID: TC - MOD5 - 04 
+ Requirement Reference:   FR - 1 8 : Inventory Oversight and Dynamic Reorder Point 
+ (ROP) Alerting 
+ Test Description:   Validate rolling daily burn rate calculation and automated low - 
+ stock banner trigger. 
+ Preconditions:   Short 70gsm Paper; Total consumption over 30 days = 900 sheets 
+ (Burn Rate = 30 sheets/day); Lead Time = 3 days; Safety Stock = 50 sheets. 
+ Test Input Data: 
+ Dynamic ROP Threshold:   ROP   =   ( Daily   Burn   Rate   ×   Lead   Time )   + 
+ Safety   Stock   =   ( 30   ×   3 )   +   50   =   140   sheets . 
+ Stock decremented to 130 sheets (below ROP). 
+ Execution Steps: 
+ •   Record consumption reducing stock to 130 sheets. 
+ •   Access Owner Master Dashboard. 
+ Expected Output:   System derives dynamic ROP = 140; evaluates   130   ≤   140 ; 
+ item flagged with visual "Low Stock" badge; automated replenishment 
+ recommendation banner rendered on Owner Dashboard. 
+ Actual Result:   Dynamic ROP evaluated accurately; restock alert banner rendered 
+ on dashboard. 
+ Status:   [ ] PASS   [   ] FAIL 
+ Tester / Date: ______________________________________ 
+=====PAGE 152=====
+140 
+ Test Case ID: TC - MOD5 - 05 
+ Requirement Reference:   FR - 1 9   : Sales, Cashflow, and Operational 
+ Analytics Generation 
+ Test Description:   Validate multi - factor financial aggregation, profit calculations, 
+ and CSV ledger export. 
+ Preconditions:   Completed and paid orders recorded across date range. 
+ Test Input Data:   Filter period: "Current Month", Export Format = CSV. 
+ Execution Steps: 
+ •   Access   /owner/analytics   hub. 
+ •   Apply date range filter. 
+ •   Inspect calculated Gross Revenue, Material COGS, Spoilage Loss, 
+ and Net Margin. 
+ •   Click "Export CSV Ledger". 
+ Expected Output:   Summary cards display aggregate financial metrics; browser 
+ downloads formatted CSV ledger detailing all transactions. 
+ Actual Result:   Financial metrics computed accurately; CSV exported cleanly. 
+ Status:   [ ] PASS   [   ] FAIL 
+ Tester / Date: ______________________________________ 
+=====PAGE 153=====
+141 
+ Appendix   H .   Task Allocation Matrix (TAM) 
+ Thesis Title 
+ Printify: Integrated Dynamic Order, Job Scheduling, and Inventory 
+ Management System for Printing Services with Automated 
+ Replenishment 
+ Adviser   DANILYN   A . FLORES   Date Submitted: 
+ Group Members   CHRISTIAN JAMES J. PEREZ, KAYE P. COMISSION 
+ Thesis components 
+ (these can be revised, 
+ as appropriate) 
+ Member/s 
+ Assigned 
+ (For shared 
+ tasks, indicate 
+ % contribution) 
+ Description 
+ Problem statement and 
+ objective 
+ Perez   –   60% 
+ Comission   –   40 % 
+ Member A (Christian James J. Perez): 
+ • Identified and formulated the core technical 
+ challenges: manual order calculation overhead, 
+ unmonitored shop floor queue delays, and decoupled 
+ inventory stockouts. 
+ • Authored the General Objective and the five (5) 
+ Specific Objectives aligning system engineering with 
+ empirical printing shop constraints. 
+ • Defined the architectural boundaries and operational 
+ scope of the automated replenishment and scheduling 
+ engines. 
+ Member B (Kaye P. Comission): 
+ • Conducted initial field inquiries and stakeholder 
+ interviews at commercial print shops in Kabacan, 
+ Cotabato to document baseline operational 
+ bottlenecks. 
+ • Synthesized end - user pain points into cohesive 
+ narrative paragraphs conforming to USM BSIS non - 
+ itemized Statement of the Problem conventions. 
+ • Drafted the Significance of the Project section for 
+ shop owners, production employees, customers, and 
+ future developers. 
+ Related literature   – 
+ Topic A 
+ Perez: 30% 
+ Comission: 70% 
+ Member B (Kaye P. Comission): 
+ • Conducted comprehensive academic literature 
+ searches across Google Scholar, IEEE, and DOAJ for 
+ modern Web - to - Print paradigms and self - service 
+ ordering portals. 
+ • Authored in - depth critical evaluations and 
+ summaries for cited authors: Apriadi & Dewi (2026), 
+ UNIVERSITY OF SOUTHERN MINDANAO 
+ Kabacan, Cotabato 
+ Philippines 
+ Task Allocation Matrix (TAM) 
+=====PAGE 154=====
+142 
+ Susila et al. (2025), Saragih et al. (2026), Kurniawan et 
+ al. (2025), Joshi et al. (2026), Bhaktha et al. (2023), and 
+ Dhiman (2021). 
+ • Synthesized how digital quoting and structured 
+ prepress intake reduce counter customer wait times 
+ and prevent intake specification errors. 
+ Member A (Christian James J. Perez): 
+ • Evaluated the technical architectures in reviewed 
+ literature against multi - variable pricing constraints 
+ (dimensional sizing, substrate weight, duplex print 
+ logic). 
+ • Identified the technical research gap regarding 
+ dynamic quotation engines capable of instant 
+ mathematical recalculation upon asset configuration. 
+ Related literature   – 
+ Topic B 
+ Perez: 60% 
+ Comission: 
+ 40% 
+ Member A (Christian James J. Perez): 
+ • Investigated operational scheduling algorithms, 
+ state - machine queue transitions, and production 
+ queue visibility frameworks in industrial environments. 
+ • Analyzed foundational studies:   Smagowicz et al. 
+ (2024)   on operational scheduling,   Zonta et al. 
+ (2022)   on data availability in operational decisions, 
+ and   Destouet et al. (2023)   on scheduling decision 
+ support. 
+ • Formulated the theoretical rationale for establishing 
+ a 5 - stage sequential Kanban state machine (Pending, 
+ Prepress, Printing, Finishing, Ready for Pickup) to 
+ replace static paper job tickets. 
+ Member B (Kaye P. Comission): 
+ • Gathered and synthesized empirical studies on shop - 
+ floor tracking and worker communication:   Hernada et 
+ al. (2024)   and   Jiang et al. (2022) . 
+ • Documented the operational delays caused by verbal 
+ job handoffs and uncoordinated prepress revisions in 
+ physical print shops. 
+ • Encoded citations, standardized paragraph 
+ formatting, and verified publication metrics. 
+ Related literature   – 
+ Topic C 
+ Perez: 60% 
+ Comission: 
+ 40% 
+ Member A (Christian James J. Perez): 
+ • Researched quantitative inventory control models, 
+ automated replenishment triggers, and rolling burn 
+ rate formulations:   Rolf et al. (2023)   on data - driven 
+ supply chain decision - making and   Munyaka & 
+ Yadavalli (2022)   on inventory optimization. 
+ • Derived the mathematical framework for the 
+ Dynamic Reorder Point ( 𝑅𝑂𝑃   =   𝑑   ×   𝐿   +   𝑆𝑆 ) and 
+ evaluated real - time Bill of Materials (BOM) stock 
+ deduction mechanics. 
+ • Analyzed algorithmic supply chain automation 
+ literature:   Ugbebor et al. (2024) ,   Jebbor et al. (2023) , 
+ and   Albayrak Ünal et al. (2023) . 
+=====PAGE 155=====
+143 
+ Member B (Kaye P. Comission): 
+ • Surveyed empirical SME inventory studies:   Tanaman 
+ et al. (2023)   on retail inventory challenges and   Asim & 
+ Arbaiy (2026)   on computerized stock control. 
+ • Researched literature on material spoilage overhead, 
+ carrying costs, and the operational risks of paper 
+ substrate stockouts. 
+ • Encoded literature citations, compiled publication 
+ metadata, and cross - referenced author years. 
+ Synthesis of literature   Perez: 40% 
+ Comission: 
+ 60% 
+ Member B (Kaye P. Comission): 
+ • Authored the comprehensive literature synthesis 
+ integrating findings from all twenty (20) empirical and 
+ theoretical studies. 
+ • Articulated the operational evolution of the printing 
+ industry from disparate, manual bookkeeping to 
+ unified, cloud - based workflow platforms. 
+ • Structured the narrative bridging user interaction, 
+ floor scheduling, and material availability. 
+ Member A (Christian James J. Perez): 
+ • Articulated the primary research and engineering 
+ gap: the persistent technical decoupling between 
+ customer ordering interfaces, shop floor Kanban 
+ queues, and automated inventory replenishment. 
+ • Grounded the design of Printify as an integrated 
+ architectural solution resolving this identified industry 
+ gap. 
+ Theoretical/Conceptual 
+ Framework 
+ Perez: 50% 
+ Comission: 
+ 50% 
+ Collaborative Effort: 
+ • Jointly structured the 5 - Stage Input - Process - Output - 
+ Outcome - Impact (IPO) model conforming to the USM 
+ institutional standard. 
+ Member A (Christian James J. Perez): 
+ • Defined the technical parameters for the   Input 
+ Stage   (system architecture, Laravel/Livewire stack, 
+ relational database schema, dynamic formulas) 
+ and   Process Stage   (multi - tier verification, Kanban 
+ state transitions, dynamic burn rate calculation, 
+ automate d Pest testing). 
+ • Specified the verifiable technical deliverables under 
+ the   Output Stage   (Printify platform, Functional Test 
+ Summary Report, Requirements Traceability Matrix). 
+ Member B (Kaye P. Comission): 
+ • Formulated the   Outcome Stage   (streamlined order 
+ processing, reduction in prepress misprints, 
+ elimination of paper stockouts) and   Impact 
+ Stage   (long - term operational resilience, maximized 
+ profit margins, scalable micro - enterprise capacity). 
+ • Designed and illustrated the formal conceptual 
+=====PAGE 156=====
+144 
+ framework diagram ( Figure 1: Conceptual Framework 
+ of Printify ). 
+ Technology Design   – 
+ Module 1 
+ Perez: 40% 
+ Comission: 
+ 60% (Lead) 
+ Member B (Kaye P. Comission   —   UI/UX & Frontend 
+ Lead): 
+ • Prototyped and built the user onboarding views, 
+ registration forms, login layouts, and password 
+ recovery interfaces. 
+ • Designed the responsive customer profile 
+ management interface, navigation bars, and role - 
+ differentiated menu sidebars. 
+ • Structured user experience flows and visual access 
+ indicators for Customers, Production Staff, and 
+ Business Owners. 
+ Member A (Christian James J. Perez   —   Backend & 
+ Security Support): 
+ • Integrated Fortify authentication backend services, 
+ session security, and bcrypt credential hashing. 
+ • Implemented role authorization middleware guards 
+ and route policies enforcing strict boundary separation 
+ across user tiers. 
+ • Structured database migrations for   users, role 
+ enumerations, and authentication audit logs. 
+ Technology Design   – 
+ Module 2 
+ Perez: 70% 
+ (Lead) 
+ Comission: 30% 
+ Member A (Christian James J. Perez   —   Lead 
+ Backend Architect): 
+ • Engineered the multi - variable dynamic pricing 
+ calculation engine handling dimensional matrices, 
+ substrate weights, and duplex multipliers. 
+ • Designed the relational database architecture linking 
+ configurable service options to physical inventory Bill 
+ of Materials (BOM) items. 
+ • Implemented administrative controllers and 
+ Eloquent models for dynamic service provisioning, 
+ price updates, and option toggling. 
+ Member B (Kaye P. Comission   —   UI/UX Layout 
+ Support): 
+ • Designed the service catalog management 
+ dashboard views, pricing tier modals, and substrate 
+ specification cards. 
+ • Structured the visual hierarchy for service categories, 
+ add - on finishes, and turnaround time options. 
+ • Documented dynamic pricing matrices and captured 
+ administrative catalog interface screenshots. 
+ Technology Design   – 
+ Module 3 
+ Perez: 40% 
+ Comission: 
+ 60% (Lead) 
+ Member B (Kaye P. Comission   —   UI/UX & 
+ Interaction Lead): 
+ • Prototyped and developed the multi - step customer 
+ ordering wizard, digital asset upload dropzone, and 
+ custom specification selectors. 
+ • Built the real - time quote preview component 
+=====PAGE 157=====
+145 
+ displaying price updates synchronously upon user 
+ option selections. 
+ • Designed the customer job tracking portal featuring 
+ a visual 5 - stage progress stepper and digital 
+ downpayment receipt upload modal. 
+ Member A (Christian James J. Perez   —   Backend 
+ Pipeline Support): 
+ • Engineered the secure file upload pipeline with 
+ MIME - type verification, storage disk isolation, and 
+ prepress asset validation. 
+ • Implemented transactional order persistence, 
+ reference tracking code generation, and payment 
+ proof handling. 
+ • Coded duplex calculation logic and page - count 
+ verification routines. 
+ Technology Design   – 
+ Module 4 
+ Perez: 70% 
+ (Lead) 
+ Comission: 30% 
+ Member A (Christian James J. Perez   —   Lead 
+ Production Systems Engineer): 
+ • Engineered the 5 - stage Kanban state machine 
+ governing order 
+ progression:   Pending ,   Prepress ,   Printing ,   Finishing , 
+ and   Ready for Pickup/Claimed . 
+ • Programmed database transaction locks, 
+ concurrency controls, and automated timestamp 
+ logging across stage transitions. 
+ • Implemented the quality control rework loop, 
+ rejection reason tracking, payment verification 
+ workflows, and staff task assignment logic. 
+ Member B (Kaye P. Comission   —   UI/UX & Flow 
+ Prototyping): 
+ • Prototyped the visual drag - and - drop Kanban board 
+ layout with responsive swimlanes, job detail cards, 
+ and urgency color tags. 
+ • Designed the walk - in counter order intake interface 
+ allowing staff to rapidly log on - site customer orders. 
+ • Captured production floor UI screenshots and 
+ documented operator interaction flows. 
+ Technology Design   – 
+ Module 5 
+ Perez: 70% 
+ (Lead) 
+ Comission: 30% 
+ Member A (Christian James J. Perez   —   Lead 
+ Telemetry & Algorithms Engineer): 
+ • Engineered the real - time Bill of Materials (BOM) 
+ inventory consumption deduction triggered 
+ synchronously as jobs advance through Kanban 
+ stages. 
+ • Implemented the Dynamic Reorder Point algorithm 
+ ( 𝑅𝑂𝑃   =   𝑑   ×   𝐿   +   𝑆𝑆 ) using rolling 30 - day historical 
+ material burn rates. 
+ • Programmed automated low - stock banner trigger 
+ logic, material spoilage audit log tracking, and 
+ financial metric aggregation routines (Gross Revenue, 
+ COGS, Net Margin, Spoilage Loss) with CSV ledger 
+=====PAGE 158=====
+146 
+ exports. 
+ Member B (Kaye P. Comission   —   UI/UX Dashboard 
+ Support): 
+ • Designed the owner executive analytics dashboard 
+ layout featuring key performance indicator (KPI) 
+ metric cards and restock alerts. 
+ • Built the inventory ledger data tables, material 
+ movement history views, and staff spoilage 
+ submission modal. 
+ • Formatted analytical reporting views and verified 
+ filter controls. 
+ Methodology   –   Phase 1   Perez: 40% 
+ Comission: 
+ 60% 
+ Member B (Kaye P. Comission): 
+ • Prepared qualitative interview guides and conducted 
+ shop floor observations at local commercial print 
+ shops. 
+ • Transcribed operational workflow procedures, 
+ recorded machine operating bottlenecks, and 
+ documented material waste patterns. 
+ • Synthesized qualitative field data into formal 
+ operational requirements and user persona profiles. 
+ Member A (Christian James J. Perez): 
+ • Analyzed gathered operational data to establish 
+ technical software specifications, performance 
+ criteria, and hardware/software design constraints. 
+ • Structured the developmental research design and 
+ mapped operational problems directly to system 
+ architectural features. 
+ Methodology   –   Phase 2   Perez: 30% 
+ Comission: 70% 
+ Member B (Kaye P. Comission   —   Lead System 
+ Modeler): 
+ • Drafted, illustrated, and finalized all   nineteen   (1 9 ) 
+ UML Activity Diagrams corresponding to all 1 9 
+ functional requirements (FR - 01   to   FR - 1 9 ). 
+ • Structured multi - lane swimlanes clearly delineating 
+ responsibilities among Customer, Counter/Production 
+ Staff, Business Owner, and System. 
+ • Ensured visual clarity, standard UML syntax 
+ compliance, and cohesive layout across all diagrams. 
+ Member A (Christian James J. Perez   —   Technical 
+ Logic Verification): 
+ • Audited all decision nodes, guard conditions, and 
+ alternate branch paths in the activity diagrams against 
+ backend database transactions and route controllers. 
+ • Validated error handling paths (e.g., payment 
+ rejection, material stockout, rework loops) against 
+ server - side logic. 
+ Methodology   –   Phase 3   Perez: 70% 
+ Comission: 30% 
+ Member A (Christian James J. Perez   —   Lead SQA 
+ Engineer): 
+ • Authored and executed the automated test suite 
+=====PAGE 159=====
+147 
+ comprising 28 Pest feature test cases with 90 
+ programmatic assertions across all five modules. 
+ • Formulated the Black - Box Functional Test Plan 
+ detailing 25 exhaustive scenario test cases (TC - MOD1 - 
+ 01   to   TC - MOD5 - 05) with rigorous preconditions, test 
+ inputs, step - by - step procedures, and expected 
+ outputs. 
+ • Programmed automated edge case simulations (zero 
+ inventory, corrupt file uploads, invalid discount rules, 
+ concurrent Kanban status updates). 
+ Member B (Kaye P. Comission   —   Functional 
+ Verification Support): 
+ • Participated in manual functional scenario 
+ walkthroughs across all 25 test cases, recording actual 
+ outputs and UI behavioral responses. 
+ • Audited and compiled the Requirements Traceability 
+ Matrix linking all 1 9   functional requirements to specific 
+ test cases and outcomes. 
+ • Authored the Functional Test Summary Report and 
+ test execution documentation in Chapter 4 and 
+ Appendix. 
+ Formatting & 
+ Referencing 
+ Perez: 30% 
+ Comission: 70% 
+ Member B (Kaye P. Comission   —   Lead Formatting 
+ Specialist): 
+ • Standardized manuscript margins (1.5 in left, 1.0 in 
+ top/bottom/right), font hierarchies (Times New 
+ Roman 12 pt), line spacing (2.0), and paragraph 
+ indentation per USM guidelines. 
+ • Verified all in - text citations and compiled the 
+ complete Literature Cited section in strict compliance 
+ with APA 7th edition formatting. 
+ • Formatted all formal tables, captions, and 
+ appendices according to institutional standards. 
+ Member A (Christian James J. Perez   —   Technical 
+ Formatting Support): 
+ • Verified mathematical equation formatting ( 𝑅𝑂𝑃   = 
+ 𝑑   ×   𝐿   +   𝑆𝑆 ), source code snippets, and database 
+ entity naming conventions. 
+ • Formatted automated test execution logs, assertion 
+ summary tables, and technical schema diagrams. 
+ Final editing & 
+ proofreading 
+ Perez: 40% 
+ Comission: 
+ 60% 
+ Member B (Kaye P. Comission   —   Editorial Lead): 
+ • Conducted thorough grammatical reviews, 
+ eliminated typographical errors, and enhanced 
+ scholarly sentence flow across Chapters 1 to 5. 
+ • Ensured strict institutional adherence to BSIS 
+ capstone guidelines (e.g., replacing "researchers" with 
+ "project developers" and "study" with "capstone 
+ project"). 
+ • Standardized table numbering, figure captions, and 
+ cross - references throughout the entire manuscript. 
+=====PAGE 160=====
+148 
+ Member A (Christian James J. Perez   —   Technical 
+ Review): 
+ • Audited the entire paper to ensure absolute 
+ consistency across functional requirements (FR - 
+ 01   to   FR - 1 9 ), test case IDs (TC - MOD1 - 01   to   TC - MOD5 - 
+ 05), and database entities. 
+ • Verified technical accuracy and mathematical 
+ precision in all formulas and algorithmic descriptions. 
+ Oral presentation 
+ preparation 
+ Perez: 50% 
+ Comission: 
+ 50% 
+ Collaborative Preparation: 
+ • Co - developed the oral defense presentation slide 
+ deck. 
+ Member A (Christian James J. Perez): 
+ • Prepared technical slides detailing system 
+ architecture, dynamic pricing formulas, Kanban state 
+ machine logic, Dynamic ROP calculations, and 
+ automated test suite results. 
+ • Configured the live technical demonstration 
+ environment for interactive system walkthroughs 
+ during the panel examination. 
+ Member B (Kaye P. Comission): 
+ • Designed the visual presentation theme, structured 
+ the problem statement and literature synthesis slides, 
+ and prepared UI/UX workflow walkthroughs. 
+ • Organized the live demonstration storyboard 
+ illustrating real - time order tracking and counter intake 
+ workflows. 
+ Submitted by   Date Submitted: 
+ CHRISTIAN JAMES J. PEREZ 
+ Name & Signature of Member A 
+ KAYE P. COMISSION 
+ Name & Signature of Member B 
+=====PAGE 161=====
+149 
+ UNIVERSITY OF SOUTHERN MINDANAO 
+ Kabacan, Cotabato 
+ Philippines 
+ CURRICULUM VITAE 
+ KAYE P. COMISSIO N 
+ Purok Miracle Extension Poblacion Kabacan 
+ 09069181280 
+ s.kapecomission@usm.edu.ph 
+ PERSONAL INFORMATION 
+ Last Name   Comission 
+ First Name   Kaye 
+ Middle Name   Perez 
+ Nickname   Kayie 
+ Age   22 
+ Nationality   Filipino 
+ Religion   Born Again 
+ Civil Status   Single 
+ Father’s Name   Wendel E. Comission 
+ Mother’s Name   Maribel P. Comission 
+ Educational Background 
+ Elementary   Matalam Central Elementary School 
+ Junior High School   Matalam High School 
+ Senior High School   Matalam High School 
+ Tertiary   U niversity of Southern Mindanao 
+ RELEVANT TRAINING 
+ •   Applications Development and Emerging Technologies   —   Application development 
+ concepts,   emerging   technologies,   software   solutions,   and   modern   development 
+ practices. 
+ •   IT Security and Management   —   Information security principles, access control, 
+ authentication, security management, and protection of information systems. 
+ •   IS Innovations & New Technology   —   Emerging information technologies, digital 
+ innovation, and the application of modern technologies in information systems. 
+ •   Systems Analysis and Design (SAD)   —   Software modeling, architectural design, UML 
+ diagramming, and functional requirements engineering. 
+ •   Database Management Systems (DBMS)   —   Relational database modeling, SQL 
+ scripting, database transactions, and schema normalization. 
+ •   Web   Systems   and   Technologies   —   Web   application   development,   dynamic 
+ interfaces, web architecture, and modern web technologies. 
+ •   Application   Development   &   Software   Engineering   —   Software   development 
+ lifecycle (SDLC), Agile development practices, application development, and quality 
+ assurance. 
+=====PAGE 162=====
+150 
+ UNIVERSITY OF SOUTHERN MINDANAO 
+ Kabacan, Cotabato 
+ Philippines 
+ CURRICULUM VITAE 
+ CHRISTIAN JAMES J. PEREZ 
+ Molonville, Osias, Kabacan, North Cotabato 
+ 09855330897 
+ s.cjjperez@usm.edu.ph 
+ PERSONAL INFORMATION 
+ Last Name   Perez 
+ First Name   Christian James 
+ Middle Name   Jimenez 
+ Nickname   Cjay 
+ Age   22 
+ Nationality   Filipino 
+ Religion   Protestant 
+ Civil Status   Single 
+ Father’s Name   N/A 
+ Mother’s Name   Maria Theresa J. Perez 
+ Educational Background 
+ Elementary   Osias Elementary School 
+ Junior High School   Osias High School 
+ Senior High School   Kabacan National High School 
+ Tertiary   University of Southern Mindanao 
+ RELEVANT TRAINING 
+ •   Systems   Analysis   and   Design   (SAD)   —   Software   modeling,   architectural   design,   UML 
+ diagramming, and functional requirement engineering. 
+ •   Database Management Systems (DBMS)   —   Relational database modeling, SQL scripting, ACID 
+ transaction handling, and schema normalization (PostgreSQL / SQLite /   MySQL) . 
+ •   Web   Systems   and   Technologies   /   Full - Stack   Web   Development   —   Modern   full - stack 
+ architecture,   RESTful   API   design,   dynamic   interfaces,   and   reactive   component   f rameworks 
+ (Laravel, PHP, Livewire, JavaScript, Tailwind CSS). 
+ •   Computer Programming & Object - Oriented Programming (OOP)   —   Algorithmic design, OOP 
+ paradigms, modular programming, and automated feature testing (PHP, Python,   Java). 
+ •   Data Structures and Algorithms (DSA)   —   Data modeling, optimization, queue handling (FIFO 
+ production queuing), and computational problem - solving. 
+ •   Computer   Networking   and   Systems   Administration   —   Network   topologies,   client - server 
+ architectures, web server configuration, and environment deployment (Cisco,   Linux/WSL) . 
+ •   Application Development & Software Engineering   —   End - to - end software development lifecycle 
+ (SDLC), Agile development practices, and Quality Assurance (QA)   verification. 
