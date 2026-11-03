@@ -5,6 +5,10 @@
     </head>
     <body class="min-h-screen bg-stone-50 font-sans antialiased dark:bg-stone-950 text-stone-900 dark:text-stone-100 selection:bg-amber-500 selection:text-white">
         <div class="relative grid min-h-svh w-full lg:grid-cols-12 overflow-hidden">
+            <!-- Theme Toggle Upper Right Corner -->
+            <div class="absolute top-4 right-4 z-50">
+                <x-theme-toggle />
+            </div>
             <!-- Left Side: Integrated Print Operations Showcase -->
             <div class="relative hidden flex-col justify-between p-10 lg:flex lg:col-span-6 xl:col-span-7 bg-stone-900 text-white overflow-hidden border-r border-stone-800">
                 <!-- Ambient Glow Background Effects -->

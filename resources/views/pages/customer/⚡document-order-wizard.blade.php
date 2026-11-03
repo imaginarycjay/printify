@@ -390,13 +390,16 @@ new #[Title('Order Document Printing')] class extends Component {
             </div>
         </div>
 
-        <!-- Step Indicator -->
-        <div class="flex items-center gap-2">
-            <span class="size-7 rounded-full flex items-center justify-center text-xs font-black {{ $step >= 1 ? 'bg-blue-500 text-white' : 'bg-stone-800 text-stone-500' }}">1</span>
-            <span class="w-4 h-0.5 {{ $step >= 2 ? 'bg-blue-500' : 'bg-stone-800' }}"></span>
-            <span class="size-7 rounded-full flex items-center justify-center text-xs font-black {{ $step >= 2 ? 'bg-blue-500 text-white' : 'bg-stone-800 text-stone-500' }}">2</span>
-            <span class="w-4 h-0.5 {{ $step >= 3 ? 'bg-blue-500' : 'bg-stone-800' }}"></span>
-            <span class="size-7 rounded-full flex items-center justify-center text-xs font-black {{ $step >= 3 ? 'bg-blue-500 text-white' : 'bg-stone-800 text-stone-500' }}">3</span>
+        <!-- Step Indicator & Theme Toggle -->
+        <div class="flex items-center gap-4">
+            <div class="flex items-center gap-2">
+                <span class="size-7 rounded-full flex items-center justify-center text-xs font-black {{ $step >= 1 ? 'bg-blue-500 text-white' : 'bg-stone-800 text-stone-500' }}">1</span>
+                <span class="w-4 h-0.5 {{ $step >= 2 ? 'bg-blue-500' : 'bg-stone-800' }}"></span>
+                <span class="size-7 rounded-full flex items-center justify-center text-xs font-black {{ $step >= 2 ? 'bg-blue-500 text-white' : 'bg-stone-800 text-stone-500' }}">2</span>
+                <span class="w-4 h-0.5 {{ $step >= 3 ? 'bg-blue-500' : 'bg-stone-800' }}"></span>
+                <span class="size-7 rounded-full flex items-center justify-center text-xs font-black {{ $step >= 3 ? 'bg-blue-500 text-white' : 'bg-stone-800 text-stone-500' }}">3</span>
+            </div>
+            <x-theme-toggle />
         </div>
     </header>
 

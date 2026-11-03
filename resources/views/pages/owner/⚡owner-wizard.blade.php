@@ -123,17 +123,20 @@ new class extends Component {
             </div>
         </div>
 
-        <!-- Step Indicator Pills -->
-        <div class="flex items-center gap-2">
-            <span class="flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold {{ $step === 1 ? 'bg-amber-500 text-stone-950' : 'bg-stone-800 text-stone-400' }}">
-                <span class="size-4 rounded-full flex items-center justify-center text-[10px] font-extrabold {{ $step === 1 ? 'bg-stone-950 text-amber-400' : 'bg-stone-700 text-stone-200' }}">1</span>
-                Shop Identity
-            </span>
-            <span class="text-stone-600">/</span>
-            <span class="flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold {{ $step === 2 ? 'bg-amber-500 text-stone-950' : 'bg-stone-800 text-stone-400' }}">
-                <span class="size-4 rounded-full flex items-center justify-center text-[10px] font-extrabold {{ $step === 2 ? 'bg-stone-950 text-amber-400' : 'bg-stone-700 text-stone-200' }}">2</span>
-                Services Selection
-            </span>
+        <!-- Step Indicator Pills & Theme Toggle -->
+        <div class="flex items-center gap-3">
+            <div class="flex items-center gap-2">
+                <span class="flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold {{ $step === 1 ? 'bg-amber-500 text-stone-950' : 'bg-stone-800 text-stone-400' }}">
+                    <span class="size-4 rounded-full flex items-center justify-center text-[10px] font-extrabold {{ $step === 1 ? 'bg-stone-950 text-amber-400' : 'bg-stone-700 text-stone-200' }}">1</span>
+                    Shop Identity
+                </span>
+                <span class="text-stone-600">/</span>
+                <span class="flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold {{ $step === 2 ? 'bg-amber-500 text-stone-950' : 'bg-stone-800 text-stone-400' }}">
+                    <span class="size-4 rounded-full flex items-center justify-center text-[10px] font-extrabold {{ $step === 2 ? 'bg-stone-950 text-amber-400' : 'bg-stone-700 text-stone-200' }}">2</span>
+                    Services Selection
+                </span>
+            </div>
+            <x-theme-toggle />
         </div>
     </header>
 

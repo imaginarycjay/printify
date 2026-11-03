@@ -62,6 +62,7 @@ new class extends Component {
         </div>
 
         <div class="flex items-center gap-3">
+            <x-theme-toggle />
             <a href="{{ route('dashboard') }}" wire:navigate class="px-3.5 py-2 rounded-xl border border-stone-800 bg-stone-900/60 text-xs font-semibold text-stone-300 hover:text-white transition-all">
                 Exit to Launcher
             </a>

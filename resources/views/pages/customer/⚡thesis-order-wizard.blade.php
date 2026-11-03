@@ -345,6 +345,8 @@ new class extends Component {
         </a>
 
         <div class="flex items-center gap-3">
+            <x-theme-toggle />
+
             <a href="{{ route('dashboard') }}" wire:navigate class="text-xs font-bold text-stone-400 hover:text-white flex items-center gap-1">
                 <flux:icon name="arrow-left" class="size-3.5" />
                 <span>Back to Dashboard</span>

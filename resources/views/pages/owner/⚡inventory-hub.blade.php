@@ -529,9 +529,12 @@ new class extends Component {
             </span>
             <span class="font-extrabold text-white text-sm">Inventory Hub</span>
         </div>
-        <button wire:click="$toggle('mobile_menu_open')" class="p-1.5 rounded-lg bg-stone-800 text-stone-300">
-            <flux:icon name="bars-3" class="size-6" />
-        </button>
+        <div class="flex items-center gap-2">
+            <x-theme-toggle />
+            <button wire:click="$toggle('mobile_menu_open')" class="p-1.5 rounded-lg bg-stone-800 text-stone-300">
+                <flux:icon name="bars-3" class="size-6" />
+            </button>
+        </div>
     </div>
 
     <!-- Sticky Vertical Left Navigation Sidebar -->
@@ -539,10 +542,13 @@ new class extends Component {
         <div class="p-5 space-y-6">
             <!-- App Header & Back Link -->
             <div>
-                <a href="{{ route('dashboard') }}" wire:navigate class="inline-flex items-center gap-1.5 text-[11px] font-bold text-stone-400 hover:text-amber-400 mb-3 transition-colors">
-                    <flux:icon name="arrow-left" class="size-3.5" />
-                    Back to App Launcher
-                </a>
+                <div class="flex items-center justify-between mb-3">
+                    <a href="{{ route('dashboard') }}" wire:navigate class="inline-flex items-center gap-1.5 text-[11px] font-bold text-stone-400 hover:text-amber-400 transition-colors">
+                        <flux:icon name="arrow-left" class="size-3.5" />
+                        Back to App Launcher
+                    </a>
+                    <x-theme-toggle />
+                </div>
                 <div class="flex items-center gap-3">
                     <span class="flex size-10 items-center justify-center rounded-2xl bg-gradient-to-br from-emerald-400 via-teal-500 to-cyan-600 text-stone-950 font-black shadow-lg shadow-emerald-500/20">
                         <flux:icon name="archive-box" class="size-6" />

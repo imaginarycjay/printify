@@ -98,6 +98,8 @@ new class extends Component {
         </div>
 
         <div class="flex items-center gap-3">
+            <x-theme-toggle />
+
             <a href="{{ route('owner.wizard') }}" wire:navigate class="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-stone-800 bg-stone-900/60 text-xs font-semibold text-stone-300 hover:text-white hover:border-stone-700 transition-all">
                 <flux:icon name="cog-6-tooth" class="size-3.5 text-stone-400" />
                 Re-run Setup Wizard

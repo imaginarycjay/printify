@@ -39,6 +39,8 @@
                         :label="__('Documentation')"
                     />
                 </flux:tooltip>
+
+                <x-theme-toggle class="ml-1" />
             </flux:navbar>
 
             <x-desktop-user-menu />

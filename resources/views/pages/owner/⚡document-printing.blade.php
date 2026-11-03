@@ -227,6 +227,8 @@ new #[Title('Document Printing & Finishing Configuration')] class extends Compon
         </div>
 
         <div class="flex items-center gap-2.5 sm:gap-3">
+            <x-theme-toggle />
+
             <button 
                 wire:click="saveSettings"
                 class="px-4 py-1.5 rounded-xl text-xs font-black bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-400 hover:to-indigo-500 text-white shadow-md shadow-blue-500/20 transition-all cursor-pointer flex items-center gap-1.5"

@@ -55,6 +55,8 @@ new class extends Component {
         </div>
 
         <div class="flex items-center gap-3">
+            <x-theme-toggle />
+
             <!-- Profile Settings Link -->
             <a
                 href="{{ route('profile.edit') }}"

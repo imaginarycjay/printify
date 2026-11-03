@@ -30,6 +30,11 @@
                 </flux:sidebar.item>
             </flux:sidebar.nav>
 
+            <div class="hidden lg:flex items-center justify-between px-2 py-1">
+                <span class="text-xs text-zinc-500 dark:text-zinc-400 font-medium">Theme</span>
+                <x-theme-toggle />
+            </div>
+
             <x-desktop-user-menu class="hidden lg:block" :name="auth()->user()->name" />
         </flux:sidebar>
 
@@ -38,6 +43,8 @@
             <flux:sidebar.toggle class="lg:hidden" icon="bars-2" inset="left" />
 
             <flux:spacer />
+
+            <x-theme-toggle class="mr-2" />
 
             <flux:dropdown position="top" align="end">
                 <flux:profile

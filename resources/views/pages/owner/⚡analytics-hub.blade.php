@@ -165,6 +165,8 @@ new #[Title('Sales & Financial Analytics Hub')] class extends Component {
 
         <!-- Quick Actions & Back to Launcher -->
         <div class="flex items-center gap-2.5 sm:gap-3">
+            <x-theme-toggle />
+
             <button 
                 wire:click="downloadCsv"
                 class="px-3.5 py-1.5 rounded-xl text-xs font-bold bg-stone-950 hover:bg-emerald-500/10 text-stone-300 hover:text-emerald-400 border border-stone-800 hover:border-emerald-500/30 transition-all flex items-center gap-1.5 shadow-sm"

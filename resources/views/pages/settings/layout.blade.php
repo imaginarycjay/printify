@@ -91,9 +91,12 @@
                 <h1 class="text-xl font-extrabold text-white tracking-tight">{{ $heading ?? 'Settings' }}</h1>
                 <p class="text-xs text-stone-400">{{ $subheading ?? 'Manage your account preferences and security credentials' }}</p>
             </div>
-            <a href="{{ route('dashboard') }}" wire:navigate class="px-3 py-1.5 rounded-xl border border-stone-800 bg-stone-900/80 text-xs font-bold text-stone-300 hover:text-white transition-all">
-                Exit Settings
-            </a>
+            <div class="flex items-center gap-3">
+                <x-theme-toggle />
+                <a href="{{ route('dashboard') }}" wire:navigate class="px-3 py-1.5 rounded-xl border border-stone-800 bg-stone-900/80 text-xs font-bold text-stone-300 hover:text-white transition-all">
+                    Exit Settings
+                </a>
+            </div>
         </div>
 
         <!-- Content Card Slot -->

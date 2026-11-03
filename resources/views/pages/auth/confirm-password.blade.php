@@ -6,6 +6,10 @@
 
 <x-layouts::blank>
     <div class="h-screen w-screen bg-stone-950 text-stone-100 font-sans antialiased flex flex-col justify-center items-center p-4 relative selection:bg-amber-500 selection:text-white overflow-hidden">
+        <div class="absolute top-4 right-4 z-50">
+            <x-theme-toggle />
+        </div>
+
         <!-- Ambient Glow Background Effects -->
         <div class="absolute -top-40 left-1/2 -translate-x-1/2 size-[600px] rounded-full bg-amber-500/10 blur-[140px] pointer-events-none"></div>
         <div class="absolute -bottom-40 right-10 size-[500px] rounded-full bg-indigo-500/10 blur-[140px] pointer-events-none"></div>

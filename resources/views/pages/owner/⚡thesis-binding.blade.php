@@ -440,14 +440,17 @@ new class extends Component {
         <div class="space-y-6">
             <!-- Shop & Module Branding Header -->
             <div class="space-y-3 border-b border-stone-800/80 pb-4">
-                <div class="flex items-center gap-3">
-                    <span class="flex size-10 items-center justify-center rounded-2xl bg-gradient-to-br from-amber-400 to-amber-600 text-stone-950 font-bold shadow-md shadow-amber-500/20">
-                        <flux:icon name="book-open" class="size-6 stroke-[2]" />
-                    </span>
-                    <div>
-                        <h2 class="text-sm font-extrabold text-white leading-tight line-clamp-1">{{ $shop ? $shop->name : 'Print Shop' }}</h2>
-                        <span class="text-[10px] font-bold text-amber-400 tracking-wide uppercase">Thesis Binding App</span>
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-3">
+                        <span class="flex size-10 items-center justify-center rounded-2xl bg-gradient-to-br from-amber-400 to-amber-600 text-stone-950 font-bold shadow-md shadow-amber-500/20">
+                            <flux:icon name="book-open" class="size-6 stroke-[2]" />
+                        </span>
+                        <div>
+                            <h2 class="text-sm font-extrabold text-white leading-tight line-clamp-1">{{ $shop ? $shop->name : 'Print Shop' }}</h2>
+                            <span class="text-[10px] font-bold text-amber-400 tracking-wide uppercase">Thesis Binding App</span>
+                        </div>
                     </div>
+                    <x-theme-toggle />
                 </div>
 
                 <!-- Service Status Indicator Switch in Sidebar -->
@@ -577,9 +580,12 @@ new class extends Component {
             </div>
         </div>
 
-        <button wire:click="toggleMobileMenu" class="p-2 rounded-xl bg-stone-800 text-stone-300 hover:text-white">
-            <flux:icon name="bars-3" class="size-5" />
-        </button>
+        <div class="flex items-center gap-2">
+            <x-theme-toggle />
+            <button wire:click="toggleMobileMenu" class="p-2 rounded-xl bg-stone-800 text-stone-300 hover:text-white">
+                <flux:icon name="bars-3" class="size-5" />
+            </button>
+        </div>
     </div>
 
     <!-- MOBILE SLIDE-OVER DRAWER MENU -->
@@ -649,6 +655,7 @@ new class extends Component {
             </div>
 
             <div class="flex items-center gap-2">
+                <x-theme-toggle />
                 <span class="px-3 py-1 rounded-full text-xs font-bold {{ $is_active ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/30' : 'bg-red-500/10 text-red-400 border border-red-500/30' }}">
                     Status: {{ $is_active ? 'ONLINE' : 'OFFLINE' }}
                 </span>

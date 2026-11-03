@@ -379,6 +379,9 @@ new #[Title('Production Operations Hub')] class extends Component {
                 </a>
             @endif
 
+            <!-- Theme Toggle -->
+            <x-theme-toggle />
+
             <!-- Profile Settings Link -->
             <a
                 href="{{ route('profile.edit') }}"
