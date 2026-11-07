@@ -13,6 +13,17 @@ use Livewire\WithFileUploads;
 new #[Title('Order Document Printing')] class extends Component {
     use WithFileUploads;
 
+    #[\Livewire\Attributes\Locked]
+    public int $shopId = 0;
+
+    public function selectedShop(): PrintShop
+    {
+        $shop = PrintShop::where('approval_status', 'approved')->where('is_setup_completed', true)->findOrFail($this->shopId);
+        $service = $shop->services()->where('service_key', 'document_printing')->firstOrFail();
+        abort_unless($service->acceptsOrders(), 422, 'This service is not accepting orders. Please browse other shops.');
+        return $shop;
+    }
+
     public function rendering(mixed $view): void
     {
         $view->layout('layouts.blank');
@@ -21,19 +32,33 @@ new #[Title('Order Document Printing')] class extends Component {
     public int $step = 1; // 1 = Configure, 2 = Checkout, 3 = Confirmation
 
     // Dynamic Shop Config Rates
+    #[\Livewire\Attributes\Locked]
     public float $page_price_bw_short = 1.50;
+    #[\Livewire\Attributes\Locked]
     public float $page_price_bw_a4 = 1.50;
+    #[\Livewire\Attributes\Locked]
     public float $page_price_bw_long = 2.00;
+    #[\Livewire\Attributes\Locked]
     public float $page_price_color_short = 5.00;
+    #[\Livewire\Attributes\Locked]
     public float $page_price_color_a4 = 5.00;
+    #[\Livewire\Attributes\Locked]
     public float $page_price_color_long = 6.00;
+    #[\Livewire\Attributes\Locked]
     public float $paper_stock_80gsm_price = 0.50;
+    #[\Livewire\Attributes\Locked]
     public float $paper_stock_100gsm_price = 1.50;
+    #[\Livewire\Attributes\Locked]
     public int $duplex_discount_percent = 10;
+    #[\Livewire\Attributes\Locked]
     public float $staple_price = 2.00;
+    #[\Livewire\Attributes\Locked]
     public float $folder_fastener_price = 15.00;
+    #[\Livewire\Attributes\Locked]
     public float $ring_bind_base_price = 45.00;
+    #[\Livewire\Attributes\Locked]
     public float $booklet_staple_price = 20.00;
+    #[\Livewire\Attributes\Locked]
     public float $rush_fee_amount = 50.00;
 
     // Customer Selection Matrix
@@ -61,21 +86,25 @@ new #[Title('Order Document Printing')] class extends Component {
     public string $payment_method = 'gcash'; // 'gcash', 'maya', 'cash_counter'
     public string $payment_reference_no = '';
     public $payment_proof;
+    #[\Livewire\Attributes\Locked]
     public ?string $uploaded_file_path = null;
+    #[\Livewire\Attributes\Locked]
     public ?string $uploaded_payment_proof_path = null;
 
     // Generated Order
+    #[\Livewire\Attributes\Locked]
     public ?Order $created_order = null;
 
-    public function mount(): void
+    public function mount(int $shop): void
     {
+        $this->shopId = $shop;
         $user = auth()->user();
         if ($user) {
             $this->customer_name = $user->name;
             $this->customer_email = $user->email;
         }
 
-        $shop = PrintShop::first();
+        $shop = $this->selectedShop();
         if ($shop) {
             $config = DocumentPrintingConfig::where('print_shop_id', $shop->id)->first();
             if ($config) {
@@ -119,14 +148,14 @@ new #[Title('Order Document Printing')] class extends Component {
     {
         if ($this->document_file) {
             $this->document_name = $this->document_file->getClientOriginalName();
-            $this->uploaded_file_path = $this->document_file->store('customer_documents', 'public');
+            $this->uploaded_file_path = $this->document_file->store('customer_documents', 'local');
         }
     }
 
     public function updatedPaymentProof(): void
     {
         if ($this->payment_proof) {
-            $this->uploaded_payment_proof_path = $this->payment_proof->store('orders/payments', 'public');
+            $this->uploaded_payment_proof_path = $this->payment_proof->store('orders/payments', 'local');
         }
     }
 
@@ -276,13 +305,15 @@ new #[Title('Order Document Printing')] class extends Component {
 
     public function submitOrder(): void
     {
+        $this->proceedToCheckout();
+        $this->recalculatePages();
         $this->validate([
             'customer_name' => 'required|string|min:2',
             'customer_email' => 'required|email',
             'payment_method' => 'required|in:gcash,maya,cash_counter',
         ]);
 
-        $shop = PrintShop::first();
+        $shop = $this->selectedShop();
         if (! $shop) {
             return;
         }
@@ -293,12 +324,12 @@ new #[Title('Order Document Printing')] class extends Component {
         // Handle file storage if uploaded
         $filePath = $this->uploaded_file_path;
         if (! $filePath && $this->document_file) {
-            $filePath = $this->document_file->store('customer_documents', 'public');
+            $filePath = $this->document_file->store('customer_documents', 'local');
         }
 
         $paymentProofPath = $this->uploaded_payment_proof_path;
         if (! $paymentProofPath && $this->payment_proof) {
-            $paymentProofPath = $this->payment_proof->store('orders/payments', 'public');
+            $paymentProofPath = $this->payment_proof->store('orders/payments', 'local');
         }
 
         // Generate Order
@@ -369,14 +400,14 @@ new #[Title('Order Document Printing')] class extends Component {
     <div class="absolute bottom-10 right-10 size-[500px] rounded-full bg-indigo-500/10 blur-[160px] pointer-events-none"></div>
 
     @php
-        $shop = PrintShop::first();
+        $shop = $this->selectedShop();
         $pricing = $this->calculatePricing();
     @endphp
 
     <!-- Top Header Navigation -->
     <header class="w-full max-w-5xl mx-auto px-4 sm:px-6 py-4 flex items-center justify-between border-b border-stone-800/80 relative z-20">
         <div class="flex items-center gap-3">
-            <a href="{{ route('customer.dashboard') }}" wire:navigate class="flex size-10 items-center justify-center rounded-2xl bg-gradient-to-br from-blue-500 to-indigo-600 text-white font-bold shadow-md shadow-blue-500/20 hover:scale-105 transition-transform">
+            <a href="{{ route('shops.show', $this->shopId) }}" wire:navigate aria-label="Back to shop" class="flex size-11 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-blue-500 to-indigo-600 text-white font-bold shadow-md shadow-blue-500/20 hover:scale-105 transition-transform">
                 <flux:icon name="arrow-left" class="size-5" />
             </a>
             <div>

@@ -1,0 +1,5 @@
+# Shared skills remain in .agents/skills. Use the existing Sail PHP 8.5 image.
+[mcp_servers.laravel-boost]
+command = "docker"
+args = ["run", "--rm", "-i", "--user", "1000:1000", "--entrypoint", "php", "-v", "/home/imaginarycjay/printify:/var/www/html", "-w", "/var/www/html", "sail-8.5/app", "artisan", "boost:mcp"]
+startup_timeout_sec = 30

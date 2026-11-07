@@ -32,15 +32,15 @@ new class extends Component {
 
     @php
         $user = auth()->user();
-        $shop = PrintShop::first();
+        $shop = null;
         $orders = $user ? $user->orders()->with(['items', 'printShop'])->get() : collect();
         $activeOrdersCount = $orders->whereNotIn('order_status', [Order::STATUS_COMPLETED, Order::STATUS_CANCELLED])->count();
         $catalog = PrintServiceCatalog::all();
-        $selectedOrder = $this->viewing_order_id ? Order::with(['items', 'printShop'])->find($this->viewing_order_id) : null;
+        $selectedOrder = $this->viewing_order_id ? Order::where('customer_id', auth()->id())->with(['items', 'printShop'])->find($this->viewing_order_id) : null;
     @endphp
 
     <!-- Top Navigation Header -->
-    <header class="w-full max-w-6xl mx-auto px-4 sm:px-6 py-4 flex items-center justify-between border-b border-stone-800/80 relative z-20">
+    <header class="w-full max-w-6xl mx-auto px-4 sm:px-6 py-4 flex flex-wrap gap-4 items-center justify-between border-b border-stone-800/80 relative z-20">
         <div class="flex items-center gap-3">
             <span class="flex size-10 items-center justify-center rounded-2xl bg-gradient-to-br from-amber-400 to-amber-600 text-stone-950 font-bold shadow-md shadow-amber-500/20">
                 <flux:icon name="shopping-bag" class="size-6 text-stone-950" />
@@ -55,6 +55,10 @@ new class extends Component {
         </div>
 
         <div class="flex items-center gap-3">
+            <a href="{{ route('shops.index') }}" wire:navigate class="inline-flex min-h-11 items-center gap-2 rounded-xl border border-stone-800 bg-stone-900 px-3 text-xs font-bold text-stone-300 hover:border-amber-500/50 hover:text-amber-400 transition-colors">
+                <flux:icon name="building-storefront" class="size-4" />
+                Find shops
+            </a>
             <x-theme-toggle />
 
             <!-- Profile Settings Link -->
@@ -94,8 +98,8 @@ new class extends Component {
         <!-- Hero Header & Tab Switcher -->
         <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-stone-800/80 pb-4">
             <div>
-                <h2 class="text-2xl font-black text-white tracking-tight">Printing Services & Job Queue</h2>
-                <p class="text-xs text-stone-400">Order thesis hardbounds, documents, and merchandise with instant online price quotations</p>
+                <h2 class="text-2xl font-black text-white tracking-tight">Find a shop. Track your prints.</h2>
+                <p class="text-sm text-stone-400">Choose a service to compare shops. Each shop sets its own prices and availability.</p>
             </div>
 
             <!-- Tab Buttons -->
@@ -105,7 +109,7 @@ new class extends Component {
                     class="px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 {{ $active_tab === 'services' ? 'bg-amber-500 text-stone-950 shadow-md shadow-amber-500/20' : 'text-stone-400 hover:text-white' }}"
                 >
                     <flux:icon name="squares-2x2" class="size-4" />
-                    <span>Order Services</span>
+                    <span>Find shops</span>
                 </button>
                 <button
                     wire:click="$set('active_tab', 'orders')"
@@ -125,7 +129,7 @@ new class extends Component {
         <!-- TAB 1: AVAILABLE PRINTING SERVICES CATALOG -->
         @if ($active_tab === 'services')
             <div class="space-y-6 animate-fadeIn">
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <!-- 1. Hardbound & Softbound Thesis Binding (ACTIVE MVP) -->
                     <div class="p-6 rounded-3xl bg-gradient-to-b from-stone-900 to-stone-950 border-2 border-amber-500/40 hover:border-amber-500 transition-all duration-300 space-y-5 shadow-2xl flex flex-col justify-between group">
                         <div class="space-y-4">
@@ -133,7 +137,7 @@ new class extends Component {
                                 <span class="size-12 rounded-2xl bg-gradient-to-br from-amber-400 to-amber-600 text-stone-950 flex items-center justify-center shadow-lg shadow-amber-500/20 group-hover:scale-105 transition-transform">
                                     <flux:icon name="book-open" class="size-6 text-stone-950" />
                                 </span>
-                                <span class="px-2.5 py-1 rounded-full text-[10px] font-black bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">ONLINE</span>
+                                <span class="px-2.5 py-1 rounded-full text-[10px] font-black bg-amber-500/10 text-amber-400 border border-amber-500/30">COMPARE SHOPS</span>
                             </div>
 
                             <div>
@@ -141,10 +145,7 @@ new class extends Component {
                                 <p class="text-xs text-stone-400 mt-1 leading-relaxed">Custom hot foil stamping, heavy duty leatherette covers, and instant manuscript page calculation.</p>
                             </div>
 
-                            <div class="p-3 rounded-2xl bg-stone-950/80 border border-stone-800 text-xs flex items-center justify-between">
-                                <span class="text-stone-400">Starting from:</span>
-                                <strong class="text-amber-400 font-extrabold">₱350.00 <span class="text-[10px] font-normal text-stone-500">/ book</span></strong>
-                            </div>
+                            <p class="rounded-2xl bg-stone-950/80 border border-stone-800 p-3 text-xs text-stone-400">View shop rates and binding workload before you order.</p>
                         </div>
 
                         <a
@@ -152,7 +153,7 @@ new class extends Component {
                             wire:navigate
                             class="w-full py-3 rounded-2xl bg-amber-500 hover:bg-amber-400 text-stone-950 text-xs font-black uppercase tracking-wider text-center shadow-lg shadow-amber-500/20 block transition-all"
                         >
-                            Order Thesis Binding &rarr;
+                            Find Thesis Binding Shops &rarr;
                         </a>
                     </div>
 
@@ -163,48 +164,23 @@ new class extends Component {
                                 <span class="size-12 rounded-2xl bg-gradient-to-br from-blue-500 to-indigo-600 text-white flex items-center justify-center shadow-lg shadow-blue-500/20 group-hover:scale-105 transition-transform">
                                     <flux:icon name="document-text" class="size-6 text-white" />
                                 </span>
-                                <span class="px-2.5 py-1 rounded-full text-[10px] font-black bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">ONLINE</span>
+                                <span class="px-2.5 py-1 rounded-full text-[10px] font-black bg-blue-500/10 text-blue-400 border border-blue-500/30">COMPARE SHOPS</span>
                             </div>
                             <div>
                                 <h3 class="text-base font-black text-white group-hover:text-blue-400 transition-colors">Document Printing & Ring Binding</h3>
                                 <p class="text-xs text-stone-400 mt-1 leading-relaxed">High-speed monochrome & color PDF documents, duplex printing, sliding folders, and ring binding.</p>
                             </div>
-                            <div class="p-3 rounded-2xl bg-stone-950/80 border border-stone-800 text-xs flex items-center justify-between">
-                                <span class="text-stone-400">Starting from:</span>
-                                <strong class="text-blue-400 font-extrabold">₱1.50 <span class="text-[10px] font-normal text-stone-500">/ page</span></strong>
-                            </div>
+                            <p class="rounded-2xl bg-stone-950/80 border border-stone-800 p-3 text-xs text-stone-400">View shop rates and printing workload before you order.</p>
                         </div>
                         <a
                             href="{{ route('customer.order-document') }}"
                             wire:navigate
                             class="w-full py-3 rounded-2xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-black uppercase tracking-wider text-center shadow-lg shadow-blue-600/20 block transition-all"
                         >
-                            Order Document Printing &rarr;
+                            Find Document Printing Shops &rarr;
                         </a>
                     </div>
 
-                    <!-- 3. Tarpaulin Printing -->
-                    <div class="p-6 rounded-3xl bg-stone-900/60 border border-stone-800 space-y-5 shadow-xl flex flex-col justify-between opacity-80 hover:opacity-100 transition-opacity">
-                        <div class="space-y-4">
-                            <div class="flex items-center justify-between">
-                                <span class="size-12 rounded-2xl bg-gradient-to-br from-purple-500 to-fuchsia-600 text-white flex items-center justify-center shadow-lg">
-                                    <flux:icon name="photo" class="size-6" />
-                                </span>
-                                <span class="px-2.5 py-1 rounded-full text-[10px] font-bold bg-stone-800 text-stone-400">Available In Shop</span>
-                            </div>
-                            <div>
-                                <h3 class="text-base font-black text-white">Tarpaulin Banner Printing</h3>
-                                <p class="text-xs text-stone-400 mt-1 leading-relaxed">High-resolution outdoor tarpaulin banners with reinforced eyelets.</p>
-                            </div>
-                            <div class="p-3 rounded-2xl bg-stone-950 border border-stone-800 text-xs flex items-center justify-between">
-                                <span class="text-stone-400">Price rate:</span>
-                                <strong class="text-white">₱18.00 <span class="text-[10px] font-normal text-stone-500">/ sq.ft</span></strong>
-                            </div>
-                        </div>
-                        <button disabled class="w-full py-3 rounded-2xl bg-stone-800 text-stone-500 text-xs font-bold text-center cursor-not-allowed">
-                            Order via Counter
-                        </button>
-                    </div>
                 </div>
             </div>
         @endif
@@ -232,7 +208,7 @@ new class extends Component {
                                 <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 border-b border-stone-800 pb-4">
                                     <div>
                                         <div class="flex flex-wrap items-center gap-2">
-                                            <span class="font-mono font-black text-amber-400 text-sm sm:text-base">{{ $order->order_number }}</span>
+                                            <span class="font-mono font-black text-amber-400 text-sm sm:text-base">{{ $order->order_number }}</span><span class="text-sm text-stone-300">{{ $order->printShop?->name }}</span>
                                             <span class="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold border {{ $order->statusBadgeColor() }}">
                                                 {{ $order->order_status === \App\Models\Order::STATUS_COMPLETED || $order->production_stage === \App\Models\Order::STAGE_COMPLETED ? 'Completed / Received' : ucfirst(str_replace('_', ' ', $order->order_status)) }}
                                             </span>

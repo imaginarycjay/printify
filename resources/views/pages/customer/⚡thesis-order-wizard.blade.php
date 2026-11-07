@@ -14,6 +14,17 @@ use Livewire\WithFileUploads;
 new class extends Component {
     use WithFileUploads;
 
+    #[\Livewire\Attributes\Locked]
+    public int $shopId = 0;
+
+    public function selectedShop(): PrintShop
+    {
+        $shop = PrintShop::where('approval_status', 'approved')->where('is_setup_completed', true)->findOrFail($this->shopId);
+        $service = $shop->services()->where('service_key', 'thesis_binding')->firstOrFail();
+        abort_unless($service->acceptsOrders(), 422, 'This service is not accepting orders. Please browse other shops.');
+        return $shop;
+    }
+
     public function rendering(mixed $view): void
     {
         $view->layout('layouts.blank');
@@ -22,19 +33,33 @@ new class extends Component {
     public int $step = 1; // 1 = Configure, 2 = Checkout & Payment, 3 = Confirmation
 
     // Dynamic Shop Config & Rates
+    #[\Livewire\Attributes\Locked]
     public float $hardbound_base_price = 350.00;
+    #[\Livewire\Attributes\Locked]
     public float $softbound_base_price = 150.00;
+    #[\Livewire\Attributes\Locked]
     public bool $allow_customer_supplied_paper = true;
+    #[\Livewire\Attributes\Locked]
     public float $hardbound_cover_only_price = 300.00;
+    #[\Livewire\Attributes\Locked]
     public float $page_price_bw = 1.50;
+    #[\Livewire\Attributes\Locked]
     public float $page_price_color = 5.00;
+    #[\Livewire\Attributes\Locked]
     public float $rush_fee = 150.00;
+    #[\Livewire\Attributes\Locked]
     public array $available_cover_colors = [];
+    #[\Livewire\Attributes\Locked]
     public array $available_foil_colors = [];
+    #[\Livewire\Attributes\Locked]
     public array $available_paper_sizes = [];
+    #[\Livewire\Attributes\Locked]
     public array $required_custom_fields = [];
+    #[\Livewire\Attributes\Locked]
     public int $standard_lead_time_days = 4;
+    #[\Livewire\Attributes\Locked]
     public int $rush_lead_time_days = 1;
+    #[\Livewire\Attributes\Locked]
     public bool $require_pdf_upload = true;
 
     // Customer Selection State
@@ -63,12 +88,14 @@ new class extends Component {
     public string $payment_reference_no = '';
 
     // Completed Order Info
+    #[\Livewire\Attributes\Locked]
     public ?int $created_order_id = null;
     public ?string $created_order_number = null;
 
-    public function mount(): void
+    public function mount(int $shop): void
     {
-        $shop = PrintShop::first();
+        $this->shopId = $shop;
+        $shop = $this->selectedShop();
         if (! $shop) {
             return;
         }
@@ -136,7 +163,7 @@ new class extends Component {
         $subtotal = $unitPrice * $this->copies_count;
 
         // Add-ons
-        $shop = PrintShop::first();
+        $shop = $this->selectedShop();
         $addonsTotal = 0.0;
         $selectedAddonsDetails = [];
 
@@ -240,6 +267,7 @@ new class extends Component {
 
     public function submitOrder(): void
     {
+        $this->proceedToCheckout();
         $this->validate([
             'payment_reference_no' => 'required|string|min:6|max:50',
             'payment_proof_file' => 'nullable|image|max:10240', // 10MB max
@@ -248,7 +276,7 @@ new class extends Component {
         ]);
 
         $user = auth()->user();
-        $shop = PrintShop::first();
+        $shop = $this->selectedShop();
 
         if (! $user || ! $shop) {
             return;
@@ -263,14 +291,14 @@ new class extends Component {
             $manuscriptPath = null;
             $manuscriptName = null;
             if ($this->manuscript_file) {
-                $manuscriptPath = $this->manuscript_file->store('orders/manuscripts', 'public');
+                $manuscriptPath = $this->manuscript_file->store('orders/manuscripts', 'local');
                 $manuscriptName = $this->manuscript_file->getClientOriginalName();
             }
 
             // Store payment proof screenshot
             $paymentProofPath = null;
             if ($this->payment_proof_file) {
-                $paymentProofPath = $this->payment_proof_file->store('orders/payments', 'public');
+                $paymentProofPath = $this->payment_proof_file->store('orders/payments', 'local');
             }
 
             $order = Order::create([
@@ -324,7 +352,7 @@ new class extends Component {
 
     @php
         $user = auth()->user();
-        $shop = App\Models\PrintShop::first();
+        $shop = $this->selectedShop();
         $pricing = $this->calculatePricing();
 
         // Check Inventory Stock Levels for Cover Colors
@@ -347,9 +375,9 @@ new class extends Component {
         <div class="flex items-center gap-3">
             <x-theme-toggle />
 
-            <a href="{{ route('dashboard') }}" wire:navigate class="text-xs font-bold text-stone-400 hover:text-white flex items-center gap-1">
+            <a href="{{ route('shops.show', $this->shopId) }}" wire:navigate class="min-h-11 text-xs font-bold text-stone-400 hover:text-white flex items-center gap-1">
                 <flux:icon name="arrow-left" class="size-3.5" />
-                <span>Back to Dashboard</span>
+                <span>Back to shop</span>
             </a>
             <div class="size-7 rounded-full bg-amber-500 text-stone-950 text-xs font-extrabold flex items-center justify-center">
                 {{ $user?->initials() }}

@@ -88,6 +88,8 @@ new class extends Component {
             ]
         );
 
+        if ($shop->getAttribute('approval_status') === 'rejected') { $shop->update(['approval_status' => 'pending', 'rejection_reason' => null]); }
+
         // Sync services
         $catalog = PrintServiceCatalog::all();
         foreach (array_keys($catalog) as $key) {

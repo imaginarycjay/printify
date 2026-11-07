@@ -32,9 +32,13 @@
         <!-- Role Info Banner -->
         <div class="flex items-center gap-3 rounded-xl bg-amber-500/10 p-3 text-xs text-amber-800 dark:text-amber-300 border border-amber-500/20">
             <flux:icon name="information-circle" class="size-4 shrink-0 text-amber-600 dark:text-amber-400" />
-            <span>Public registration creates a <strong>Customer Account</strong>. Business Owner and Production Staff accounts are configured during setup.</span>
+            <span>Public registration creates a <strong>Customer Account</strong>. Shop owners can register their business separately; staff join by invitation.</span>
         </div>
 
+        <a href="{{ route('owner.register') }}" wire:navigate class="flex min-h-11 items-center justify-between gap-3 rounded-xl border border-stone-200 p-3 text-sm font-semibold text-stone-700 hover:border-amber-500 dark:border-stone-800 dark:text-stone-300">
+            <span class="flex items-center gap-2"><flux:icon name="building-storefront" class="size-4 text-amber-600 dark:text-amber-400" /> Register your print shop</span>
+            <flux:icon name="arrow-right" class="size-4" />
+        </a>
         <!-- Session Status -->
         <x-auth-session-status class="text-center" :status="session('status')" />
 

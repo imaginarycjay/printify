@@ -33,10 +33,14 @@ class CustomerThesisOrderTest extends TestCase
         $this->customer = User::factory()->create(['role' => User::ROLE_CUSTOMER]);
 
         $this->shop = PrintShop::create([
+            'approval_status' => 'approved',
+            'is_setup_completed' => true,
             'user_id' => $this->owner->id,
             'name' => 'Apex Print Hub',
             'is_setup_completed' => true,
         ]);
+        $this->shop->services()->create(['service_key' => 'thesis_binding', 'is_active' => true]);
+        $this->shop->services()->create(['service_key' => 'document_printing', 'is_active' => true]);
 
         $this->config = ThesisBindingConfig::create([
             'print_shop_id' => $this->shop->id,
@@ -71,7 +75,7 @@ class CustomerThesisOrderTest extends TestCase
 
     public function test_customer_can_access_thesis_order_wizard(): void
     {
-        $response = $this->actingAs($this->customer)->get(route('customer.order-thesis'));
+        $response = $this->actingAs($this->customer)->get(route('customer.shop.order-thesis', $this->shop->id));
         $response->assertOk();
         $response->assertSee('Thesis Binding Order Portal');
     }
@@ -79,7 +83,7 @@ class CustomerThesisOrderTest extends TestCase
     public function test_price_calculation_computes_accurately(): void
     {
         Livewire::actingAs($this->customer)
-            ->test('pages::customer.⚡thesis-order-wizard')
+            ->test('pages::customer.⚡thesis-order-wizard', ['shop' => $this->shop->id])
             ->set('binding_type', 'hardbound') // 350
             ->set('bw_pages', 80) // 80 * 1.50 = 120
             ->set('color_pages', 20) // 20 * 5.00 = 100
@@ -90,13 +94,13 @@ class CustomerThesisOrderTest extends TestCase
 
     public function test_customer_can_complete_thesis_order_and_payment(): void
     {
-        Storage::fake('public');
+        Storage::fake('local');
 
         $dummyPdf = UploadedFile::fake()->create('thesis_final.pdf', 1024, 'application/pdf');
         $dummyReceipt = UploadedFile::fake()->create('gcash_receipt.png', 500, 'image/png');
 
         Livewire::actingAs($this->customer)
-            ->test('pages::customer.⚡thesis-order-wizard')
+            ->test('pages::customer.⚡thesis-order-wizard', ['shop' => $this->shop->id])
             ->set('binding_type', 'hardbound')
             ->set('bw_pages', 50)
             ->set('color_pages', 10)
@@ -168,19 +172,19 @@ class CustomerThesisOrderTest extends TestCase
             ->set('active_tab', 'orders')
             ->assertSee('ORD-2026-0001')
             ->assertSee('In production')
-            ->assertSee('Printing')
+            ->assertSee('Live Production Progress')
             ->call('viewOrderDetails', $order->id)
             ->assertSee('Official Order Receipt');
     }
 
     public function test_softbound_order_greys_out_cover_colors_and_succeeds(): void
     {
-        Storage::fake('public');
+        Storage::fake('local');
 
         $dummyPdf = UploadedFile::fake()->create('report_final.pdf', 512, 'application/pdf');
 
         Livewire::actingAs($this->customer)
-            ->test('pages::customer.⚡thesis-order-wizard')
+            ->test('pages::customer.⚡thesis-order-wizard', ['shop' => $this->shop->id])
             ->set('binding_type', 'softbound')
             ->assertSee('Not Applicable')
             ->assertSee('transparent clear PVC acetate front sheet')
@@ -203,12 +207,12 @@ class CustomerThesisOrderTest extends TestCase
 
     public function test_customer_can_place_cover_only_binding_order_with_zero_print_cost(): void
     {
-        Storage::fake('public');
+        Storage::fake('local');
 
         $dummyRefPdf = UploadedFile::fake()->create('digital_reference.pdf', 512, 'application/pdf');
 
         Livewire::actingAs($this->customer)
-            ->test('pages::customer.⚡thesis-order-wizard')
+            ->test('pages::customer.⚡thesis-order-wizard', ['shop' => $this->shop->id])
             ->set('fulfillment_type', 'cover_only')
             ->set('preprinted_total_pages', 150) // ~15.0mm spine
             ->set('paper_size', 'A4')

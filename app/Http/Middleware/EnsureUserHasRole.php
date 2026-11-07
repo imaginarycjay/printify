@@ -34,6 +34,10 @@ class EnsureUserHasRole
         }
 
         if (empty($allowedRoles) || in_array($user->role, $allowedRoles, true)) {
+            if ($user->isStaff()) {
+                abort_unless($user->operationalShop() !== null, 403, 'Ask your shop owner for a staff invitation.');
+            }
+
             return $next($request);
         }
 

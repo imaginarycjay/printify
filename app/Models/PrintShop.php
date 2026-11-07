@@ -18,7 +18,7 @@ use Illuminate\Support\Carbon;
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
  */
-#[Fillable(['user_id', 'name', 'is_setup_completed'])]
+#[Fillable(['user_id', 'name', 'is_setup_completed', 'approval_status', 'rejection_reason', 'address', 'contact', 'description'])]
 class PrintShop extends Model
 {
     /**

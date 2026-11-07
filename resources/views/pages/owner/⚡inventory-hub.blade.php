@@ -470,7 +470,7 @@ new class extends Component {
         $user = auth()->user();
         $shop = $user?->printShop;
 
-        $itemsQuery = $shop ? $shop->inventoryItems() : InventoryItem::query();
+        $itemsQuery = $shop ? $shop->inventoryItems() : InventoryItem::whereRaw('1 = 0');
 
         // Apply filters
         if (!empty($this->search)) {

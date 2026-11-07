@@ -5,49 +5,9 @@
     </head>
     <body class="min-h-screen bg-stone-100 dark:bg-stone-950 font-sans antialiased text-stone-900 dark:text-stone-100 selection:bg-amber-500 selection:text-white flex flex-col justify-between relative overflow-x-hidden">
         <!-- Ambient Radial Glow -->
-        <div class="absolute -top-40 left-1/2 -translate-x-1/2 size-[600px] rounded-full bg-amber-500/15 blur-[120px] pointer-events-none"></div>
+        <div class="absolute -top-40 left-1/2 -translate-x-1/2 size-[600px] max-w-full rounded-full bg-amber-500/15 blur-[120px] pointer-events-none"></div>
 
-        <!-- Top Navigation -->
-        <header class="w-full max-w-7xl mx-auto px-6 py-6 flex items-center justify-between relative z-20">
-            <a href="{{ route('home') }}" class="inline-flex items-center gap-3 font-bold text-lg text-stone-900 dark:text-white group">
-                <span class="flex size-10 items-center justify-center rounded-xl bg-gradient-to-br from-amber-400 to-amber-600 shadow-md shadow-amber-500/20 group-hover:scale-105 transition-transform duration-200">
-                    <x-app-logo-icon class="size-6 fill-current text-stone-950" />
-                </span>
-                <span class="text-xl font-extrabold tracking-tight bg-gradient-to-r from-stone-900 to-stone-600 dark:from-white dark:to-stone-300 bg-clip-text text-transparent">
-                    {{ config('app.name', 'Printify') }}
-                </span>
-            </a>
-
-            <nav class="flex items-center gap-3">
-                @auth
-                    <a
-                        href="{{ route('dashboard') }}"
-                        class="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-amber-500 text-stone-950 text-xs font-bold shadow-md shadow-amber-500/20 hover:bg-amber-400 transition-colors"
-                    >
-                        <flux:icon name="squares-2x2" class="size-4" />
-                        Go to Dashboard
-                    </a>
-                @else
-                    <a
-                        href="{{ route('login') }}"
-                        class="inline-flex items-center px-4 py-2 rounded-xl border border-stone-200 dark:border-stone-800 bg-white/80 dark:bg-stone-900/60 text-xs font-semibold text-stone-700 dark:text-stone-300 hover:text-stone-950 dark:hover:text-white hover:border-stone-300 dark:hover:border-stone-700 transition-all shadow-xs"
-                    >
-                        Sign In
-                    </a>
-                    @if (Route::has('register'))
-                        <a
-                            href="{{ route('register') }}"
-                            class="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-amber-500 text-stone-950 text-xs font-bold shadow-md shadow-amber-500/20 hover:bg-amber-400 transition-colors"
-                        >
-                            Create Account
-                            <flux:icon name="arrow-right" class="size-3.5" />
-                        </a>
-                    @endif
-                @endauth
-
-                <x-theme-toggle />
-            </nav>
-        </header>
+        <x-platform-header />
 
         <!-- Main Hero Section -->
         <main class="w-full max-w-5xl mx-auto px-6 py-12 text-center relative z-10 my-auto space-y-8">
@@ -67,18 +27,18 @@
             <!-- CTA Action Buttons -->
             <div class="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4">
                 <a
-                    href="{{ route('login') }}"
+                    href="{{ route('shops.index') }}"
                     class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl bg-amber-500 text-stone-950 text-sm font-bold shadow-xl shadow-amber-500/25 hover:bg-amber-400 transition-all cursor-pointer"
                 >
-                    <flux:icon name="arrow-right-end-on-rectangle" class="size-4" />
-                    Access Auth Portal
+                    <flux:icon name="building-storefront" class="size-4" />
+                    Find a print shop
                 </a>
                 <a
-                    href="{{ route('register') }}"
+                    href="{{ auth()->check() ? route('dashboard') : route('owner.register') }}"
                     class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl border border-stone-200 dark:border-stone-800 bg-white/90 dark:bg-stone-900/80 text-sm font-semibold text-stone-800 dark:text-stone-200 hover:bg-stone-100 dark:hover:bg-stone-800 hover:border-stone-300 dark:hover:border-stone-700 transition-all cursor-pointer shadow-sm"
                 >
                     <flux:icon name="user-plus" class="size-4" />
-                    Register as Customer
+                    {{ auth()->check() ? 'Open my dashboard' : 'Register your print shop' }}
                 </a>
             </div>
 

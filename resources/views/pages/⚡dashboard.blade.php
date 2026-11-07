@@ -16,6 +16,8 @@ new #[Title('Dashboard')] class extends Component {
             return redirect()->route('login');
         }
 
+        if ($user->role === \App\Models\User::ROLE_ADMIN) { return redirect()->route('admin.shops'); }
+
         if ($user->isOwner()) {
             if ($user->printShop && $user->printShop->is_setup_completed) {
                 return redirect()->route('owner.dashboard');

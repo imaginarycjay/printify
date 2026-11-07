@@ -78,6 +78,7 @@ class DashboardTest extends TestCase
 
         /** @var User $staff */
         $staff = User::factory()->create(['role' => User::ROLE_PRODUCTION_STAFF]);
+        $staff->forceFill(['staff_shop_id' => $shop->id])->save();
         $this->actingAs($staff)->get(route('staff.dashboard'))->assertOk();
 
         /** @var User $customer */

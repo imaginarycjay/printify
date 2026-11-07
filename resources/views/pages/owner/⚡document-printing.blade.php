@@ -60,7 +60,7 @@ new #[Title('Document Printing & Finishing Configuration')] class extends Compon
             return;
         }
 
-        $shop = $user->isOwner() && $user->printShop ? $user->printShop : PrintShop::first();
+        $shop = $user?->operationalShop();
         if (! $shop) {
             return;
         }
@@ -150,7 +150,7 @@ new #[Title('Document Printing & Finishing Configuration')] class extends Compon
         ]);
 
         $user = auth()->user();
-        $shop = $user && $user->isOwner() && $user->printShop ? $user->printShop : PrintShop::first();
+        $shop = $user?->operationalShop();
         if (! $shop) {
             return;
         }
@@ -203,12 +203,12 @@ new #[Title('Document Printing & Finishing Configuration')] class extends Compon
 
     @php
         $user = auth()->user();
-        $shop = $user && $user->isOwner() && $user->printShop ? $user->printShop : PrintShop::first();
+        $shop = $user?->operationalShop();
         $inventoryItems = $shop ? $shop->inventoryItems : collect();
     @endphp
 
     <!-- Top Navigation Header -->
-    <header class="w-full bg-stone-900/90 border-b border-stone-800/80 backdrop-blur-md sticky top-0 z-30 px-4 sm:px-8 py-3.5 flex items-center justify-between">
+    <header class="w-full bg-stone-900/90 border-b border-stone-800/80 backdrop-blur-md sticky top-0 z-30 px-4 sm:px-8 py-3.5 flex flex-wrap gap-3 items-center justify-between">
         <div class="flex items-center gap-3.5">
             <span class="flex size-10 items-center justify-center rounded-2xl bg-gradient-to-br from-blue-500 to-indigo-700 text-white font-black shadow-lg shadow-blue-500/20">
                 <flux:icon name="document-text" class="size-5 text-white" />
@@ -226,7 +226,10 @@ new #[Title('Document Printing & Finishing Configuration')] class extends Compon
             </div>
         </div>
 
-        <div class="flex items-center gap-2.5 sm:gap-3">
+        <div class="flex flex-wrap items-center gap-2.5 sm:gap-3">
+            <a href="{{ route('owner.platform') }}#availability" wire:navigate class="inline-flex min-h-11 items-center gap-2 rounded-xl border border-stone-800 px-3 text-xs font-bold text-stone-300 hover:border-blue-500/50 hover:text-blue-400">
+                <flux:icon name="signal" class="size-4" /> Availability
+            </a>
             <x-theme-toggle />
 
             <button 

@@ -52,7 +52,7 @@ new #[Title('Production Operations Hub')] class extends Component {
         }
 
         // Default or first active shop for staff
-        return PrintShop::first();
+        return $user->operationalShop();
     }
 
     public function getOrdersProperty()
@@ -120,7 +120,7 @@ new #[Title('Production Operations Hub')] class extends Component {
             return null;
         }
 
-        return Order::with(['customer', 'items', 'assignedStaff'])->find($this->selectedOrderId);
+        return Order::where('print_shop_id', auth()->user()?->operationalShop()?->id ?? 0)->with(['customer', 'items', 'assignedStaff'])->find($this->selectedOrderId);
     }
 
     /**
@@ -128,7 +128,7 @@ new #[Title('Production Operations Hub')] class extends Component {
      */
     public function markPaperReceived(int $orderId): void
     {
-        $order = Order::with('items')->find($orderId);
+        $order = Order::where('print_shop_id', auth()->user()?->operationalShop()?->id ?? 0)->with('items')->find($orderId);
         if (! $order) {
             return;
         }
@@ -151,7 +151,7 @@ new #[Title('Production Operations Hub')] class extends Component {
      */
     public function advanceOrder(int $orderId, InventoryDeductionService $deductionService): void
     {
-        $order = Order::with(['items', 'printShop'])->find($orderId);
+        $order = Order::where('print_shop_id', auth()->user()?->operationalShop()?->id ?? 0)->with(['items', 'printShop'])->find($orderId);
         if (! $order) {
             return;
         }
@@ -190,7 +190,7 @@ new #[Title('Production Operations Hub')] class extends Component {
      */
     public function viewJobTicket(int $orderId): void
     {
-        $order = Order::with(['customer', 'items', 'assignedStaff'])->find($orderId);
+        $order = Order::where('print_shop_id', auth()->user()?->operationalShop()?->id ?? 0)->with(['customer', 'items', 'assignedStaff'])->find($orderId);
         if (! $order) {
             return;
         }
@@ -210,7 +210,7 @@ new #[Title('Production Operations Hub')] class extends Component {
             return;
         }
 
-        $order = Order::find($this->selectedOrderId);
+        $order = Order::where('print_shop_id', auth()->user()?->operationalShop()?->id ?? 0)->find($this->selectedOrderId);
         if ($order) {
             $order->update([
                 'assigned_machine' => $this->assignedMachine,
@@ -233,7 +233,7 @@ new #[Title('Production Operations Hub')] class extends Component {
      */
     public function verifyPayment(int $orderId): void
     {
-        $order = Order::find($orderId);
+        $order = Order::where('print_shop_id', auth()->user()?->operationalShop()?->id ?? 0)->find($orderId);
         if ($order) {
             $order->update([
                 'payment_status' => Order::PAYMENT_VERIFIED_PAID,
@@ -268,7 +268,7 @@ new #[Title('Production Operations Hub')] class extends Component {
             return;
         }
 
-        $order = Order::find($this->rejectOrderId);
+        $order = Order::where('print_shop_id', auth()->user()?->operationalShop()?->id ?? 0)->find($this->rejectOrderId);
         if ($order) {
             $order->stepBackStage($this->rejectReason ?: 'Quality check issue detected.');
 
@@ -306,7 +306,7 @@ new #[Title('Production Operations Hub')] class extends Component {
             'spoilageReason' => 'required|string|min:3',
         ]);
 
-        $item = InventoryItem::find($this->spoilageItemId);
+        $item = InventoryItem::where('print_shop_id', auth()->user()?->operationalShop()?->id ?? 0)->find($this->spoilageItemId);
         if ($item) {
             $deductionService->recordSpoilage($item, (float) $this->spoilageQty, $this->spoilageReason, auth()->user());
 
@@ -652,7 +652,7 @@ new #[Title('Production Operations Hub')] class extends Component {
                                             </span>
                                             @if ($item?->document_file_path)
                                                 <a 
-                                                    href="{{ Storage::url($item->document_file_path) }}" 
+                                                    href="{{ route('orders.file', ['order' => $item->order_id, 'kind' => 'document', 'item' => $item->id]) }}"
                                                     target="_blank"
                                                     class="px-1.5 py-0.5 rounded text-[9px] font-bold bg-blue-500/20 text-blue-300 hover:bg-blue-500/30 border border-blue-500/30 flex items-center gap-1 transition-colors"
                                                     title="View Document File: {{ $item->document_original_name }}"
@@ -1149,7 +1149,7 @@ new #[Title('Production Operations Hub')] class extends Component {
                             </div>
                             <div class="flex items-center gap-2 w-full sm:w-auto shrink-0">
                                 <a 
-                                    href="{{ Storage::url($ticketItem->document_file_path) }}" 
+                                    href="{{ route('orders.file', ['order' => $ticketItem->order_id, 'kind' => 'document', 'item' => $ticketItem->id]) }}"
                                     target="_blank" 
                                     download="{{ $ticketItem->document_original_name ?? 'Document.pdf' }}"
                                     class="flex-1 sm:flex-initial px-4 py-2 rounded-xl text-xs font-black bg-blue-500 hover:bg-blue-400 text-stone-950 transition-colors flex items-center justify-center gap-1.5 shadow-md shadow-blue-500/20 cursor-pointer"
@@ -1158,7 +1158,7 @@ new #[Title('Production Operations Hub')] class extends Component {
                                     <span>Download File</span>
                                 </a>
                                 <a 
-                                    href="{{ Storage::url($ticketItem->document_file_path) }}" 
+                                    href="{{ route('orders.file', ['order' => $ticketItem->order_id, 'kind' => 'document', 'item' => $ticketItem->id]) }}"
                                     target="_blank" 
                                     class="px-3 py-2 rounded-xl text-xs font-bold bg-stone-800 hover:bg-stone-700 text-stone-200 border border-stone-700 transition-colors flex items-center justify-center gap-1 cursor-pointer"
                                     title="Preview in new tab"

@@ -40,6 +40,8 @@ class User extends Authenticatable implements PasskeyUser
     /** @use HasFactory<UserFactory> */
     use HasFactory, Notifiable, PasskeyAuthenticatable, TwoFactorAuthenticatable;
 
+    public const ROLE_ADMIN = 'platform_admin';
+
     public const ROLE_BUSINESS_OWNER = 'business_owner';
 
     public const ROLE_PRODUCTION_STAFF = 'production_staff';
@@ -99,6 +101,18 @@ class User extends Authenticatable implements PasskeyUser
     public function printShop(): HasOne
     {
         return $this->hasOne(PrintShop::class);
+    }
+
+    public function operationalShop(): ?PrintShop
+    {
+        if ($this->isOwner()) {
+            return $this->printShop;
+        }
+        if ($this->isStaff()) {
+            return PrintShop::whereKey((int) $this->getAttribute('staff_shop_id'))->first();
+        }
+
+        return null;
     }
 
     /**

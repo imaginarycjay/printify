@@ -48,6 +48,8 @@ class ProductionStaffQueueTest extends TestCase
             'is_setup_completed' => true,
         ]);
 
+        $this->staff->forceFill(['staff_shop_id' => $this->shop->id])->save();
+
         $this->config = ThesisBindingConfig::create([
             'print_shop_id' => $this->shop->id,
             'is_active' => true,

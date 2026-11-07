@@ -29,7 +29,7 @@ new class extends Component {
 
     public function saveChanges(): void
     {
-        $this->dispatch('toast', message: 'Web Builder: Storefront design and layout settings saved successfully!');
+        $this->dispatch('toast', message: 'Preview updated. Storefront branding is not published yet. Manage public shop details in Shop Settings.');
     }
 }; ?>
 
@@ -44,7 +44,7 @@ new class extends Component {
     @endphp
 
     <!-- Web Builder Header -->
-    <header class="w-full max-w-7xl mx-auto flex items-center justify-between py-4 border-b border-stone-800/80 relative z-20">
+    <header class="w-full max-w-7xl mx-auto flex flex-wrap gap-4 items-center justify-between py-4 border-b border-stone-800/80 relative z-20">
         <div class="flex items-center gap-3">
             <a href="{{ route('dashboard') }}" wire:navigate class="size-10 rounded-xl bg-stone-900 hover:bg-stone-800 border border-stone-800 text-stone-300 hover:text-white flex items-center justify-center transition-colors">
                 <flux:icon name="arrow-left" class="size-5" />
@@ -61,20 +61,27 @@ new class extends Component {
             </div>
         </div>
 
-        <div class="flex items-center gap-3">
+        <div class="flex flex-wrap items-center gap-3">
             <x-theme-toggle />
+            @if ($shop && $shop->getAttribute('approval_status') === 'approved' && $shop->is_setup_completed)
+                <a href="{{ route('shops.show', $shop->id) }}" wire:navigate class="inline-flex min-h-11 items-center gap-2 rounded-xl border border-stone-800 px-3 text-xs font-semibold text-stone-300 hover:border-violet-500/50 hover:text-violet-400"><flux:icon name="globe-alt" class="size-4" /> View storefront</a>
+            @endif
             <a href="{{ route('dashboard') }}" wire:navigate class="px-3.5 py-2 rounded-xl border border-stone-800 bg-stone-900/60 text-xs font-semibold text-stone-300 hover:text-white transition-all">
                 Exit to Launcher
             </a>
             <flux:button wire:click="saveChanges" variant="primary" class="bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 text-white font-bold px-5 py-2 rounded-xl shadow-lg shadow-purple-500/20">
                 <flux:icon name="check" class="size-4 me-1.5" />
-                Publish Changes
+                Preview Changes
             </flux:button>
         </div>
     </header>
 
     <!-- Main Builder Workspace -->
     <main class="w-full max-w-7xl mx-auto my-6 relative z-20 grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+        <div class="lg:col-span-12 rounded-2xl border border-violet-500/20 bg-violet-500/10 p-4 text-sm text-stone-300">
+            This editor is a visual preview. Manage your published contact details, description and service availability in
+            <a href="{{ route('owner.platform') }}" wire:navigate class="font-bold text-violet-700 underline dark:text-violet-300">Shop Settings</a>.
+        </div>
         <!-- Left Control Panel -->
         <div class="lg:col-span-4 space-y-6">
             <div class="rounded-3xl border border-stone-800 bg-stone-900/90 p-6 shadow-xl space-y-5 backdrop-blur-xl">

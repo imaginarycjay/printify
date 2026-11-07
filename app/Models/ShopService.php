@@ -18,7 +18,7 @@ use Illuminate\Support\Carbon;
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
  */
-#[Fillable(['print_shop_id', 'service_key', 'is_active', 'display_order', 'settings'])]
+#[Fillable(['print_shop_id', 'service_key', 'is_active', 'display_order', 'settings', 'capacity', 'pause_reason', 'paused_until'])]
 class ShopService extends Model
 {
     /**
@@ -32,7 +32,30 @@ class ShopService extends Model
             'is_active' => 'boolean',
             'display_order' => 'integer',
             'settings' => 'array',
+            'paused_until' => 'datetime',
+            'capacity' => 'integer',
         ];
+    }
+
+    public function isPaused(): bool
+    {
+        return $this->getAttribute('paused_until')?->isFuture() ?? false;
+    }
+
+    public function workload(): string
+    {
+        $count = Order::where('print_shop_id', $this->print_shop_id)->where('service_key', $this->service_key)
+            ->whereIn('order_status', [Order::STATUS_IN_QUEUE, Order::STATUS_IN_PRODUCTION, Order::STATUS_QUALITY_CHECK])
+            ->where('payment_status', '!=', Order::PAYMENT_REJECTED)->count();
+        $capacity = max(1, (int) $this->getAttribute('capacity'));
+
+        return $count >= $capacity ? 'At capacity' : ($count >= $capacity / 2 ? 'Busy' : 'Normal');
+    }
+
+    public function acceptsOrders(): bool
+    {
+        return $this->is_active && ! $this->isPaused() && $this->printShop?->getAttribute('approval_status') === 'approved'
+            && $this->printShop->is_setup_completed;
     }
 
     /**

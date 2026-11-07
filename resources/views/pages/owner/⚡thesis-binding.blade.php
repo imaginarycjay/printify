@@ -159,7 +159,7 @@ new class extends Component {
     public function updatedSelectedInventoryItemId(mixed $val): void
     {
         if ($val) {
-            $item = InventoryItem::find($val);
+            $item = InventoryItem::where('print_shop_id', auth()->user()?->operationalShop()?->id ?? 0)->find($val);
             if ($item) {
                 $this->bom_unit = $item->unit;
             }
@@ -284,7 +284,7 @@ new class extends Component {
             return;
         }
 
-        $invItem = InventoryItem::find($this->selected_inventory_item_id);
+        $invItem = InventoryItem::where('print_shop_id', auth()->user()?->operationalShop()?->id ?? 0)->find($this->selected_inventory_item_id);
         if (! $invItem) {
             return;
         }
@@ -302,7 +302,7 @@ new class extends Component {
 
     public function deleteBomItem(int $id): void
     {
-        $bomItem = ThesisBindingBomItem::find($id);
+        $bomItem = ThesisBindingBomItem::where('thesis_binding_config_id', $this->getConfig()?->id ?? 0)->find($id);
         if ($bomItem) {
             $bomItem->delete();
             $this->statusMessage = 'BOM material rule deleted successfully.';
@@ -654,7 +654,10 @@ new class extends Component {
                 <p class="text-xs text-stone-400">Hardbound & Softbound Thesis Binding Service Workspace</p>
             </div>
 
-            <div class="flex items-center gap-2">
+            <div class="flex flex-wrap items-center gap-2">
+                <a href="{{ route('owner.platform') }}#availability" wire:navigate class="inline-flex min-h-11 items-center gap-2 rounded-xl border border-stone-800 px-3 text-xs font-bold text-stone-300 hover:border-amber-500/50 hover:text-amber-400">
+                    <flux:icon name="signal" class="size-4" /> Availability
+                </a>
                 <x-theme-toggle />
                 <span class="px-3 py-1 rounded-full text-xs font-bold {{ $is_active ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/30' : 'bg-red-500/10 text-red-400 border border-red-500/30' }}">
                     Status: {{ $is_active ? 'ONLINE' : 'OFFLINE' }}

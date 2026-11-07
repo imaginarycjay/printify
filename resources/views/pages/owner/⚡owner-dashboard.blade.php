@@ -83,7 +83,7 @@ new class extends Component {
     @endphp
 
     <!-- App Launcher Top Navigation Bar -->
-    <header class="w-full max-w-6xl mx-auto flex items-center justify-between py-2 sm:py-3 border-b border-stone-800/80 relative z-20">
+    <header class="w-full max-w-6xl mx-auto flex flex-wrap gap-4 items-center justify-between py-2 sm:py-3 border-b border-stone-800/80 relative z-20">
         <div class="flex items-center gap-3">
             <span class="flex size-10 items-center justify-center rounded-xl bg-gradient-to-br from-amber-400 to-amber-600 text-stone-950 font-bold shadow-md shadow-amber-500/20">
                 <x-app-logo-icon class="size-6 fill-current" />
@@ -98,6 +98,12 @@ new class extends Component {
         </div>
 
         <div class="flex items-center gap-3">
+            @if ($shop)
+                <a href="{{ route('owner.platform') }}" wire:navigate class="inline-flex min-h-11 items-center gap-2 rounded-xl border border-stone-800 bg-stone-900 px-3 text-xs font-bold text-stone-300 hover:border-amber-500/50 hover:text-amber-400 transition-colors">
+                    <flux:icon name="cog-6-tooth" class="size-4" />
+                    Shop Settings
+                </a>
+            @endif
             <x-theme-toggle />
 
             <a href="{{ route('owner.wizard') }}" wire:navigate class="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-stone-800 bg-stone-900/60 text-xs font-semibold text-stone-300 hover:text-white hover:border-stone-700 transition-all">
@@ -136,6 +142,13 @@ new class extends Component {
             </form>
         </div>
     </header>
+
+    @if ($shop && $shop->getAttribute('approval_status') !== 'approved')
+        <aside class="relative z-20 mx-auto mt-4 flex w-full max-w-6xl flex-wrap items-center justify-between gap-3 rounded-2xl border border-amber-500/30 bg-amber-500/10 p-4 text-sm">
+            <p class="text-amber-700 dark:text-amber-300"><strong>{{ $shop->getAttribute('approval_status') === 'rejected' ? 'Application needs changes.' : 'Shop approval pending.' }}</strong> Your shop is hidden from customers until approved.</p>
+            <a href="{{ route('owner.platform') }}" wire:navigate class="inline-flex min-h-11 items-center gap-2 font-bold text-amber-700 dark:text-amber-400">Review shop profile <flux:icon name="arrow-right" class="size-4" /></a>
+        </aside>
+    @endif
 
     <!-- Main App Launcher Body -->
     <main class="w-full max-w-5xl mx-auto my-auto py-10 relative z-20 space-y-8">

@@ -47,6 +47,8 @@ class DocumentPrintingServiceTest extends TestCase
         ]);
 
         $this->shop = PrintShop::create([
+            'approval_status' => 'approved',
+            'is_setup_completed' => true,
             'user_id' => $this->owner->id,
             'name' => 'Speedy Prints Inc',
             'slug' => 'speedy-prints',
@@ -54,6 +56,10 @@ class DocumentPrintingServiceTest extends TestCase
             'phone' => '+63 917 123 4567',
             'is_onboarding_completed' => true,
         ]);
+        $this->shop->services()->create(['service_key' => 'thesis_binding', 'is_active' => true]);
+        $this->shop->services()->create(['service_key' => 'document_printing', 'is_active' => true]);
+        $this->staff->forceFill(['staff_shop_id' => $this->shop->id])->save();
+
     }
 
     public function test_owner_can_access_document_printing_config_and_save_rates(): void
@@ -91,13 +97,13 @@ class DocumentPrintingServiceTest extends TestCase
             'rush_fee_amount' => 50.00,
         ]);
 
-        $response = $this->actingAs($this->customer)->get(route('customer.order-document'));
+        $response = $this->actingAs($this->customer)->get(route('customer.shop.order-document', $this->shop->id));
         $response->assertOk();
         $response->assertSee('Order Document Printing');
 
         // Total 20 pages: 15 B&W, 5 Color, A4 80gsm, Duplex (10 physical sheets), Ring Binding (Blue)
         Livewire::actingAs($this->customer)
-            ->test('pages::customer.⚡document-order-wizard')
+            ->test('pages::customer.⚡document-order-wizard', ['shop' => $this->shop->id])
             ->set('total_pages', 20)
             ->set('color_mode', 'mixed')
             ->set('custom_color_pages', '1, 5, 10, 15, 20')

@@ -210,3 +210,12 @@ This project has domain-specific skills available in `**/skills/**`. You MUST ac
 - Do NOT delete tests without approval.
 
 </laravel-boost-guidelines>
+
+## Codex integration (additive; Antigravity remains supported)
+
+- Shared skills live in `.agents/skills/`; Codex discovers these directly, including symlinked skills in `.ai/skills/`. Keep one shared source rather than copying skills into `.codex`.
+- In Codex, explicitly invoke skills with `$ponytail`, `$ponytail-review`, `$ponytail-audit`, `$ponytail-debt`, `$ponytail-gain`, or `$ponytail-help` (and `$<name>` for the other installed skills). Use the skills picker when available. Native slash-menu availability depends on the Codex client; if `/ponytail` is rejected by the client, use `$ponytail`.
+- When a user message contains `/ponytail` or another installed skill name as a slash command, treat it as an invocation of the matching shared SKILL.md, preserving its arguments. Keep Ponytail's selected level in the conversation until changed or disabled; `off` or `normal mode` disables it. Do not execute Antigravity's lifecycle adapter in Codex: its `injectSteps` output is specific to Antigravity.
+- Codex tools equivalent to `view_file`/`list_dir` are shell file reads and directory listings. Use the available tools rather than requiring Antigravity tool names.
+- Preserve `.agents/hooks.json`, `.agents/hooks/`, `.agents/rules/`, and `opencode.json` for their existing clients. Codex MCP configuration belongs in `.codex/config.toml` and requires a trusted project and a new session to load. Check `/mcp` after restarting; never claim a configured integration is connected until verified.
+- Current application context supersedes the introductory starter-kit description: routes include business-owner setup, analytics, web builder, inventory and printing/binding management, production-staff workflows, and customer ordering. Inspect the relevant implementation before making domain changes. Academic sources and diagrams are in `capstone_paper/`.

@@ -29,7 +29,7 @@ new #[Title('Sales & Financial Analytics Hub')] class extends Component {
             return $user->printShop;
         }
 
-        return PrintShop::first();
+        return $user->operationalShop();
     }
 
     /**
@@ -58,7 +58,7 @@ new #[Title('Sales & Financial Analytics Hub')] class extends Component {
      */
     public function verifyPayment(int $orderId): void
     {
-        $order = Order::find($orderId);
+        $order = Order::where('print_shop_id', auth()->user()?->operationalShop()?->id ?? 0)->find($orderId);
         if ($order) {
             $order->update([
                 'payment_status' => Order::PAYMENT_VERIFIED_PAID,

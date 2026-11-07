@@ -1,6 +1,7 @@
 {
     "agents": [
         "antigravity",
+        "codex",
         "opencode"
     ],
     "cloud": false,
