@@ -18,7 +18,7 @@
 
                 <!-- Brand Header -->
                 <div class="relative z-10">
-                    <a href="{{ route('home') }}" class="inline-flex items-center gap-3 text-lg font-bold tracking-tight text-white group" wire:navigate>
+                    <a href="{{ route('home') }}" class="inline-flex items-center gap-3 text-lg font-bold tracking-tight text-white group">
                         <span class="flex size-11 items-center justify-center rounded-xl bg-gradient-to-br from-amber-400 to-amber-600 shadow-lg shadow-amber-500/25 group-hover:scale-105 transition-transform duration-200">
                             <x-app-logo-icon class="size-7 fill-current text-stone-950" />
                         </span>
@@ -112,7 +112,7 @@
             <div class="flex flex-col justify-center items-center p-6 sm:p-12 lg:col-span-6 xl:col-span-5 min-h-svh bg-stone-50 dark:bg-stone-950">
                 <!-- Mobile Top Brand Header -->
                 <div class="w-full max-w-md mb-6 lg:hidden text-center">
-                    <a href="{{ route('home') }}" class="inline-flex items-center gap-2 font-bold text-stone-900 dark:text-white" wire:navigate>
+                    <a href="{{ route('home') }}" class="inline-flex items-center gap-2 font-bold text-stone-900 dark:text-white">
                         <span class="flex size-9 items-center justify-center rounded-lg bg-amber-500 text-stone-950">
                             <x-app-logo-icon class="size-5 fill-current" />
                         </span>

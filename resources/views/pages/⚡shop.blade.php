@@ -27,7 +27,7 @@ new class extends Component {
                 ->with(['services', 'thesisBindingConfig'])->findOrFail($this->shopId);
             $documentConfig = App\Models\DocumentPrintingConfig::where('print_shop_id', $shop->id)->first();
         @endphp
-        <a href="{{ route('shops.index') }}" wire:navigate class="inline-flex min-h-11 items-center gap-2 text-sm font-semibold text-stone-500 hover:text-amber-700 dark:text-stone-400 dark:hover:text-amber-400"><flux:icon name="arrow-left" class="size-4" /> Back to shops</a>
+        <a href="{{ route('shops.index') }}" class="inline-flex min-h-11 items-center gap-2 text-sm font-semibold text-stone-500 hover:text-amber-700 dark:text-stone-400 dark:hover:text-amber-400"><flux:icon name="arrow-left" class="size-4" /> Back to shops</a>
         <section class="space-y-4 rounded-3xl border border-stone-200 bg-white p-6 sm:p-8 dark:border-stone-800 dark:bg-stone-900/80">
             <span class="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-amber-700 dark:text-amber-400"><flux:icon name="building-storefront" class="size-4" /> Print shop</span>
             <h1 class="break-words text-3xl font-extrabold tracking-tight sm:text-4xl">{{ $shop->name }}</h1>
@@ -66,7 +66,7 @@ new class extends Component {
                                 <p class="mt-2 text-xs text-stone-500 dark:text-stone-400">Scheduled to resume {{ $offering->getAttribute('paused_until')->format('M j, Y · g:i A') }} ({{ config('app.timezone') }}).</p>
                             </div>
                         @elseif (! auth()->check() || auth()->user()->isCustomer())
-                            <a href="{{ route($isThesis ? 'customer.shop.order-thesis' : 'customer.shop.order-document', $shop->id) }}" wire:navigate data-theme-keep class="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl px-4 text-sm font-bold transition-colors {{ $isThesis ? 'bg-amber-500 text-stone-950 hover:bg-amber-400' : 'bg-blue-600 text-white hover:bg-blue-500' }}">Configure order <flux:icon name="arrow-right" class="size-4" /></a>
+                            <a href="{{ route($isThesis ? 'customer.shop.order-thesis' : 'customer.shop.order-document', $shop->id) }}" data-theme-keep class="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl px-4 text-sm font-bold transition-colors {{ $isThesis ? 'bg-amber-500 text-stone-950 hover:bg-amber-400' : 'bg-blue-600 text-white hover:bg-blue-500' }}">Configure order <flux:icon name="arrow-right" class="size-4" /></a>
                         @else
                             <p class="text-sm text-stone-500 dark:text-stone-400">Orders are placed using a customer account.</p>
                         @endif

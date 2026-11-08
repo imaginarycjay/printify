@@ -3,3 +3,6 @@
 command = "docker"
 args = ["run", "--rm", "-i", "--user", "1000:1000", "--entrypoint", "php", "-v", "/home/imaginarycjay/printify:/var/www/html", "-w", "/var/www/html", "sail-8.5/app", "artisan", "boost:mcp"]
 startup_timeout_sec = 30
+
+[mcp_servers.laravel-boost.tools.search-docs]
+approval_mode = "approve"

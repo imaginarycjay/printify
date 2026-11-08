@@ -113,6 +113,69 @@ test('owner and invitation forms retain their submission destinations in the aut
         ->assertSee('data-test="theme-toggle"', false);
 });
 
+test('landing page describes available services with a navigable heading structure', function () {
+    $response = $this->get(route('home'))
+        ->assertOk()
+        ->assertSee(route('shops.index'), false)
+        ->assertSee(route('owner.register'), false)
+        ->assertSee('Your printing projects,')
+        ->assertSee('Example order')
+        ->assertSee('Complete setup and submit your shop for approval')
+        ->assertSee(route('shops.index', ['service' => 'document_printing']), false)
+        ->assertSee(route('shops.index', ['service' => 'thesis_binding']), false)
+        ->assertDontSee('ID services')
+        ->assertDontSee('dispatch customer notifications automatically');
+
+    $document = new DOMDocument;
+    @$document->loadHTML($response->getContent());
+    $xpath = new DOMXPath($document);
+
+    expect($xpath->evaluate('count(//main//h1)'))->toBe(1.0)
+        ->and($xpath->evaluate('count(//main//h2)'))->toBe(6.0)
+        ->and($xpath->evaluate('count(//main/section[@aria-labelledby])'))->toBe(6.0)
+        ->and($xpath->evaluate('count(//section[@id="services"] | //section[@id="how-it-works"] | //section[@id="for-shop-owners"] | //section[@id="reviews"] | //section[@id="pricing"])'))->toBe(5.0)
+        ->and($xpath->evaluate('count(//main//ol[@aria-label="Ordering steps"]/li)'))->toBe(3.0);
+});
+
+test('landing page labels sample orders ratings and free capstone pricing honestly', function () {
+    $response = $this->get(route('home'))
+        ->assertOk()
+        ->assertSee('ORD-2026-0148')
+        ->assertSee('₱860.00')
+        ->assertSee('Payment verified')
+        ->assertSee('In production')
+        ->assertDontSee('Demo data')
+        ->assertSee('Hardbound manuscript')
+        ->assertSee('Royal blue · Gold foil')
+        ->assertSee('₱360.00')
+        ->assertSee('₱500.00')
+        ->assertSee('Tarpaulin, PVC IDs, T-shirts, and more.')
+        ->assertSee('<s>₱3,999</s>', false)
+        ->assertSee('not collected testimonials')
+        ->assertSee('₱0')
+        ->assertSee('<s>₱499</s>', false)
+        ->assertSee('<s>₱4,999</s>', false)
+        ->assertSee('No payment collected during the preview.')
+        ->assertSee('Printing and binding orders are charged separately');
+
+    $document = new DOMDocument;
+    @$document->loadHTML($response->getContent());
+    $xpath = new DOMXPath($document);
+
+    expect($xpath->evaluate('count(//section[@id="reviews"]//figure)'))->toBe(3.0)
+        ->and($xpath->evaluate('count(//section[@id="pricing"]//article)'))->toBe(3.0)
+        ->and($xpath->evaluate('count(//section[@id="pricing"]//a[@href="'.route('owner.register').'"])'))->toBe(3.0);
+});
+
+test('signed in visitors can return to their dashboard from the landing page', function () {
+    $this->actingAs(User::factory()->create(['role' => User::ROLE_CUSTOMER]))
+        ->get(route('home'))
+        ->assertOk()
+        ->assertSee('Open my dashboard')
+        ->assertSee(route('dashboard'), false)
+        ->assertDontSee('Register your print shop');
+});
+
 test('service configuration and the builder lead back to shop management', function () {
     $this->actingAs($this->owner)->get(route('owner.document-printing'))
         ->assertOk()->assertSee(route('owner.platform').'#availability', false);
@@ -140,4 +203,16 @@ test('invalid availability changes preserve input only for the submitted service
     @$document->loadHTML($response->getContent());
     $xpath = new DOMXPath($document);
     expect($xpath->evaluate('count(//form[@action="'.route('owner.availability', $service).'"]//details[@open])'))->toBe(1.0);
+});
+test('public navigation uses direct links between the landing page and shop directory', function () {
+    foreach (['home', 'shops.index'] as $routeName) {
+        $response = $this->get(route($routeName))->assertOk();
+        $document = new DOMDocument;
+        @$document->loadHTML($response->getContent());
+        $xpath = new DOMXPath($document);
+
+        expect($xpath->evaluate('count(//header//a[@*[name()="wire:navigate"]])'))->toBe(0.0)
+            ->and($xpath->evaluate('count(//header//a[@href="'.route('home').'"])'))->toBe(1.0)
+            ->and($xpath->evaluate('count(//header//a[@href="'.route('shops.index').'"])'))->toBe(1.0);
+    }
 });
