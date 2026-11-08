@@ -30,7 +30,7 @@ new class extends Component {
         </div>
         <nav aria-label="Filter shops by service" class="flex flex-wrap gap-2">
             @foreach (['' => 'All services', 'thesis_binding' => 'Thesis binding', 'document_printing' => 'Document printing'] as $key => $label)
-                <a href="{{ route('shops.index', $key === '' ? [] : ['service' => $key]) }}" wire:navigate @if($this->service === $key) aria-current="page" @endif class="inline-flex min-h-11 items-center rounded-xl border px-4 text-sm font-bold transition-colors {{ $this->service === $key ? 'border-amber-500 bg-amber-500 text-stone-950' : 'border-stone-200 bg-white text-stone-600 hover:border-amber-500 dark:border-stone-800 dark:bg-stone-900 dark:text-stone-300' }}">{{ $label }}</a>
+                <a href="{{ route('shops.index', $key === '' ? [] : ['service' => $key]) }}" @if($this->service === $key) aria-current="page" @endif class="inline-flex min-h-11 items-center rounded-xl border px-4 text-sm font-bold transition-colors {{ $this->service === $key ? 'border-amber-500 bg-amber-500 text-stone-950' : 'border-stone-200 bg-white text-stone-600 hover:border-amber-500 dark:border-stone-800 dark:bg-stone-900 dark:text-stone-300' }}">{{ $label }}</a>
             @endforeach
         </nav>
         <div wire:poll.30s.visible class="space-y-4">
@@ -60,14 +60,14 @@ new class extends Component {
                                 <p class="text-sm text-stone-500">Online services are being configured.</p>
                             @endforelse
                         </div>
-                        <a href="{{ route('shops.show', $shop->id) }}" wire:navigate class="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl bg-amber-500 px-4 text-sm font-bold text-stone-950 transition-colors hover:bg-amber-400">View shop & services <flux:icon name="arrow-right" class="size-4" /></a>
+                        <a href="{{ route('shops.show', $shop->id) }}" class="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl bg-amber-500 px-4 text-sm font-bold text-stone-950 transition-colors hover:bg-amber-400">View shop & services <flux:icon name="arrow-right" class="size-4" /></a>
                     </article>
                 @empty
                     <div class="rounded-3xl border border-dashed border-stone-300 p-10 text-center md:col-span-2 lg:col-span-3 dark:border-stone-700">
                         <flux:icon name="building-storefront" class="mx-auto mb-3 size-10 text-stone-400" />
                         <h2 class="font-bold">No shops match this service yet</h2>
                         <p class="mt-2 text-sm text-stone-500 dark:text-stone-400">Try another service or check back when more shops join Printify.</p>
-                        <a href="{{ route('shops.index') }}" wire:navigate class="mt-4 inline-flex min-h-11 items-center font-bold text-amber-700 dark:text-amber-400">Browse all shops &rarr;</a>
+                        <a href="{{ route('shops.index') }}" class="mt-4 inline-flex min-h-11 items-center font-bold text-amber-700 dark:text-amber-400">Browse all shops &rarr;</a>
                     </div>
                 @endforelse
             </div>
