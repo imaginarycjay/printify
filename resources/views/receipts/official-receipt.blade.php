@@ -205,9 +205,13 @@
 </head>
 <body>
     @if (! ($isPdf ?? false))
+        @php
+            $receiptBack = \App\Support\Navigation::backTarget(auth()->user(), 'orders.receipt')
+                ?? \App\Support\Navigation::workspaceHome(auth()->user());
+        @endphp
         <div class="toolbar no-print">
             <div>
-                <a href="{{ url()->previous() }}" class="btn">&larr; Back</a>
+                <a href="{{ $receiptBack['url'] }}" class="btn">&larr; {{ $receiptBack['label'] }}</a>
             </div>
             <div style="display: flex; gap: 8px;">
                 <button type="button" onclick="window.print()" class="btn">Print Receipt</button>

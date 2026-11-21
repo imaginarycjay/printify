@@ -14,7 +14,7 @@ new class extends Component {
 }; ?>
 
 <div class="min-h-screen bg-stone-100 text-stone-900 dark:bg-stone-950 dark:text-stone-100">
-    <x-platform-header />
+    <x-platform-header :auto-back="auth()->check()" />
     <main class="mx-auto w-full max-w-6xl space-y-8 px-4 py-8 sm:px-6 sm:py-12">
         <x-platform-feedback />
         @php

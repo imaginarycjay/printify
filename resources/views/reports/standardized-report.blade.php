@@ -142,8 +142,12 @@
 </head>
 <body>
     @if (! ($isPdf ?? false))
+        @php
+            $reportBack = \App\Support\Navigation::backTarget(auth()->user(), 'owner.reports.show')
+                ?? ['url' => route('owner.analytics-hub', ['tab' => 'reports']), 'label' => 'Standardized Reports'];
+        @endphp
         <div class="toolbar no-print">
-            <a href="{{ route('owner.analytics-hub') }}" class="btn">&larr; Analytics &amp; Reports Hub</a>
+            <a href="{{ $reportBack['url'] }}" class="btn">&larr; {{ $reportBack['label'] }}</a>
             <div style="display: flex; gap: 8px;">
                 <button type="button" onclick="window.print()" class="btn">Print Report</button>
                 <a href="{{ route('owner.reports.show', ['type' => $report['report_type'], 'period' => $report['period'], 'format' => 'pdf']) }}" class="btn btn-primary">Download PDF</a>

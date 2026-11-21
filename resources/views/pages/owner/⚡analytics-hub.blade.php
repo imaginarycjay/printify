@@ -9,6 +9,7 @@ use App\Services\SalesAnalyticsService;
 use App\Services\SpecRevisionService;
 use Livewire\Attributes\Locked;
 use Livewire\Attributes\Title;
+use Livewire\Attributes\Url;
 use Livewire\Component;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
@@ -18,7 +19,15 @@ new #[Title('Sales & Financial Analytics Hub')] class extends Component {
         $view->layout('layouts.blank');
     }
 
+    #[Url(as: 'tab', except: 'overview')]
     public string $active_tab = 'overview'; // overview, payments, reports
+
+    public function mount(): void
+    {
+        if (! in_array($this->active_tab, ['overview', 'payments', 'reports'], true)) {
+            $this->active_tab = 'overview';
+        }
+    }
     public string $report_type = 'sales'; // inventory, sales, schedule
     public string $selected_period = 'this_month'; // today, 7d, this_month, ytd, all_time
     public string $selected_service = 'all'; // all, thesis_binding

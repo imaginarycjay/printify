@@ -72,9 +72,79 @@ select:focus[data-flux-control] {
 }
 
 /* ==========================================================================
-   Global Light Mode Theme System
-   Retains PressQueue's brand design, warm stone palette, and amber hierarchy
-   while delivering a clean, accessible, high-contrast light mode.
+   PressQueue Semantic Design Tokens (CR-1 Light-Mode First + Dark Mode)
+   ========================================================================== */
+
+:root {
+    --pq-canvas: #f5f5f4;
+    --pq-surface: #ffffff;
+    --pq-well: #fafaf9;
+    --pq-border: #e7e5e4;
+    --pq-border-strong: #d6d3d1;
+    --pq-ink: #1c1917;
+    --pq-muted: #57534e;
+    --pq-accent: #f59e0b;
+    --pq-accent-strong: #b45309;
+}
+
+html.dark {
+    --pq-canvas: #0c0a09;
+    --pq-surface: #1c1917;
+    --pq-well: #292524;
+    --pq-border: #292524;
+    --pq-border-strong: #44403c;
+    --pq-ink: #f5f5f4;
+    --pq-muted: #a8a29e;
+    --pq-accent: #f59e0b;
+    --pq-accent-strong: #fbbf24;
+}
+
+@layer components {
+    .pq-page {
+        @apply min-h-screen bg-stone-100 text-stone-900 antialiased selection:bg-amber-500 selection:text-stone-950 dark:bg-stone-950 dark:text-stone-100;
+    }
+
+    .pq-card {
+        @apply rounded-2xl border border-stone-200 bg-white shadow-xs dark:border-stone-800 dark:bg-stone-900;
+    }
+
+    .pq-well {
+        @apply rounded-xl border border-stone-200 bg-stone-50 dark:border-stone-800 dark:bg-stone-800/60;
+    }
+
+    .pq-topbar {
+        @apply sticky top-0 z-30 border-b border-stone-200 bg-white/95 backdrop-blur-sm dark:border-stone-800 dark:bg-stone-900/95;
+    }
+
+    .pq-back-btn {
+        @apply inline-flex min-h-10 items-center gap-2 rounded-xl border border-stone-200 bg-white px-3.5 text-sm font-semibold text-stone-700 transition-colors hover:border-amber-500 hover:text-stone-950 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber-600 dark:border-stone-800 dark:bg-stone-900 dark:text-stone-200 dark:hover:border-amber-400 dark:hover:text-white;
+    }
+
+    .pq-badge-success {
+        @apply inline-flex items-center gap-1 rounded-full border border-emerald-200 bg-emerald-50 px-2.5 py-0.5 text-xs font-semibold text-emerald-800 dark:border-emerald-800 dark:bg-emerald-950/60 dark:text-emerald-300;
+    }
+
+    .pq-badge-warning {
+        @apply inline-flex items-center gap-1 rounded-full border border-amber-200 bg-amber-50 px-2.5 py-0.5 text-xs font-semibold text-amber-800 dark:border-amber-800 dark:bg-amber-950/60 dark:text-amber-300;
+    }
+
+    .pq-badge-danger {
+        @apply inline-flex items-center gap-1 rounded-full border border-rose-200 bg-rose-50 px-2.5 py-0.5 text-xs font-semibold text-rose-800 dark:border-rose-800 dark:bg-rose-950/60 dark:text-rose-300;
+    }
+
+    .pq-badge-info {
+        @apply inline-flex items-center gap-1 rounded-full border border-sky-200 bg-sky-50 px-2.5 py-0.5 text-xs font-semibold text-sky-800 dark:border-sky-800 dark:bg-sky-950/60 dark:text-sky-300;
+    }
+
+    .pq-badge-neutral {
+        @apply inline-flex items-center gap-1 rounded-full border border-stone-200 bg-stone-100 px-2.5 py-0.5 text-xs font-semibold text-stone-700 dark:border-stone-700 dark:bg-stone-800 dark:text-stone-300;
+    }
+}
+
+/* ==========================================================================
+   @deprecated Legacy Light Mode Theme Inversion Block
+   Scheduled for removal in CR-2 Wave 2D once all legacy dark-first pages
+   migrate to native Light-Mode-first + dark: classes.
    ========================================================================== */
 
 html:not(.dark) {

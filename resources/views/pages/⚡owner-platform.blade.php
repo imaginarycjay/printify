@@ -15,7 +15,7 @@ new class extends Component {
         abort_unless($shop, 403);
         $approval = $shop->getAttribute('approval_status');
     @endphp
-    <x-platform-header title="Shop Settings" :subtitle="$shop->name" :back-url="route('owner.dashboard')">
+    <x-platform-header title="Shop Settings" :subtitle="$shop->name" :back-url="route('owner.dashboard')" back-label="App Launcher">
         @if ($approval === 'approved' && $shop->is_setup_completed)
             <a href="{{ route('shops.show', $shop->id) }}" wire:navigate class="inline-flex min-h-11 items-center gap-2 rounded-xl border border-stone-200 px-3 text-sm font-semibold dark:border-stone-800"><flux:icon name="globe-alt" class="size-4" /> View storefront</a>
         @endif

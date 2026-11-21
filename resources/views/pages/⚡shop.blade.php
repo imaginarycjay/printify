@@ -18,16 +18,16 @@ new class extends Component {
     }
 }; ?>
 
+@php
+    $shop = App\Models\PrintShop::where('approval_status', 'approved')->where('is_setup_completed', true)
+        ->with(['services', 'thesisBindingConfig'])->findOrFail($this->shopId);
+    $documentConfig = App\Models\DocumentPrintingConfig::where('print_shop_id', $shop->id)->first();
+@endphp
+
 <div class="min-h-screen bg-stone-100 text-stone-900 dark:bg-stone-950 dark:text-stone-100">
-    <x-platform-header />
+    <x-platform-header title="{{ $shop->name }}" subtitle="Shop directory &amp; services" :back-url="route('shops.index')" back-label="Find Shops" />
     <main class="mx-auto w-full max-w-6xl space-y-8 px-4 py-8 sm:px-6">
         <x-platform-feedback />
-        @php
-            $shop = App\Models\PrintShop::where('approval_status', 'approved')->where('is_setup_completed', true)
-                ->with(['services', 'thesisBindingConfig'])->findOrFail($this->shopId);
-            $documentConfig = App\Models\DocumentPrintingConfig::where('print_shop_id', $shop->id)->first();
-        @endphp
-        <a href="{{ route('shops.index') }}" class="inline-flex min-h-11 items-center gap-2 text-sm font-semibold text-stone-500 hover:text-amber-700 dark:text-stone-400 dark:hover:text-amber-400"><flux:icon name="arrow-left" class="size-4" /> Back to shops</a>
         <section class="space-y-4 rounded-3xl border border-stone-200 bg-white p-6 sm:p-8 dark:border-stone-800 dark:bg-stone-900/80">
             <div class="flex flex-wrap items-center justify-between gap-3">
                 <span class="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-amber-700 dark:text-amber-400"><flux:icon name="building-storefront" class="size-4" /> Print shop</span>

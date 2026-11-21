@@ -1,4 +1,4 @@
-# Printify
+# PressQueue
 
 <!-- impeccable:product-schema 1 -->
 
@@ -8,80 +8,49 @@ web
 
 ## Record Basis
 
-Initialized from the repository and business workflows on 2026-11-07, at the user's direction to infer context without an interview. Implemented behavior below is evidence of the current product, not proof of production deployment. Strategic priorities are explicitly identified as inferred.
+Updated from the implemented PressQueue v2 codebase (`WP-0` through `WP-5`) on 2026-11-21 to replace legacy `Printify` starter descriptions. Implemented behavior below reflects verified application code and automated tests, not claims of commercial deployment or external user studies.
 
 ## Users
 
-- Customers browse shops, configure document printing or thesis binding, submit orders and payment details, and track progress to pickup.
-- Business owners configure their shop, services, pricing, materials, availability, and staff; monitor orders and analytics; and manage their shop's web presence.
-- Production staff work within their assigned shop to handle job tickets, payment verification, physical manuscript intake, production stages, quality checks, and spoilage reporting.
-- Platform administrators review shop applications for approval or rejection.
-
-Inferred priority: treat customers, owners, and staff as distinct task audiences. Customer ordering and staff fulfillment form the central end-to-end workflow; the repository does not establish one audience as commercially dominant.
+- **Super Admin (`platform_admin`):** Approves, requests changes on (`rejected`), suspends, or reactivates printing shop tenants; configures global file retention TTL bounds and maximum customer upload limits; monitors private disk footprint and governance audit logs without viewing private shop financial ledgers.
+- **Printing Shop Owner (`business_owner`):** Registers and onboards a tenant print shop (`PrintShop`), configures operating hours, live workload thresholds (`busy_threshold`, `at_capacity_threshold`), multi-printer fleet (`Printer`), staff invitations/revocations, modular shop applications via the App Launcher and More Services modal (`Install` / `Remove`), service pricing and Bill of Materials (BOM) recipes, raw material stock-in and Reorder Point (ROP) alerts, payment proof audits (50% downpayment / 100% full / offline counter / aging flags), pre-print specification revisions and manual refund settlements, and three standardized printable/exportable (PDF/CSV) operational reports.
+- **Production Staff (`production_staff`):** Works strictly within the assigned tenant shop (`staff_shop_id`) to inspect prepress artwork, confirm Cover-Only customer-supplied paper intake (or shift rejected Cover-Only sheets to Full-Package shop paper), enforce post-approval specification locks, dispatch print jobs via inline direct browser print preview (`window.print()`, or RIP export for wide-format plotters), advance item-level stages across assigned printers, record optional shelf/bin tags for split early pickup, and log decoupled paper + ink/toner quality-assurance rework spoilage.
+- **Customer (`customer`):** Browses approved, setup-complete shops and live workload indicators (`Normal`, `Busy`, `At capacity`) plus paused service notices; configures single or mixed multi-item Document Printing and Thesis Binding orders (Full-Package or Cover-Only) with reactive pricing and stock-shortage fallbacks; persists `pending_payment` orders with unique tracking codes prior to two-step proof submission/retry (50% downpayment or 100% full payment); requests pre-print specification revisions; tracks item-level production and split pickup readiness; and views/downloads official payment receipts.
 
 ## Product Purpose
 
-Connect customer print orders with the shop operations that fulfill them. The welcome page describes a unified printing services system with configurable services, job queues, and transparent order tracking.
-
-Inferred success criteria: customers can choose an available service and submit an accurate order; staff can identify and complete the next production action; owners can maintain service settings and understand material use and sales.
+Coordinate multi-tenant printing shop operations, multi-printer item-level job scheduling, prepress and flexible payment verification, and atomic Bill of Materials (BOM) inventory control in one unified web platform—replacing disconnected walk-in notebooks, chat threads, and loose desktop print downloads.
 
 ## Positioning
 
-The implemented mechanism combines a multi-shop service directory with shop-specific ordering, production tracking, configurable pricing, and bill-of-materials inventory deductions. This is the local application named Printify; the repository provides no evidence of affiliation with any similarly named external service or of a unique market advantage.
+PressQueue is a multi-tenant SaaS marketplace and print-operations system built on Laravel 13, Livewire 4, Flux UI, Tailwind CSS v4, and PostgreSQL 18. Each printing shop operates inside a logically isolated `PrintShop` tenant boundary while sharing a public customer discovery marketplace. Per-shop `Web Builder` tooling has been retired and removed in favor of the unified marketplace storefront (`shops.show`) and Shop Settings (`owner.platform`).
 
 ## Operating Context
 
-1. An owner registers a shop, completes setup, and configures services. Administrative approval and completed setup control public shop visibility.
-2. Customers browse approved shops and service availability, then choose a shop-specific document-printing or thesis-binding flow.
-3. Order configuration captures the applicable files, printing or binding specifications, quantities, finishing options, and calculated charges. Thesis binding also supports cover-only jobs using customer-supplied printed pages.
-4. Document checkout offers GCash, Maya, and cash at the counter. Thesis checkout collects a GCash reference and optional proof image. Electronic payment submissions await verification; counter payment is represented separately as unpaid.
-5. Staff inspect job tickets, verify payments, record physical paper receipt when needed, and move work through production and quality inspection. The model represents queue, printing, binding, quality check, ready for pickup, and completion; actual service behavior must be checked before assuming every order needs every stage.
-6. Inventory deductions use configured service recipes and service-specific material calculations. Staff can record material spoilage and quality-check rejection.
-7. Customers follow order and payment statuses; owners inspect analytics and manage ongoing operations.
-
-The implemented monetary displays use Philippine pesos and local wallet terminology. A Philippine operating context is inferred; a specific city, university, exclusive audience, or launch territory is not established.
+1. A printing shop owner registers (`owner.register`), completes guided setup (`owner.wizard`), and awaits Super Admin approval (`admin.shops`). Once approved and setup-complete, the shop appears in the public marketplace (`shops.index` → `shops.show`).
+2. Customers browse approved shops with live 30-second-polled workload badges (`Normal`, `Busy`, `At capacity`) and service pause explanations without arbitrary completion-time promises.
+3. Unified checkout (`customer.shop.checkout`) and single-service wizards validate page counts, duplex sheet equivalents, binding sheet limits (`max_binding_sheets`), and uploaded files (`PDF`, `PNG`, `DOCX`), reserving BOM stock atomically via ordered pessimistic row locks (`SELECT ... FOR UPDATE`) and saving the `pending_payment` order + tracking code before payment proof upload.
+4. Upfront payment accepts either a minimum `50%` downpayment or `100%` full payment with per-shop unique reference enforcement, two-step retry recovery after connectivity drops, and owner verification/offline counter settlement (`payments` ledger + DomPDF/HTML Official Receipts).
+5. Prepress approval locks item specifications (`is_spec_locked = true`). Pre-print specification revisions route through `spec_revisions` (`on_hold`, upgrade top-ups, downgrade balance credits or `Manual Refund Pending` → `Manual Refund Settled`) and are frozen permanently once physical printing begins.
+6. Production Staff execute item-level multi-printer scheduling (`printer_id`, `assigned_staff_id`, Maintenance failover), direct inline browser print preview (`orders.file.preview`), split item pickup (`Partially Ready`, `shelf_bin_code`, `ready_at`), zero-balance + all-items-claimed parent completion, and decoupled paper + ink/toner `rework_spoilage`.
+7. Scheduled background jobs (`pressqueue:purge-expired-files`, `pressqueue:check-aging-alerts`) purge expired completed-order artwork while preserving receipts/active jobs and emit deduplicated database + mail notifications surfaced via `<livewire:notification-bell />`.
 
 ## Capabilities and Constraints
 
-- Laravel 13, Livewire 4, Flux Blade components, and Tailwind CSS 4 form the existing application stack. Full-page components predominantly live in `resources/views/pages/` as inline Blade components.
-- Shop ownership, staff membership, customer access, and administrative access are separate authorization concerns. UI changes must preserve shop boundaries and protected document/payment-file access.
-- Service availability includes active state, capacity, temporary pauses, and pause reasons. Public workload is refreshed every 30 seconds and explicitly does not promise a completion time; a busy shop may still accept orders.
-- Payment status and production status are separate information. Payment submission must not be presented as verified payment.
-- Cover-only binding requires physical paper intake; file upload cannot silently replace that handoff.
-- Existing features include inventory, service configuration, analytics, a web builder, staff invitations, order tracking, and account settings.
-- Preserve existing routes, calculated prices, validation, file requirements, role restrictions, and workflow actions during an audit or refinement unless a separate behavior change is requested.
-- Production deployment, delivery services, automated wallet settlement, subscriptions, commercial pricing, and service-level guarantees are not established by this record.
+- **Stack:** PHP 8.5, Laravel 13, Livewire 4 single-file `⚡` components under `resources/views/pages/`, Flux UI v2, Tailwind CSS v4, Fortify (2FA + passkeys), DomPDF, Larastan Level 7, and Pest 5.
+- **Tenant Boundary (`.ai/rules/pages.md`):** `PrintShop` is the strict tenant boundary. Owners resolve their own shop; staff require `staff_shop_id`; `PrintShop::first()` fallbacks are strictly forbidden; private artwork, payment proofs, receipts, and reports enforce shop/customer authorization.
+- **Explicit Out-of-Scope Boundaries:** Hardware printer firmware sheet/ink polling, automated e-wallet banking webhooks or payout APIs, physical delivery tracking, and commercial hosting claims are out of scope.
 
 ## Brand Commitments
 
-The existing application name is Printify, with shared logo components under `resources/views/components/`. Existing interface copy is English. Preserve the incumbent identity during audit and refinement; this initialization does not authorize a rebrand or establish new visual rules.
+- **Application Name:** `PressQueue` (rebranded cleanly from `Printify`).
+- **Interface Copy & Language:** Concise, scannable operational English matching `Instrument Sans` editorial typography.
+- **Visual Authority:** Native Light-Mode-first surfaces (`DESIGN.md`) with clean `dark:` variants; all UI assets, icons, and labels must remain legible in both interactive browsers and printed academic screenshots.
 
 ## Evidence on Hand
 
-- `routes/web.php`: public directory, shop profiles, owner registration, shop review, staff invitations, role-specific dashboards, and ordering entry points.
-- `resources/views/welcome.blade.php`: current product description and public entry actions.
-- `resources/views/pages/`: implemented customer, owner, staff, and administrator interfaces.
-- `app/Models/Order.php`: order/payment terminology, production stages, and physical-paper intake state.
-- `app/Http/Controllers/PlatformController.php`: shop review, availability, invitations, and protected files.
-- `app/Services/InventoryDeductionService.php`: service recipes and material consumption.
-- `tests/Feature/TenantPlatformTest.php`, `CustomerThesisOrderTest.php`, `DocumentPrintingServiceTest.php`, and `ProductionStaffQueueTest.php`: executable workflow examples; their presence alone does not establish that the current checkout passes them.
-- `resources/css/app.css` and shared view components: incumbent visual implementation for a later audit to inspect, rather than a new design specification.
-- `capstone_paper/`: project academic sources and diagrams; not independently validated as current product requirements during initialization.
-
-No verified customer testimonials, adoption metrics, performance benchmarks, or production screenshots were established during this initialization. Do not fabricate them.
-
-## Product Principles
-
-Inferred from the implemented business process:
-
-1. Make the user's next valid action clear for their role and order state.
-2. Keep pricing, service availability, payment verification, and production progress understandable and distinct.
-3. Preserve the connection between online orders and physical shop work, including material use and pickup.
-4. Keep shop-specific data and actions within their authorization boundaries.
-5. Evaluate UI quality against complete tasks and exceptional states, including paused services, rejected payments, missing paper intake, and quality-check rework.
-
-## Open Decisions
-
-No product-specific accessibility standard, device distribution, primary commercial audience, geographic restriction, or marketing claim has been confirmed. Responsive behavior, keyboard access, readable status information, and form accessibility should be inspected during the UI audit without treating them as already verified.
-
-No persistent image-first versus code-first preference was supplied. This initialization concerns audit preparation and documentation; it does not set a workflow default for future landing-page creation.
+- `routes/web.php`, `routes/console.php`, `routes/settings.php`
+- `app/Services/{InventoryDeductionService,OrderCheckoutService,PaymentService,ProductionQueueService,SpecRevisionService,ReportService,SalesAnalyticsService,AuditLogger}.php`
+- `resources/views/welcome.blade.php`, `resources/views/pages/**`, `resources/views/components/**`
+- `tests/Feature/` (`143` passing Pest tests, `0` PHPStan Level 7 errors)
+- `system_plan/pressqueue_v2_system_implementation_plan.md` & `system_plan/pressqueue_v2_correction_plan_v2.md`

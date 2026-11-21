@@ -69,7 +69,7 @@ new class extends Component {
 @endphp
 
 <div class="min-h-screen bg-stone-100 text-stone-900 dark:bg-stone-950 dark:text-stone-100">
-    <x-platform-header title="Platform Administration" subtitle="Tenant governance, retention & storage health" :back-url="route('home')" />
+    <x-platform-header title="Platform Administration" subtitle="Tenant governance, retention & storage health" :brand-url="route('admin.shops')" />
     <main class="mx-auto w-full max-w-6xl space-y-8 px-4 py-8 sm:px-6">
         <x-platform-feedback />
 
