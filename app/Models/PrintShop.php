@@ -154,6 +154,61 @@ class PrintShop extends Model
     }
 
     /**
+     * Get the printer fleet workstations registered for this print shop.
+     *
+     * @return HasMany<Printer, $this>
+     */
+    public function printers(): HasMany
+    {
+        return $this->hasMany(Printer::class)->orderBy('name');
+    }
+
+    /**
+     * Count active in-flight order line items awaiting completion or QC.
+     */
+    public function activeWorkloadItemCount(): int
+    {
+        return OrderItem::query()
+            ->whereHas('order', function ($query): void {
+                $query->where('print_shop_id', $this->id)
+                    ->whereNotIn('order_status', [
+                        Order::STATUS_CANCELLED,
+                        Order::STATUS_COMPLETED,
+                        Order::STATUS_PENDING_PAYMENT,
+                    ])
+                    ->where('payment_status', '!=', Order::PAYMENT_REJECTED);
+            })
+            ->whereIn('production_stage', [
+                OrderItem::STAGE_QUEUE,
+                OrderItem::STAGE_ON_HOLD,
+                OrderItem::STAGE_PRINTING,
+                OrderItem::STAGE_BINDING,
+                OrderItem::STAGE_QUALITY_CHECK,
+            ])
+            ->count();
+    }
+
+    /**
+     * Compute shop-level public workload indicator against configured thresholds.
+     */
+    public function workloadStatus(): string
+    {
+        $busy = max(1, (int) ($this->busy_threshold ?: 5));
+        $atCapacity = max($busy, (int) ($this->at_capacity_threshold ?: 10));
+        $count = $this->activeWorkloadItemCount();
+
+        if ($count >= $atCapacity) {
+            return 'At capacity';
+        }
+
+        if ($count >= $busy) {
+            return 'Busy';
+        }
+
+        return 'Normal';
+    }
+
+    /**
      * Audit log entries associated with this print shop.
      *
      * @return HasMany<AuditLog, $this>

@@ -12,6 +12,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property int $id
  * @property int $order_id
  * @property string|null $service_key
+ * @property int|null $printer_id
  * @property int|null $assigned_staff_id
  * @property string $binding_type
  * @property int $bw_pages_count
@@ -45,6 +46,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 #[Fillable([
     'order_id',
     'service_key',
+    'printer_id',
     'assigned_staff_id',
     'binding_type',
     'fulfillment_type',
@@ -85,6 +87,20 @@ class OrderItem extends Model
 
     public const PREPRESS_REJECTED = 'rejected';
 
+    public const STAGE_QUEUE = 'queue';
+
+    public const STAGE_ON_HOLD = 'on_hold';
+
+    public const STAGE_PRINTING = 'printing';
+
+    public const STAGE_BINDING = 'binding';
+
+    public const STAGE_QUALITY_CHECK = 'quality_check';
+
+    public const STAGE_READY_FOR_PICKUP = 'ready_for_pickup';
+
+    public const STAGE_CLAIMED = 'claimed';
+
     /**
      * Get the attributes that should be cast.
      *
@@ -93,6 +109,7 @@ class OrderItem extends Model
     protected function casts(): array
     {
         return [
+            'printer_id' => 'integer',
             'assigned_staff_id' => 'integer',
             'is_paper_received' => 'boolean',
             'estimated_spine_thickness_mm' => 'float',
@@ -259,6 +276,100 @@ class OrderItem extends Model
     public function assignedStaff(): BelongsTo
     {
         return $this->belongsTo(User::class, 'assigned_staff_id');
+    }
+
+    /**
+     * Printer workstation assigned to this line item.
+     *
+     * @return BelongsTo<Printer, $this>
+     */
+    public function printer(): BelongsTo
+    {
+        return $this->belongsTo(Printer::class);
+    }
+
+    /**
+     * Specification revision history for this line item.
+     *
+     * @return HasMany<SpecRevision, $this>
+     */
+    public function specRevisions(): HasMany
+    {
+        return $this->hasMany(SpecRevision::class)->latest();
+    }
+
+    /**
+     * Determine whether printing or downstream physical work has already started for this item.
+     */
+    public function hasStartedPrinting(): bool
+    {
+        return in_array($this->production_stage ?? self::STAGE_QUEUE, [
+            self::STAGE_PRINTING,
+            self::STAGE_BINDING,
+            self::STAGE_QUALITY_CHECK,
+            self::STAGE_READY_FOR_PICKUP,
+            self::STAGE_CLAIMED,
+        ], true);
+    }
+
+    /**
+     * Determine whether pre-print specification revisions are still permitted for this item.
+     */
+    public function canReviseSpecifications(): bool
+    {
+        if ($this->hasStartedPrinting()) {
+            return false;
+        }
+
+        $order = $this->order;
+        if (! $order instanceof Order) {
+            return true;
+        }
+
+        return ! in_array($order->order_status, [Order::STATUS_CANCELLED, Order::STATUS_COMPLETED], true);
+    }
+
+    /**
+     * Determine whether this line item is staged in a shelf/bin ready for customer pickup.
+     */
+    public function isReadyForPickup(): bool
+    {
+        return ($this->production_stage ?? self::STAGE_QUEUE) === self::STAGE_READY_FOR_PICKUP;
+    }
+
+    /**
+     * Determine whether this line item has been claimed by the customer.
+     */
+    public function isClaimed(): bool
+    {
+        return ($this->production_stage ?? self::STAGE_QUEUE) === self::STAGE_CLAIMED || $this->claimed_at !== null;
+    }
+
+    /**
+     * Determine whether a ready item has remained unclaimed beyond the given number of days.
+     */
+    public function isUnclaimedAging(int $days = 3): bool
+    {
+        return $this->isReadyForPickup()
+            && $this->claimed_at === null
+            && $this->ready_at !== null
+            && $this->ready_at->lte(now()->subDays($days));
+    }
+
+    /**
+     * Human-readable stage label for this line item.
+     */
+    public function stageLabel(): string
+    {
+        return match ($this->production_stage ?? self::STAGE_QUEUE) {
+            self::STAGE_ON_HOLD => 'On Hold (Prepress / Revision)',
+            self::STAGE_PRINTING => 'Printing Pages',
+            self::STAGE_BINDING => 'Binding & Finishing',
+            self::STAGE_QUALITY_CHECK => 'Quality Check (QC)',
+            self::STAGE_READY_FOR_PICKUP => 'Ready for Pickup',
+            self::STAGE_CLAIMED => 'Claimed',
+            default => 'In Queue',
+        };
     }
 
     /**

@@ -29,8 +29,36 @@ class InventoryDeductionService
     public function reserveForOrderItems(Order $order, ?User $actor = null): array
     {
         $order->loadMissing(['items', 'printShop']);
+
+        return $this->reserveForItemsCollection($order, $order->items, $actor);
+    }
+
+    /**
+     * Reserve raw materials atomically for a single order line item.
+     *
+     * @return array<int, array{inventory_item_id: int, item_name: string, quantity_reserved: float, unit: string, remaining_available: float}>
+     *
+     * @throws InsufficientStockException
+     */
+    public function reserveForOrderItem(Order $order, OrderItem $item, ?User $actor = null): array
+    {
+        $order->loadMissing('printShop');
+
+        return $this->reserveForItemsCollection($order, collect([$item]), $actor);
+    }
+
+    /**
+     * Shared atomic reservation routine with deterministic ascending row locking.
+     *
+     * @param  Collection<int, OrderItem>  $items
+     * @return array<int, array{inventory_item_id: int, item_name: string, quantity_reserved: float, unit: string, remaining_available: float}>
+     *
+     * @throws InsufficientStockException
+     */
+    protected function reserveForItemsCollection(Order $order, Collection $items, ?User $actor = null): array
+    {
         $shop = $order->printShop;
-        if (! $shop) {
+        if (! $shop || $items->isEmpty()) {
             return [];
         }
 
@@ -39,7 +67,7 @@ class InventoryDeductionService
         /** @var array<int, float> $totalsByItemId */
         $totalsByItemId = [];
 
-        foreach ($order->items as $orderItem) {
+        foreach ($items as $orderItem) {
             $requirements = $this->calculateRequiredMaterialsForItem($shop, $order, $orderItem);
             if ($requirements === []) {
                 continue;
@@ -142,7 +170,32 @@ class InventoryDeductionService
      */
     public function releaseReservation(Order $order, ?User $actor = null, string $reason = 'Order cancelled'): array
     {
-        $orderItemIds = $order->items()->pluck('id');
+        return $this->releaseReservationsForItemIds($order, $order->items()->pluck('id'), $actor, $reason);
+    }
+
+    /**
+     * Release any unreleased stock reservations for a single order item idempotently.
+     *
+     * @return array<int, array{inventory_item_id: int, item_name: string, quantity_released: float, unit: string}>
+     */
+    public function releaseReservationForItem(OrderItem $item, ?User $actor = null, string $reason = 'Specification revision'): array
+    {
+        $order = $item->order;
+        if (! $order instanceof Order) {
+            return [];
+        }
+
+        return $this->releaseReservationsForItemIds($order, collect([$item->id]), $actor, $reason);
+    }
+
+    /**
+     * Shared idempotent reservation release routine across a collection of item IDs.
+     *
+     * @param  Collection<int, int>  $orderItemIds
+     * @return array<int, array{inventory_item_id: int, item_name: string, quantity_released: float, unit: string}>
+     */
+    protected function releaseReservationsForItemIds(Order $order, Collection $orderItemIds, ?User $actor = null, string $reason = 'Order cancelled'): array
+    {
         if ($orderItemIds->isEmpty()) {
             return [];
         }
@@ -228,6 +281,15 @@ class InventoryDeductionService
         $involvedItemIds = [];
 
         foreach ($targetItems as $orderItem) {
+            $alreadyDeducted = StockMovement::query()
+                ->where('order_item_id', $orderItem->id)
+                ->where('movement_type', StockMovement::TYPE_PRODUCTION_DEDUCTION)
+                ->exists();
+
+            if ($alreadyDeducted) {
+                continue;
+            }
+
             $requirements = $this->calculateRequiredMaterialsForItem($shop, $order, $orderItem);
             if ($requirements === []) {
                 continue;
@@ -377,6 +439,85 @@ class InventoryDeductionService
                 'logged_by' => $staff?->id,
             ]);
         });
+    }
+
+    /**
+     * Identify linked paper and ink/toner inventory items for rework spoilage logging.
+     *
+     * @return array{paper: ?InventoryItem, ink: ?InventoryItem, ink_per_sheet: float}
+     */
+    public function resolvePaperAndInkItemsForItem(PrintShop $shop, Order $order, OrderItem $item): array
+    {
+        $requirements = $this->calculateRequiredMaterialsForItem($shop, $order, $item);
+        $itemIds = array_column($requirements, 'item_id');
+
+        $bomItems = $itemIds !== []
+            ? InventoryItem::where('print_shop_id', $shop->id)->whereIn('id', $itemIds)->get()->keyBy('id')
+            : collect();
+
+        $paper = null;
+        $ink = null;
+        $inkPerSheet = 0.02;
+
+        foreach ($requirements as $req) {
+            $inv = $bomItems->get($req['item_id']);
+            if (! $inv instanceof InventoryItem) {
+                continue;
+            }
+
+            if ($paper === null && $this->isPaperItem($inv)) {
+                $paper = $inv;
+            }
+
+            if ($ink === null && $this->isInkItem($inv)) {
+                $ink = $inv;
+                $sheets = max(1, $item->getPhysicalSheetsCount());
+                $inkPerSheet = max(0.01, round(((float) $req['quantity']) / $sheets, 4));
+            }
+        }
+
+        if (! $paper instanceof InventoryItem) {
+            $paper = $shop->inventoryItems()
+                ->where(function (Builder $query): void {
+                    $query->where('category', 'Paper')
+                        ->orWhere('name', 'like', '%Paper%')
+                        ->orWhere('name', 'like', '%Bond%');
+                })
+                ->first();
+        }
+
+        if (! $ink instanceof InventoryItem) {
+            $ink = $shop->inventoryItems()
+                ->where(function (Builder $query): void {
+                    $query->where('category', 'Ink / Toner')
+                        ->orWhere('category', 'like', '%Ink%')
+                        ->orWhere('category', 'like', '%Toner%')
+                        ->orWhere('name', 'like', '%Ink%')
+                        ->orWhere('name', 'like', '%Toner%');
+                })
+                ->first();
+        }
+
+        return [
+            'paper' => $paper,
+            'ink' => $ink,
+            'ink_per_sheet' => $inkPerSheet,
+        ];
+    }
+
+    /**
+     * Check if an inventory item represents ink or toner consumables.
+     */
+    protected function isInkItem(InventoryItem $item): bool
+    {
+        $name = strtolower($item->name);
+        $category = strtolower($item->category);
+
+        return str_contains($name, 'ink') ||
+            str_contains($name, 'toner') ||
+            str_contains($name, 'cartridge') ||
+            str_contains($category, 'ink') ||
+            str_contains($category, 'toner');
     }
 
     /**

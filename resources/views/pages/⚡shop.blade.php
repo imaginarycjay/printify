@@ -29,13 +29,27 @@ new class extends Component {
         @endphp
         <a href="{{ route('shops.index') }}" class="inline-flex min-h-11 items-center gap-2 text-sm font-semibold text-stone-500 hover:text-amber-700 dark:text-stone-400 dark:hover:text-amber-400"><flux:icon name="arrow-left" class="size-4" /> Back to shops</a>
         <section class="space-y-4 rounded-3xl border border-stone-200 bg-white p-6 sm:p-8 dark:border-stone-800 dark:bg-stone-900/80">
-            <span class="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-amber-700 dark:text-amber-400"><flux:icon name="building-storefront" class="size-4" /> Print shop</span>
+            <div class="flex flex-wrap items-center justify-between gap-3">
+                <span class="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-amber-700 dark:text-amber-400"><flux:icon name="building-storefront" class="size-4" /> Print shop</span>
+                @php
+                    $shopWorkload = $shop->workloadStatus();
+                    $shopWorkloadColor = match ($shopWorkload) {
+                        'Busy' => 'amber',
+                        'At capacity' => 'orange',
+                        default => 'emerald',
+                    };
+                @endphp
+                <flux:badge :color="$shopWorkloadColor" size="sm" icon="signal">{{ $shopWorkload }}</flux:badge>
+            </div>
             <h1 class="break-words text-3xl font-extrabold tracking-tight sm:text-4xl">{{ $shop->name }}</h1>
             <p class="max-w-2xl whitespace-pre-line text-sm leading-relaxed text-stone-600 dark:text-stone-400">{{ $shop->getAttribute('description') ?: 'Choose a service below to customize your printing order.' }}</p>
             <div class="flex flex-wrap gap-x-6 gap-y-3 border-t border-stone-200 pt-4 text-sm text-stone-600 dark:border-stone-800 dark:text-stone-400">
                 <span class="flex items-start gap-2"><flux:icon name="map-pin" class="size-4 shrink-0" /> {{ $shop->getAttribute('address') ?: 'Location not provided' }}</span>
                 @if ($shop->getAttribute('contact'))
                     <span class="flex items-start gap-2"><flux:icon name="phone" class="size-4 shrink-0" /> {{ $shop->getAttribute('contact') }}</span>
+                @endif
+                @if ($shop->operating_hours)
+                    <span class="flex items-start gap-2"><flux:icon name="clock" class="size-4 shrink-0" /> {{ $shop->operating_hours }}</span>
                 @endif
             </div>
         </section>

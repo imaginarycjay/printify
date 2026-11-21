@@ -5,6 +5,7 @@ use App\Models\Payment;
 use App\Models\PrintShop;
 use App\Services\PaymentService;
 use App\Services\SalesAnalyticsService;
+use App\Services\SpecRevisionService;
 use Livewire\Attributes\Locked;
 use Livewire\Attributes\Title;
 use Livewire\Component;
@@ -215,6 +216,24 @@ new #[Title('Sales & Financial Analytics Hub')] class extends Component {
             variant: 'success'
         );
     }
+
+    public function settleManualRefund(int $orderId): void
+    {
+        $shop = $this->shop;
+        $user = auth()->user();
+        if (! $shop || ! $user) {
+            return;
+        }
+
+        $order = Order::where('print_shop_id', $shop->id)->findOrFail($orderId);
+        app(SpecRevisionService::class)->settleManualRefund($order, $user);
+
+        \Flux\Flux::toast(
+            text: "Manual refund settled for Order {$order->order_number}.",
+            heading: 'Refund Settled',
+            variant: 'success'
+        );
+    }
 }; ?>
 
 <div class="min-h-screen w-full bg-stone-950 text-stone-100 font-sans antialiased flex flex-col justify-between relative selection:bg-amber-500 selection:text-white">
@@ -309,6 +328,15 @@ new #[Title('Sales & Financial Analytics Hub')] class extends Component {
         $settlingOrder = $settling_order_id && $shop
             ? Order::where('print_shop_id', $shop->id)->find($settling_order_id)
             : null;
+
+        $manualRefundOrders = $shop
+            ? Order::where('print_shop_id', $shop->id)
+                ->where('refund_status', Order::REFUND_MANUAL_PENDING)
+                ->where('refund_due', '>', 0)
+                ->with(['customer', 'items'])
+                ->latest('updated_at')
+                ->get()
+            : collect();
     @endphp
 
     <!-- Top Navigation Header -->
@@ -976,6 +1004,46 @@ new #[Title('Sales & Financial Analytics Hub')] class extends Component {
                         </div>
                     @endif
                 </div>
+
+                @if ($manualRefundOrders->isNotEmpty())
+                    <div class="p-6 rounded-3xl bg-stone-900/80 border border-rose-500/30 space-y-4">
+                        <div class="border-b border-stone-800 pb-3">
+                            <h3 class="text-base font-black text-rose-300">Pending Manual Refunds (Spec Downgrades)</h3>
+                            <p class="text-xs text-stone-400">Refunds triggered when an already-paid item was downgraded prior to printing.</p>
+                        </div>
+
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left text-xs text-stone-300">
+                                <thead class="bg-stone-950/80 border-b border-stone-800 text-[11px] font-bold text-stone-400 uppercase">
+                                    <tr>
+                                        <th class="p-3">Order</th>
+                                        <th class="p-3">Customer</th>
+                                        <th class="p-3 text-right">Paid</th>
+                                        <th class="p-3 text-right">Adjusted Total</th>
+                                        <th class="p-3 text-right">Refund Due</th>
+                                        <th class="p-3 text-right">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-stone-800/60">
+                                    @foreach ($manualRefundOrders as $refundOrder)
+                                        <tr wire:key="manual-refund-{{ $refundOrder->id }}">
+                                            <td class="p-3 font-mono font-bold text-white">{{ $refundOrder->order_number }}</td>
+                                            <td class="p-3">{{ $refundOrder->customer?->name ?? 'Customer' }}</td>
+                                            <td class="p-3 text-right font-mono">₱{{ number_format((float) $refundOrder->amount_paid, 2) }}</td>
+                                            <td class="p-3 text-right font-mono">₱{{ number_format((float) $refundOrder->total_amount, 2) }}</td>
+                                            <td class="p-3 text-right font-mono font-black text-rose-300">₱{{ number_format((float) $refundOrder->refund_due, 2) }}</td>
+                                            <td class="p-3 text-right">
+                                                <button type="button" wire:click="settleManualRefund({{ $refundOrder->id }})" class="px-3 py-1 rounded-lg bg-rose-500 hover:bg-rose-400 text-stone-950 text-[11px] font-black cursor-pointer">
+                                                    Mark Refund Settled
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                @endif
             </div>
         @endif
     </main>

@@ -38,12 +38,26 @@ new class extends Component {
             <div class="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
                 @forelse ($shops as $shop)
                     <article wire:key="shop-{{ $shop->id }}" class="flex flex-col gap-5 rounded-3xl border border-stone-200 bg-white p-6 shadow-sm dark:border-stone-800 dark:bg-stone-900/80">
-                        <div class="flex items-start gap-3">
-                            <span class="flex size-11 shrink-0 items-center justify-center rounded-2xl bg-amber-500/10 text-amber-700 dark:text-amber-400"><flux:icon name="building-storefront" class="size-6" /></span>
-                            <div class="min-w-0 space-y-1">
-                                <h2 class="break-words text-lg font-extrabold">{{ $shop->name }}</h2>
-                                <p class="text-sm text-stone-500 dark:text-stone-400">{{ $shop->getAttribute('address') ?: 'Contact the shop for its location' }}</p>
+                        <div class="flex items-start justify-between gap-3">
+                            <div class="flex items-start gap-3 min-w-0">
+                                <span class="flex size-11 shrink-0 items-center justify-center rounded-2xl bg-amber-500/10 text-amber-700 dark:text-amber-400"><flux:icon name="building-storefront" class="size-6" /></span>
+                                <div class="min-w-0 space-y-1">
+                                    <h2 class="break-words text-lg font-extrabold">{{ $shop->name }}</h2>
+                                    <p class="text-sm text-stone-500 dark:text-stone-400">{{ $shop->getAttribute('address') ?: 'Contact the shop for its location' }}</p>
+                                    @if ($shop->operating_hours)
+                                        <p class="text-xs text-stone-500 dark:text-stone-400">{{ $shop->operating_hours }}</p>
+                                    @endif
+                                </div>
                             </div>
+                            @php
+                                $shopWorkload = $shop->workloadStatus();
+                                $shopWorkloadColor = match ($shopWorkload) {
+                                    'Busy' => 'amber',
+                                    'At capacity' => 'orange',
+                                    default => 'emerald',
+                                };
+                            @endphp
+                            <flux:badge :color="$shopWorkloadColor" size="sm" class="shrink-0">{{ $shopWorkload }}</flux:badge>
                         </div>
                         <div class="flex-1 space-y-3 border-t border-stone-200 pt-4 dark:border-stone-800">
                             @forelse ($shop->services as $offering)

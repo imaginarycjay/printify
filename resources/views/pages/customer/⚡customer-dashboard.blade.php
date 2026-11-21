@@ -1,10 +1,14 @@
 <?php
 
 use App\Models\Order;
+use App\Models\OrderItem;
 use App\Models\Payment;
 use App\Models\PrintShop;
+use App\Models\SpecRevision;
 use App\Services\PaymentService;
 use App\Services\PrintServiceCatalog;
+use App\Services\ProductionQueueService;
+use App\Services\SpecRevisionService;
 use Illuminate\Http\UploadedFile;
 use Livewire\Attributes\Locked;
 use Livewire\Component;
@@ -30,6 +34,21 @@ new class extends Component {
     public string $payment_reference_no = '';
     public mixed $payment_proof_file = null;
     public ?string $payment_feedback = null;
+
+    #[Locked]
+    public ?int $reuploading_item_id = null;
+    public mixed $reupload_file = null;
+
+    #[Locked]
+    public ?int $revising_item_id = null;
+    public int $rev_bw_pages = 0;
+    public int $rev_color_pages = 0;
+    public int $rev_total_pages = 1;
+    public int $rev_copies_count = 1;
+    public string $rev_binding_type = 'hardbound';
+    public string $rev_cover_color = 'Maroon';
+    public string $rev_print_sides = 'simplex';
+    public string $rev_notes = '';
 
     public function viewOrderDetails(int $id): void
     {
@@ -113,6 +132,109 @@ new class extends Component {
         $this->payment_feedback = "Payment proof submitted for Order {$order->order_number}. Awaiting shop verification.";
         $this->closePaymentModal();
     }
+
+    public function openReuploadModal(int $itemId): void
+    {
+        $this->resetValidation();
+        $item = OrderItem::whereHas('order', fn ($q) => $q->where('customer_id', auth()->id()))->findOrFail($itemId);
+        $this->reuploading_item_id = $item->id;
+        $this->reupload_file = null;
+    }
+
+    public function closeReuploadModal(): void
+    {
+        $this->reuploading_item_id = null;
+        $this->reupload_file = null;
+        $this->resetValidation();
+    }
+
+    public function submitArtworkReupload(): void
+    {
+        $this->resetValidation();
+        $user = auth()->user();
+        if (! $user || ! $this->reuploading_item_id) {
+            return;
+        }
+
+        $item = OrderItem::whereHas('order', fn ($q) => $q->where('customer_id', $user->id))->findOrFail($this->reuploading_item_id);
+        $file = $this->reupload_file instanceof UploadedFile ? $this->reupload_file : null;
+        if (! $file) {
+            $this->addError('artwork_file', 'Please select a corrected PDF artwork file to upload.');
+
+            return;
+        }
+
+        app(ProductionQueueService::class)->reuploadArtwork($item, $user, $file);
+        $this->payment_feedback = 'Corrected artwork uploaded and returned to prepress queue.';
+        $this->closeReuploadModal();
+    }
+
+    public function openSpecRevisionModal(int $itemId): void
+    {
+        $this->resetValidation();
+        $item = OrderItem::with('order')->whereHas('order', fn ($q) => $q->where('customer_id', auth()->id()))->findOrFail($itemId);
+        abort_unless($item->canReviseSpecifications(), 422, 'Specifications are locked once printing starts.');
+
+        $this->revising_item_id = $item->id;
+        $this->rev_bw_pages = (int) $item->bw_pages_count;
+        $this->rev_color_pages = (int) $item->color_pages_count;
+        $this->rev_total_pages = max(1, (int) $item->total_pages_count);
+        $this->rev_copies_count = max(1, (int) $item->copies_count);
+        $this->rev_binding_type = $item->binding_type ?: 'hardbound';
+        $this->rev_cover_color = $item->cover_color ?: 'Maroon';
+        $this->rev_print_sides = $item->getPrintSides();
+        $this->rev_notes = '';
+    }
+
+    public function closeSpecRevisionModal(): void
+    {
+        $this->revising_item_id = null;
+        $this->rev_notes = '';
+        $this->resetValidation();
+    }
+
+    public function submitSpecRevision(): void
+    {
+        $this->resetValidation();
+        $user = auth()->user();
+        if (! $user || ! $this->revising_item_id) {
+            return;
+        }
+
+        $this->validate([
+            'rev_copies_count' => ['required', 'integer', 'min:1', 'max:500'],
+            'rev_bw_pages' => ['required', 'integer', 'min:0', 'max:2000'],
+            'rev_color_pages' => ['required', 'integer', 'min:0', 'max:2000'],
+            'rev_total_pages' => ['required', 'integer', 'min:1', 'max:5000'],
+        ]);
+
+        $item = OrderItem::with('order')->whereHas('order', fn ($q) => $q->where('customer_id', $user->id))->findOrFail($this->revising_item_id);
+
+        $newSpecs = $item->isThesisBinding()
+            ? [
+                'binding_type' => $item->isCoverOnly() ? 'hardbound' : $this->rev_binding_type,
+                'bw_pages' => $this->rev_bw_pages,
+                'color_pages' => $this->rev_color_pages,
+                'cover_color' => $this->rev_cover_color,
+                'print_sides' => $this->rev_print_sides,
+                'copies_count' => $this->rev_copies_count,
+            ]
+            : [
+                'total_pages' => $this->rev_total_pages,
+                'print_sides' => $this->rev_print_sides,
+                'copies_count' => $this->rev_copies_count,
+            ];
+
+        app(SpecRevisionService::class)->requestRevision(
+            item: $item,
+            actor: $user,
+            newSpecs: $newSpecs,
+            notes: trim($this->rev_notes) !== '' ? trim($this->rev_notes) : null,
+        );
+
+        $this->payment_feedback = 'Specification revision requested. Item is temporarily placed on hold awaiting shop approval.';
+        $this->closeSpecRevisionModal();
+    }
 }; ?>
 
 <div class="min-h-screen w-full bg-stone-950 text-stone-100 font-sans antialiased relative selection:bg-amber-500 selection:text-white pb-24">
@@ -123,11 +245,13 @@ new class extends Component {
     @php
         $user = auth()->user();
         $shop = null;
-        $orders = $user ? $user->orders()->with(['items', 'printShop', 'payments'])->get() : collect();
+        $orders = $user ? $user->orders()->with(['items.printer', 'items.specRevisions', 'printShop', 'payments'])->get() : collect();
         $activeOrdersCount = $orders->whereNotIn('order_status', [Order::STATUS_COMPLETED, Order::STATUS_CANCELLED])->count();
         $catalog = PrintServiceCatalog::all();
-        $selectedOrder = $this->viewing_order_id ? Order::where('customer_id', auth()->id())->with(['items', 'printShop', 'payments'])->find($this->viewing_order_id) : null;
+        $selectedOrder = $this->viewing_order_id ? Order::where('customer_id', auth()->id())->with(['items.printer', 'items.specRevisions', 'printShop', 'payments'])->find($this->viewing_order_id) : null;
         $payingOrder = $this->paying_order_id ? Order::where('customer_id', auth()->id())->find($this->paying_order_id) : null;
+        $reuploadingItem = $this->reuploading_item_id ? OrderItem::with('order')->whereHas('order', fn ($q) => $q->where('customer_id', auth()->id()))->find($this->reuploading_item_id) : null;
+        $revisingItem = $this->revising_item_id ? OrderItem::with('order')->whereHas('order', fn ($q) => $q->where('customer_id', auth()->id()))->find($this->revising_item_id) : null;
     @endphp
 
     <!-- Top Navigation Header -->
@@ -361,6 +485,15 @@ new class extends Component {
                                                 Payment Proof Rejected: {{ $latestRejectedPayment->rejection_reason }}
                                             </p>
                                         @endif
+                                        @if ($order->refund_status === Order::REFUND_MANUAL_PENDING && (float) $order->refund_due > 0)
+                                            <p class="text-[11px] text-rose-300 font-semibold mt-1">
+                                                Manual Refund Pending: ₱{{ number_format((float) $order->refund_due, 2) }} to be settled by shop.
+                                            </p>
+                                        @elseif ($order->refund_status === Order::REFUND_SETTLED)
+                                            <p class="text-[11px] text-emerald-300 font-semibold mt-1">
+                                                Manual Refund Settled
+                                            </p>
+                                        @endif
                                     </div>
 
                                     <div class="flex flex-wrap items-center gap-2.5">
@@ -390,6 +523,59 @@ new class extends Component {
                                         </a>
                                     </div>
                                 </div>
+
+                                <!-- Split Item Status & Pickup Tracker -->
+                                @if ($order->items->isNotEmpty())
+                                    <div class="space-y-2 border-t border-stone-800/70 pt-3">
+                                        @foreach ($order->items as $custItem)
+                                            <div wire:key="cust-item-{{ $custItem->id }}" class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 rounded-2xl bg-stone-950/70 border border-stone-800 px-3.5 py-2.5 text-xs">
+                                                <div class="space-y-0.5">
+                                                    <div class="flex flex-wrap items-center gap-2">
+                                                        <span class="font-bold text-white">{{ $custItem->isThesisBinding() ? 'Thesis Binding' : 'Document Printing' }} (x{{ $custItem->copies_count }})</span>
+                                                        <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-stone-800 text-stone-200 border border-stone-700">
+                                                            {{ $custItem->stageLabel() }}
+                                                        </span>
+                                                        @if ($custItem->printer)
+                                                            <span class="text-[10px] text-stone-400">Printer: {{ $custItem->printer->name }}</span>
+                                                        @endif
+                                                        @if ($custItem->shelf_bin_code && $custItem->isReadyForPickup())
+                                                            <span class="px-2 py-0.5 rounded text-[10px] font-black bg-emerald-500/20 text-emerald-300 border border-emerald-500/40">
+                                                                Ready at Shelf/Bin: {{ $custItem->shelf_bin_code }}
+                                                            </span>
+                                                        @endif
+                                                        @if ($custItem->is_spec_locked)
+                                                            <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-indigo-500/15 text-indigo-300 border border-indigo-500/30">
+                                                                Specs Locked
+                                                            </span>
+                                                        @endif
+                                                    </div>
+                                                    @if ($custItem->prepress_status === OrderItem::PREPRESS_REJECTED)
+                                                        <p class="text-[11px] text-red-300 font-semibold">
+                                                            Artwork Rejected: {{ $custItem->prepress_rejection_reason ?: 'Please upload a corrected PDF.' }}
+                                                        </p>
+                                                    @endif
+                                                    @if ($custItem->specRevisions->where('status', SpecRevision::STATUS_PENDING)->isNotEmpty())
+                                                        <p class="text-[11px] text-amber-300 font-semibold">
+                                                            Specification revision pending shop approval (Item on hold).
+                                                        </p>
+                                                    @endif
+                                                </div>
+                                                <div class="flex flex-wrap items-center gap-2 shrink-0">
+                                                    @if ($custItem->prepress_status === OrderItem::PREPRESS_REJECTED && ! $custItem->hasStartedPrinting())
+                                                        <button type="button" wire:click="openReuploadModal({{ $custItem->id }})" class="px-2.5 py-1 rounded-lg bg-red-500 hover:bg-red-400 text-white text-[11px] font-bold cursor-pointer">
+                                                            Re-upload PDF
+                                                        </button>
+                                                    @endif
+                                                    @if ($custItem->canReviseSpecifications() && $custItem->specRevisions->where('status', SpecRevision::STATUS_PENDING)->isEmpty())
+                                                        <button type="button" wire:click="openSpecRevisionModal({{ $custItem->id }})" class="px-2.5 py-1 rounded-lg bg-stone-800 hover:bg-stone-700 text-stone-200 text-[11px] font-bold cursor-pointer">
+                                                            Request Revision
+                                                        </button>
+                                                    @endif
+                                                </div>
+                                            </div>
+                                        @endforeach
+                                    </div>
+                                @endif
 
                                 <!-- 5-Stage Visual Progress Stepper -->
                                 <div class="space-y-2 pt-2">
@@ -642,6 +828,103 @@ new class extends Component {
                     <button type="button" wire:click="submitPaymentProof" class="px-4 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-xs font-black text-stone-950 cursor-pointer">
                         Submit Proof
                     </button>
+                </div>
+            </div>
+        </div>
+    @endif
+
+    <!-- PREPRESS ARTWORK RE-UPLOAD MODAL -->
+    @if ($reuploadingItem)
+        <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-stone-950/80 backdrop-blur-md">
+            <div class="w-full max-w-md rounded-3xl border border-stone-800 bg-stone-900 p-6 shadow-2xl space-y-4">
+                <div class="flex items-center justify-between border-b border-stone-800 pb-3">
+                    <div>
+                        <span class="text-[10px] font-bold text-red-400 uppercase">Prepress Artwork Replacement</span>
+                        <h3 class="text-base font-black text-white font-mono">{{ $reuploadingItem->order?->order_number }}</h3>
+                    </div>
+                    <button type="button" wire:click="closeReuploadModal" class="text-stone-400 hover:text-white text-lg cursor-pointer">✕</button>
+                </div>
+                @if ($reuploadingItem->prepress_rejection_reason)
+                    <div class="p-3 rounded-xl bg-red-500/10 border border-red-500/30 text-xs text-red-200">
+                        Reason: {{ $reuploadingItem->prepress_rejection_reason }}
+                    </div>
+                @endif
+                <div class="space-y-2 text-xs">
+                    <label class="block font-bold text-stone-300">Upload Corrected PDF File</label>
+                    <input type="file" wire:model="reupload_file" class="block w-full text-xs text-stone-400 file:mr-3 file:py-1.5 file:px-3 file:rounded-xl file:border-0 file:bg-stone-800 file:text-stone-200 file:font-bold" />
+                    @error('artwork_file') <p class="text-[11px] text-red-400">{{ $message }}</p> @enderror
+                </div>
+                <div class="flex justify-end gap-2 pt-2">
+                    <button type="button" wire:click="closeReuploadModal" class="px-4 py-2 rounded-xl bg-stone-800 text-xs font-bold text-stone-300 cursor-pointer">Cancel</button>
+                    <button type="button" wire:click="submitArtworkReupload" class="px-4 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-xs font-black text-stone-950 cursor-pointer">Upload Corrected PDF</button>
+                </div>
+            </div>
+        </div>
+    @endif
+
+    <!-- SPECIFICATION REVISION REQUEST MODAL -->
+    @if ($revisingItem)
+        <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-stone-950/80 backdrop-blur-md">
+            <div class="w-full max-w-md rounded-3xl border border-stone-800 bg-stone-900 p-6 shadow-2xl space-y-4">
+                <div class="flex items-center justify-between border-b border-stone-800 pb-3">
+                    <div>
+                        <span class="text-[10px] font-bold text-amber-400 uppercase">Request Pre-Print Spec Revision</span>
+                        <h3 class="text-base font-black text-white font-mono">{{ $revisingItem->order?->order_number }}</h3>
+                    </div>
+                    <button type="button" wire:click="closeSpecRevisionModal" class="text-stone-400 hover:text-white text-lg cursor-pointer">✕</button>
+                </div>
+                <div class="space-y-3 text-xs">
+                    @if ($revisingItem->isThesisBinding())
+                        <div class="grid grid-cols-2 gap-3">
+                            <div>
+                                <label class="block font-bold text-stone-300 mb-1">B&amp;W Pages</label>
+                                <input type="number" min="0" wire:model="rev_bw_pages" class="w-full rounded-xl bg-stone-950 border border-stone-800 px-3 py-2 text-xs text-white" />
+                            </div>
+                            <div>
+                                <label class="block font-bold text-stone-300 mb-1">Color Pages</label>
+                                <input type="number" min="0" wire:model="rev_color_pages" class="w-full rounded-xl bg-stone-950 border border-stone-800 px-3 py-2 text-xs text-white" />
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-2 gap-3">
+                            <div>
+                                <label class="block font-bold text-stone-300 mb-1">Binding Style</label>
+                                <select wire:model="rev_binding_type" @disabled($revisingItem->isCoverOnly()) class="w-full rounded-xl bg-stone-950 border border-stone-800 px-3 py-2 text-xs text-white">
+                                    <option value="hardbound">Hardbound</option>
+                                    <option value="softbound">Softbound</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block font-bold text-stone-300 mb-1">Cover Color</label>
+                                <input type="text" wire:model="rev_cover_color" class="w-full rounded-xl bg-stone-950 border border-stone-800 px-3 py-2 text-xs text-white" />
+                            </div>
+                        </div>
+                    @else
+                        <div>
+                            <label class="block font-bold text-stone-300 mb-1">Total Pages</label>
+                            <input type="number" min="1" wire:model="rev_total_pages" class="w-full rounded-xl bg-stone-950 border border-stone-800 px-3 py-2 text-xs text-white" />
+                        </div>
+                    @endif
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="block font-bold text-stone-300 mb-1">Print Sides</label>
+                            <select wire:model="rev_print_sides" class="w-full rounded-xl bg-stone-950 border border-stone-800 px-3 py-2 text-xs text-white">
+                                <option value="simplex">Simplex</option>
+                                <option value="duplex">Duplex</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block font-bold text-stone-300 mb-1">Copies</label>
+                            <input type="number" min="1" wire:model="rev_copies_count" class="w-full rounded-xl bg-stone-950 border border-stone-800 px-3 py-2 text-xs text-white" />
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block font-bold text-stone-300 mb-1">Revision Note</label>
+                        <textarea wire:model="rev_notes" rows="2" placeholder="Optional note explaining change..." class="w-full rounded-xl bg-stone-950 border border-stone-800 px-3 py-2 text-xs text-white"></textarea>
+                    </div>
+                </div>
+                <div class="flex justify-end gap-2 pt-2">
+                    <button type="button" wire:click="closeSpecRevisionModal" class="px-4 py-2 rounded-xl bg-stone-800 text-xs font-bold text-stone-300 cursor-pointer">Cancel</button>
+                    <button type="button" wire:click="submitSpecRevision" class="px-4 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-xs font-black text-stone-950 cursor-pointer">Submit Revision Request</button>
                 </div>
             </div>
         </div>

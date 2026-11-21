@@ -4,13 +4,19 @@ use App\Models\InventoryItem;
 use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\Payment;
+use App\Models\Printer;
 use App\Models\PrintShop;
+use App\Models\SpecRevision;
 use App\Models\StockMovement;
 use App\Models\User;
 use App\Services\InventoryDeductionService;
 use App\Services\PaymentService;
+use App\Services\ProductionQueueService;
+use App\Services\SpecRevisionService;
 use Flux\Flux;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Validation\ValidationException;
+use Livewire\Attributes\Locked;
 use Livewire\Attributes\Title;
 use Livewire\Component;
 
@@ -42,6 +48,41 @@ new #[Title('Production Operations Hub')] class extends Component {
     public float $spoilageQty = 1;
     public string $spoilageReason = '';
 
+    // WP-3 Direct Browser Print Preview Modal
+    public bool $showPrintPreviewModal = false;
+    #[Locked]
+    public ?int $printPreviewItemId = null;
+
+    // WP-3 Prepress Reject Modal
+    public bool $showPrepressRejectModal = false;
+    #[Locked]
+    public ?int $prepressItemId = null;
+    public string $prepressRejectReason = '';
+
+    // WP-3 Cover-Only -> Shop Paper Shift Modal
+    public bool $showShiftToShopPaperModal = false;
+    #[Locked]
+    public ?int $shiftingItemId = null;
+    public string $shiftReason = '';
+    public int $shiftBwPages = 100;
+    public int $shiftColorPages = 0;
+
+    // WP-3 Item QA Pass (Shelf Bin) Modal
+    public bool $showItemQaPassModal = false;
+    #[Locked]
+    public ?int $qaPassItemId = null;
+    public string $qaPassShelfBin = '';
+
+    // WP-3 Item QA Fail (Dual Paper + Ink Rework Spoilage) Modal
+    public bool $showItemQaFailModal = false;
+    #[Locked]
+    public ?int $qaFailItemId = null;
+    public string $qaFailReason = '';
+    public float $qaFailSpoiledSheets = 10;
+    public ?int $qaFailPaperItemId = null;
+    public ?int $qaFailInkItemId = null;
+    public float $qaFailInkQty = 1;
+
     public function getShopProperty(): ?PrintShop
     {
         $user = auth()->user();
@@ -67,7 +108,7 @@ new #[Title('Production Operations Hub')] class extends Component {
         $query = Order::where('print_shop_id', $shop->id)
             ->where('payment_status', '!=', Order::PAYMENT_REJECTED)
             ->where('order_status', '!=', Order::STATUS_CANCELLED)
-            ->with(['customer', 'items', 'assignedStaff'])
+            ->with(['customer', 'items.printer', 'items.assignedStaff', 'items.specRevisions', 'assignedStaff'])
             ->latest('created_at');
 
         if ($this->selectedService !== 'all') {
@@ -126,7 +167,33 @@ new #[Title('Production Operations Hub')] class extends Component {
             return null;
         }
 
-        return Order::where('print_shop_id', auth()->user()?->operationalShop()?->id ?? 0)->with(['customer', 'items', 'assignedStaff'])->find($this->selectedOrderId);
+        return Order::where('print_shop_id', auth()->user()?->operationalShop()?->id ?? 0)
+            ->with(['customer', 'items.printer', 'items.assignedStaff', 'items.specRevisions', 'assignedStaff'])
+            ->find($this->selectedOrderId);
+    }
+
+    public function getShopPrintersProperty()
+    {
+        $shop = $this->shop;
+        if (! $shop) {
+            return collect();
+        }
+
+        return $shop->printers()->get();
+    }
+
+    public function getShopOperatorsProperty()
+    {
+        $shop = $this->shop;
+        if (! $shop) {
+            return collect();
+        }
+
+        return User::query()
+            ->where('id', $shop->user_id)
+            ->orWhere('staff_shop_id', $shop->id)
+            ->orderBy('name')
+            ->get();
     }
 
     /**
@@ -362,6 +429,284 @@ new #[Title('Production Operations Hub')] class extends Component {
         }
 
         $this->showSpoilageModal = false;
+    }
+
+    public function openPrintPreview(int $itemId): void
+    {
+        $item = $this->findShopOrderItem($itemId);
+        if (! $item || ! $item->document_file_path) {
+            return;
+        }
+
+        $this->printPreviewItemId = $item->id;
+        $this->showPrintPreviewModal = true;
+    }
+
+    public function assignItemPrinter(int $itemId, mixed $printerId): void
+    {
+        $user = auth()->user();
+        $item = $this->findShopOrderItem($itemId);
+        if (! $user || ! $item) {
+            return;
+        }
+
+        $resolvedPrinterId = is_numeric($printerId) && (int) $printerId > 0 ? (int) $printerId : null;
+        app(ProductionQueueService::class)->assignItem($item, $user, $resolvedPrinterId, $item->assigned_staff_id);
+        Flux::toast(text: 'Printer workstation assignment updated.', heading: 'Printer Assigned', variant: 'success');
+    }
+
+    public function assignItemStaff(int $itemId, mixed $staffId): void
+    {
+        $user = auth()->user();
+        $item = $this->findShopOrderItem($itemId);
+        if (! $user || ! $item) {
+            return;
+        }
+
+        $resolvedStaffId = is_numeric($staffId) && (int) $staffId > 0 ? (int) $staffId : null;
+        app(ProductionQueueService::class)->assignItem($item, $user, $item->printer_id, $resolvedStaffId);
+        Flux::toast(text: 'Operator assignment updated.', heading: 'Operator Assigned', variant: 'success');
+    }
+
+    public function approveItemPrepress(int $itemId): void
+    {
+        $user = auth()->user();
+        $item = $this->findShopOrderItem($itemId);
+        if (! $user || ! $item) {
+            return;
+        }
+
+        app(ProductionQueueService::class)->approvePrepress($item, $user);
+        Flux::toast(text: 'Prepress artwork approved and specifications locked.', heading: 'Prepress Approved', variant: 'success');
+    }
+
+    public function openItemPrepressRejectModal(int $itemId): void
+    {
+        $item = $this->findShopOrderItem($itemId);
+        if (! $item) {
+            return;
+        }
+
+        $this->prepressItemId = $item->id;
+        $this->prepressRejectReason = '';
+        $this->showPrepressRejectModal = true;
+    }
+
+    public function confirmPrepressRejection(): void
+    {
+        $user = auth()->user();
+        $item = $this->prepressItemId ? $this->findShopOrderItem($this->prepressItemId) : null;
+        if (! $user || ! $item) {
+            return;
+        }
+
+        app(ProductionQueueService::class)->rejectPrepress($item, $user, $this->prepressRejectReason);
+        $this->showPrepressRejectModal = false;
+        $this->prepressItemId = null;
+        Flux::toast(text: 'Artwork rejected and item placed on hold.', heading: 'Prepress Rejected', variant: 'warning');
+    }
+
+    public function confirmCoverOnlyIntake(int $itemId): void
+    {
+        $user = auth()->user();
+        $item = $this->findShopOrderItem($itemId);
+        if (! $user || ! $item) {
+            return;
+        }
+
+        app(ProductionQueueService::class)->confirmCoverOnlyPaperIntake($item, $user);
+        Flux::toast(text: 'Customer paper intake confirmed and specifications locked.', heading: 'Paper Intake Approved', variant: 'success');
+    }
+
+    public function openShiftToShopPaperModal(int $itemId): void
+    {
+        $item = $this->findShopOrderItem($itemId);
+        if (! $item) {
+            return;
+        }
+
+        $this->shiftingItemId = $item->id;
+        $this->shiftReason = '';
+        $this->shiftBwPages = max(1, (int) $item->total_pages_count);
+        $this->shiftColorPages = 0;
+        $this->showShiftToShopPaperModal = true;
+    }
+
+    public function confirmShiftToShopPaper(): void
+    {
+        $user = auth()->user();
+        $item = $this->shiftingItemId ? $this->findShopOrderItem($this->shiftingItemId) : null;
+        if (! $user || ! $item) {
+            return;
+        }
+
+        app(ProductionQueueService::class)->rejectCoverOnlyAndShiftToShopPaper(
+            item: $item,
+            staff: $user,
+            reason: $this->shiftReason,
+            bwPages: $this->shiftBwPages,
+            colorPages: $this->shiftColorPages,
+        );
+
+        $this->showShiftToShopPaperModal = false;
+        $this->shiftingItemId = null;
+        Flux::toast(text: 'Item shifted to Full Package (Shop Paper) with recalculated total and locked BOM stock.', heading: 'Shifted to Shop Paper', variant: 'success');
+    }
+
+    public function startItemPrinting(int $itemId): void
+    {
+        $user = auth()->user();
+        $item = $this->findShopOrderItem($itemId);
+        if (! $user || ! $item) {
+            return;
+        }
+
+        app(ProductionQueueService::class)->startPrintingItem($item, $user);
+        Flux::toast(text: 'Item printing started and specs locked.', heading: 'Printing Started', variant: 'success');
+    }
+
+    public function advanceItemWorkflow(int $itemId): void
+    {
+        $user = auth()->user();
+        $item = $this->findShopOrderItem($itemId);
+        if (! $user || ! $item) {
+            return;
+        }
+
+        $updated = app(ProductionQueueService::class)->advanceItemStage($item, $user);
+        Flux::toast(text: "Item moved to {$updated->stageLabel()}.", heading: 'Item Stage Updated', variant: 'success');
+    }
+
+    public function openItemQaPassModal(int $itemId): void
+    {
+        $item = $this->findShopOrderItem($itemId);
+        if (! $item) {
+            return;
+        }
+
+        $this->qaPassItemId = $item->id;
+        $this->qaPassShelfBin = $item->shelf_bin_code ?: 'BIN-A1';
+        $this->showItemQaPassModal = true;
+    }
+
+    public function confirmItemQaPass(): void
+    {
+        $user = auth()->user();
+        $item = $this->qaPassItemId ? $this->findShopOrderItem($this->qaPassItemId) : null;
+        if (! $user || ! $item) {
+            return;
+        }
+
+        app(ProductionQueueService::class)->passQualityCheck($item, $user, $this->qaPassShelfBin);
+        $this->showItemQaPassModal = false;
+        $this->qaPassItemId = null;
+        Flux::toast(text: 'QA passed and item assigned to pickup bin.', heading: 'Ready for Pickup', variant: 'success');
+    }
+
+    public function openItemQaFailModal(int $itemId): void
+    {
+        $item = $this->findShopOrderItem($itemId);
+        $shop = $this->shop;
+        if (! $item || ! $shop || ! $item->order) {
+            return;
+        }
+
+        $resolved = app(InventoryDeductionService::class)->resolvePaperAndInkItemsForItem($shop, $item->order, $item);
+
+        $this->qaFailItemId = $item->id;
+        $this->qaFailReason = '';
+        $this->qaFailSpoiledSheets = max(1.0, (float) min(10, max(1, $item->getPhysicalSheetsCount())));
+        $this->qaFailPaperItemId = $resolved['paper']?->id;
+        $this->qaFailInkItemId = $resolved['ink']?->id;
+        $this->qaFailInkQty = max(0.1, round($this->qaFailSpoiledSheets * $resolved['ink_per_sheet'], 2));
+        $this->showItemQaFailModal = true;
+    }
+
+    public function confirmItemQaFail(): void
+    {
+        $user = auth()->user();
+        $item = $this->qaFailItemId ? $this->findShopOrderItem($this->qaFailItemId) : null;
+        if (! $user || ! $item) {
+            return;
+        }
+
+        app(ProductionQueueService::class)->failQualityCheckWithDualSpoilage(
+            item: $item,
+            staff: $user,
+            reason: $this->qaFailReason,
+            spoiledSheets: (float) $this->qaFailSpoiledSheets,
+            paperItemId: $this->qaFailPaperItemId,
+            inkItemId: $this->qaFailInkItemId,
+            inkQty: (float) $this->qaFailInkQty,
+        );
+
+        $this->showItemQaFailModal = false;
+        $this->qaFailItemId = null;
+        Flux::toast(text: 'QA rework logged for paper and ink without changing customer billing.', heading: 'QA Rework Logged', variant: 'warning');
+    }
+
+    public function claimOrderItem(int $itemId): void
+    {
+        $user = auth()->user();
+        $item = $this->findShopOrderItem($itemId);
+        if (! $user || ! $item) {
+            return;
+        }
+
+        try {
+            app(ProductionQueueService::class)->claimItem($item, $user);
+            Flux::toast(text: 'Item marked claimed.', heading: 'Item Claimed', variant: 'success');
+        } catch (ValidationException $e) {
+            Flux::toast(text: collect($e->errors())->flatten()->first() ?? 'Settle remaining balance before final release.', heading: 'Balance Required', variant: 'danger');
+        }
+    }
+
+    public function approveItemRevision(int $revisionId): void
+    {
+        $user = auth()->user();
+        $shopId = $this->shop?->id ?? 0;
+        $revision = SpecRevision::whereHas('orderItem.order', fn ($q) => $q->where('print_shop_id', $shopId))->findOrFail($revisionId);
+        if (! $user) {
+            return;
+        }
+
+        app(SpecRevisionService::class)->approveAndApplyRevision($revision, $user);
+        Flux::toast(text: 'Specification revision applied and BOM reservations updated.', heading: 'Revision Applied', variant: 'success');
+    }
+
+    public function rejectItemRevision(int $revisionId): void
+    {
+        $user = auth()->user();
+        $shopId = $this->shop?->id ?? 0;
+        $revision = SpecRevision::whereHas('orderItem.order', fn ($q) => $q->where('print_shop_id', $shopId))->findOrFail($revisionId);
+        if (! $user) {
+            return;
+        }
+
+        app(SpecRevisionService::class)->rejectRevision($revision, $user, 'Rejected by production floor');
+        Flux::toast(text: 'Revision rejected and item returned to queue.', heading: 'Revision Rejected', variant: 'warning');
+    }
+
+    public function settleOrderManualRefund(int $orderId): void
+    {
+        $user = auth()->user();
+        $shopId = $this->shop?->id ?? 0;
+        $order = Order::where('print_shop_id', $shopId)->findOrFail($orderId);
+        if (! $user) {
+            return;
+        }
+
+        app(SpecRevisionService::class)->settleManualRefund($order, $user);
+        Flux::toast(text: 'Manual refund recorded and cleared.', heading: 'Refund Settled', variant: 'success');
+    }
+
+    protected function findShopOrderItem(int $itemId): ?OrderItem
+    {
+        $shopId = $this->shop?->id ?? 0;
+
+        return OrderItem::with(['order', 'printer'])
+            ->whereHas('order', fn ($q) => $q->where('print_shop_id', $shopId))
+            ->find($itemId);
     }
 }; ?>
 
@@ -695,15 +1040,15 @@ new #[Title('Production Operations Hub')] class extends Component {
                                                 {{ $order->order_number }}
                                             </span>
                                             @if ($item?->document_file_path)
-                                                <a 
-                                                    href="{{ route('orders.file', ['order' => $item->order_id, 'kind' => 'document', 'item' => $item->id]) }}"
-                                                    target="_blank"
-                                                    class="px-1.5 py-0.5 rounded text-[9px] font-bold bg-blue-500/20 text-blue-300 hover:bg-blue-500/30 border border-blue-500/30 flex items-center gap-1 transition-colors"
-                                                    title="View Document File: {{ $item->document_original_name }}"
+                                                <button
+                                                    type="button"
+                                                    wire:click="openPrintPreview({{ $item->id }})"
+                                                    class="px-1.5 py-0.5 rounded text-[9px] font-bold bg-blue-500/20 text-blue-300 hover:bg-blue-500/30 border border-blue-500/30 flex items-center gap-1 transition-colors cursor-pointer"
+                                                    title="Direct Print Preview: {{ $item->document_original_name }}"
                                                 >
-                                                    <flux:icon name="document-text" class="size-2.5" />
-                                                    <span>PDF</span>
-                                                </a>
+                                                    <flux:icon name="printer" class="size-2.5" />
+                                                    <span>Print Preview</span>
+                                                </button>
                                             @endif
                                         </div>
                                         
@@ -1181,6 +1526,141 @@ new #[Title('Production Operations Hub')] class extends Component {
                         </div>
                     @endif
 
+                    <!-- Line-Item Scheduling, Prepress, Printers, QA & Split Pickup -->
+                    <div class="space-y-3">
+                        <div class="flex items-center justify-between">
+                            <h4 class="font-black text-amber-400 text-xs uppercase tracking-wider">Line-Item Production Routing &amp; Controls ({{ $ticketOrder->items->count() }})</h4>
+                            @if ($ticketOrder->refund_status === Order::REFUND_MANUAL_PENDING && (float) $ticketOrder->refund_due > 0)
+                                <button type="button" wire:click="settleOrderManualRefund({{ $ticketOrder->id }})" class="px-2.5 py-1 rounded-lg bg-rose-500 hover:bg-rose-400 text-stone-950 text-[11px] font-black cursor-pointer">
+                                    Settle Manual Refund (₱{{ number_format((float) $ticketOrder->refund_due, 2) }})
+                                </button>
+                            @endif
+                        </div>
+
+                        @foreach ($ticketOrder->items as $lineItem)
+                            @php
+                                $pendingRev = $lineItem->specRevisions->where('status', SpecRevision::STATUS_PENDING)->first();
+                            @endphp
+                            <div wire:key="ticket-item-{{ $lineItem->id }}" class="p-4 rounded-2xl bg-stone-950 border border-stone-800 space-y-3">
+                                <div class="flex flex-wrap items-center justify-between gap-2">
+                                    <div class="flex flex-wrap items-center gap-2">
+                                        <span class="font-bold text-white">{{ $lineItem->isThesisBinding() ? 'Thesis Binding' : 'Document Printing' }} (x{{ $lineItem->copies_count }})</span>
+                                        <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-stone-800 text-amber-300 border border-stone-700">{{ $lineItem->stageLabel() }}</span>
+                                        <span class="px-2 py-0.5 rounded text-[10px] font-bold {{ $lineItem->prepress_status === OrderItem::PREPRESS_APPROVED ? 'bg-emerald-500/20 text-emerald-300' : ($lineItem->prepress_status === OrderItem::PREPRESS_REJECTED ? 'bg-red-500/20 text-red-300' : 'bg-stone-800 text-stone-400') }}">
+                                            Prepress: {{ ucfirst($lineItem->prepress_status) }}
+                                        </span>
+                                        @if ($lineItem->is_spec_locked)
+                                            <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-indigo-500/20 text-indigo-300">Specs Locked</span>
+                                        @endif
+                                        @if ($lineItem->shelf_bin_code)
+                                            <span class="px-2 py-0.5 rounded text-[10px] font-black bg-emerald-500/20 text-emerald-300">Shelf: {{ $lineItem->shelf_bin_code }}</span>
+                                        @endif
+                                        @if ($lineItem->isUnclaimedAging(3))
+                                            <span class="px-2 py-0.5 rounded text-[10px] font-black bg-amber-500/20 text-amber-300">Aging Pickup (&gt;3d)</span>
+                                        @endif
+                                    </div>
+                                    <span class="font-mono font-bold text-stone-200">₱{{ number_format((float) $lineItem->total_price, 2) }}</span>
+                                </div>
+
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                                    <div>
+                                        <label class="block text-[10px] font-bold text-stone-400 uppercase mb-1">Assigned Printer</label>
+                                        <select wire:change="assignItemPrinter({{ $lineItem->id }}, $event.target.value)" class="w-full rounded-xl bg-stone-900 border border-stone-800 px-3 py-1.5 text-xs text-white">
+                                            <option value="">Unassigned</option>
+                                            @foreach ($this->shopPrinters as $shopPrinter)
+                                                <option value="{{ $shopPrinter->id }}" @selected($lineItem->printer_id === $shopPrinter->id)>
+                                                    {{ $shopPrinter->name }} ({{ ucfirst($shopPrinter->status) }})
+                                                </option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label class="block text-[10px] font-bold text-stone-400 uppercase mb-1">Assigned Operator</label>
+                                        <select wire:change="assignItemStaff({{ $lineItem->id }}, $event.target.value)" class="w-full rounded-xl bg-stone-900 border border-stone-800 px-3 py-1.5 text-xs text-white">
+                                            <option value="">Unassigned</option>
+                                            @foreach ($this->shopOperators as $shopOp)
+                                                <option value="{{ $shopOp->id }}" @selected($lineItem->assigned_staff_id === $shopOp->id)>
+                                                    {{ $shopOp->name }}
+                                                </option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                </div>
+
+                                @if ($pendingRev)
+                                    <div class="p-3 rounded-xl bg-amber-500/10 border border-amber-500/30 flex flex-wrap items-center justify-between gap-2">
+                                        <div>
+                                            <div class="font-bold text-amber-300">Pending Spec Revision ({{ ucwords(str_replace('_', ' ', $pendingRev->revision_type)) }})</div>
+                                            <div class="text-[11px] text-stone-300">
+                                                New total: ₱{{ number_format((float) $pendingRev->new_total, 2) }}
+                                                (Delta: {{ $pendingRev->delta_amount >= 0 ? '+' : '' }}₱{{ number_format((float) $pendingRev->delta_amount, 2) }})
+                                            </div>
+                                        </div>
+                                        <div class="flex gap-1.5">
+                                            <button type="button" wire:click="approveItemRevision({{ $pendingRev->id }})" class="px-2.5 py-1 rounded-lg bg-emerald-500 hover:bg-emerald-400 text-stone-950 text-[11px] font-black cursor-pointer">Approve &amp; Apply</button>
+                                            <button type="button" wire:click="rejectItemRevision({{ $pendingRev->id }})" class="px-2.5 py-1 rounded-lg bg-red-500/20 text-red-300 border border-red-500/30 text-[11px] font-bold cursor-pointer">Reject</button>
+                                        </div>
+                                    </div>
+                                @endif
+
+                                <div class="flex flex-wrap items-center gap-1.5 pt-1">
+                                    @if ($lineItem->document_file_path)
+                                        <button type="button" wire:click="openPrintPreview({{ $lineItem->id }})" class="px-2.5 py-1 rounded-lg bg-blue-500 hover:bg-blue-400 text-stone-950 text-[11px] font-black cursor-pointer">
+                                            Direct Print Preview
+                                        </button>
+                                        @if ($lineItem->printer?->is_wide_format)
+                                            <a href="{{ route('orders.file', ['order' => $lineItem->order_id, 'kind' => 'document', 'item' => $lineItem->id]) }}" class="px-2.5 py-1 rounded-lg bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 text-[11px] font-bold">
+                                                RIP Export
+                                            </a>
+                                        @endif
+                                    @endif
+
+                                    @if ($lineItem->isCoverOnly() && ! $lineItem->is_paper_received && ! $lineItem->hasStartedPrinting())
+                                        <button type="button" wire:click="confirmCoverOnlyIntake({{ $lineItem->id }})" class="px-2.5 py-1 rounded-lg bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-[11px] font-bold cursor-pointer">
+                                            Confirm Paper Intake
+                                        </button>
+                                        <button type="button" wire:click="openShiftToShopPaperModal({{ $lineItem->id }})" class="px-2.5 py-1 rounded-lg bg-rose-500/20 text-rose-300 border border-rose-500/30 text-[11px] font-bold cursor-pointer">
+                                            Reject Paper &rarr; Shop Paper
+                                        </button>
+                                    @endif
+
+                                    @if (! $lineItem->hasStartedPrinting() && $lineItem->prepress_status !== OrderItem::PREPRESS_APPROVED && (! $lineItem->isCoverOnly() || $lineItem->is_paper_received))
+                                        <button type="button" wire:click="approveItemPrepress({{ $lineItem->id }})" class="px-2.5 py-1 rounded-lg bg-emerald-500 hover:bg-emerald-400 text-stone-950 text-[11px] font-black cursor-pointer">
+                                            Approve Prepress
+                                        </button>
+                                    @endif
+
+                                    @if (! $lineItem->hasStartedPrinting())
+                                        <button type="button" wire:click="openItemPrepressRejectModal({{ $lineItem->id }})" class="px-2.5 py-1 rounded-lg bg-red-500/20 text-red-300 border border-red-500/30 text-[11px] font-bold cursor-pointer">
+                                            Reject Artwork
+                                        </button>
+                                    @endif
+
+                                    @if (($lineItem->production_stage ?? OrderItem::STAGE_QUEUE) === OrderItem::STAGE_QUEUE && $lineItem->prepress_status !== OrderItem::PREPRESS_REJECTED && (! $lineItem->isCoverOnly() || $lineItem->is_paper_received))
+                                        <button type="button" wire:click="startItemPrinting({{ $lineItem->id }})" class="px-2.5 py-1 rounded-lg bg-amber-500 hover:bg-amber-400 text-stone-950 text-[11px] font-black cursor-pointer">
+                                            Start Printing
+                                        </button>
+                                    @elseif (in_array($lineItem->production_stage ?? OrderItem::STAGE_QUEUE, [OrderItem::STAGE_PRINTING, OrderItem::STAGE_BINDING], true))
+                                        <button type="button" wire:click="advanceItemWorkflow({{ $lineItem->id }})" class="px-2.5 py-1 rounded-lg bg-amber-500 hover:bg-amber-400 text-stone-950 text-[11px] font-black cursor-pointer">
+                                            Advance Stage
+                                        </button>
+                                    @elseif (($lineItem->production_stage ?? OrderItem::STAGE_QUEUE) === OrderItem::STAGE_QUALITY_CHECK)
+                                        <button type="button" wire:click="openItemQaPassModal({{ $lineItem->id }})" class="px-2.5 py-1 rounded-lg bg-emerald-500 hover:bg-emerald-400 text-stone-950 text-[11px] font-black cursor-pointer">
+                                            Pass QC &amp; Bin
+                                        </button>
+                                        <button type="button" wire:click="openItemQaFailModal({{ $lineItem->id }})" class="px-2.5 py-1 rounded-lg bg-red-500 hover:bg-red-400 text-white text-[11px] font-bold cursor-pointer">
+                                            Fail QC (Rework)
+                                        </button>
+                                    @elseif ($lineItem->isReadyForPickup())
+                                        <button type="button" wire:click="claimOrderItem({{ $lineItem->id }})" class="px-2.5 py-1 rounded-lg bg-emerald-500 hover:bg-emerald-400 text-stone-950 text-[11px] font-black cursor-pointer">
+                                            Mark Item Claimed
+                                        </button>
+                                    @endif
+                                </div>
+                            </div>
+                        @endforeach
+                    </div>
+
                     <!-- Customer Document Print Asset Box -->
                     @if ($ticketItem?->document_file_path)
                         <div class="p-4 rounded-2xl bg-gradient-to-r from-blue-950/40 to-indigo-950/30 border border-blue-500/40 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-lg shadow-blue-500/5">
@@ -1192,30 +1672,30 @@ new #[Title('Production Operations Hub')] class extends Component {
                                     <div class="flex items-center gap-2 flex-wrap">
                                         <p class="font-bold text-white text-xs truncate max-w-[280px] sm:max-w-md select-all">{{ $ticketItem->document_original_name ?? 'Document.pdf' }}</p>
                                         <span class="px-2 py-0.5 rounded text-[10px] font-black bg-blue-500/20 text-blue-300 border border-blue-500/30 shrink-0">
-                                            Print-Ready File
+                                            Inline Browser Print Dispatch
                                         </span>
                                     </div>
-                                    <p class="text-[11px] text-stone-400 mt-0.5">Uploaded by customer for direct rasterization and printing.</p>
+                                    <p class="text-[11px] text-stone-400 mt-0.5">Dispatched directly inside locked inline viewer without loose file copies.</p>
                                 </div>
                             </div>
                             <div class="flex items-center gap-2 w-full sm:w-auto shrink-0">
-                                <a 
-                                    href="{{ route('orders.file', ['order' => $ticketItem->order_id, 'kind' => 'document', 'item' => $ticketItem->id]) }}"
-                                    target="_blank" 
-                                    download="{{ $ticketItem->document_original_name ?? 'Document.pdf' }}"
+                                <button
+                                    type="button"
+                                    wire:click="openPrintPreview({{ $ticketItem->id }})"
                                     class="flex-1 sm:flex-initial px-4 py-2 rounded-xl text-xs font-black bg-blue-500 hover:bg-blue-400 text-stone-950 transition-colors flex items-center justify-center gap-1.5 shadow-md shadow-blue-500/20 cursor-pointer"
                                 >
-                                    <flux:icon name="arrow-down-tray" class="size-3.5" />
-                                    <span>Download File</span>
-                                </a>
-                                <a 
-                                    href="{{ route('orders.file', ['order' => $ticketItem->order_id, 'kind' => 'document', 'item' => $ticketItem->id]) }}"
-                                    target="_blank" 
-                                    class="px-3 py-2 rounded-xl text-xs font-bold bg-stone-800 hover:bg-stone-700 text-stone-200 border border-stone-700 transition-colors flex items-center justify-center gap-1 cursor-pointer"
-                                    title="Preview in new tab"
-                                >
-                                    <flux:icon name="arrow-top-right-on-square" class="size-3.5" />
-                                </a>
+                                    <flux:icon name="printer" class="size-3.5" />
+                                    <span>Direct Print Preview</span>
+                                </button>
+                                @if ($ticketItem->printer?->is_wide_format)
+                                    <a
+                                        href="{{ route('orders.file', ['order' => $ticketItem->order_id, 'kind' => 'document', 'item' => $ticketItem->id]) }}"
+                                        download="{{ $ticketItem->document_original_name ?? 'Document.pdf' }}"
+                                        class="px-3 py-2 rounded-xl text-xs font-bold bg-indigo-500/20 hover:bg-indigo-500/30 text-indigo-300 border border-indigo-500/40 transition-colors flex items-center justify-center gap-1 cursor-pointer"
+                                    >
+                                        <span>RIP Export</span>
+                                    </a>
+                                @endif
                             </div>
                         </div>
                     @else
@@ -1409,6 +1889,139 @@ new #[Title('Production Operations Hub')] class extends Component {
                     >
                         Confirm Spoilage Deduction
                     </button>
+                </div>
+            </div>
+        </div>
+    @endif
+
+    <!-- Direct Browser Print Preview Modal -->
+    @if ($showPrintPreviewModal && $printPreviewItemId)
+        @php
+            $previewItem = $this->findShopOrderItem($printPreviewItemId);
+        @endphp
+        @if ($previewItem)
+            <div class="fixed inset-0 z-50 bg-stone-950/90 backdrop-blur-md flex items-center justify-center p-4">
+                <div class="bg-stone-900 border border-stone-800 rounded-3xl w-full max-w-5xl h-[88vh] flex flex-col overflow-hidden shadow-2xl">
+                    <div class="p-4 border-b border-stone-800 flex items-center justify-between gap-3">
+                        <div>
+                            <h3 class="text-sm font-black text-white">Direct Print Dispatch: {{ $previewItem->document_original_name ?? 'Artwork.pdf' }}</h3>
+                            <p class="text-[11px] text-stone-400">Protected inline preview stream (no local download for standard printers).</p>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <button type="button" onclick="const frame = document.getElementById('pressqueue-print-frame'); if (frame && frame.contentWindow) { frame.contentWindow.focus(); frame.contentWindow.print(); }" class="px-4 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-stone-950 text-xs font-black cursor-pointer">
+                                Print Now
+                            </button>
+                            <button type="button" wire:click="$set('showPrintPreviewModal', false)" class="px-3 py-2 rounded-xl bg-stone-800 text-stone-300 text-xs font-bold cursor-pointer">
+                                Close
+                            </button>
+                        </div>
+                    </div>
+                    <iframe
+                        id="pressqueue-print-frame"
+                        src="{{ route('orders.file.preview', ['order' => $previewItem->order_id, 'item' => $previewItem->id]) }}"
+                        class="w-full flex-1 bg-white"
+                    ></iframe>
+                </div>
+            </div>
+        @endif
+    @endif
+
+    <!-- Prepress Rejection Modal -->
+    @if ($showPrepressRejectModal)
+        <div class="fixed inset-0 z-50 bg-stone-950/80 backdrop-blur-md flex items-center justify-center p-4">
+            <div class="bg-stone-900 border border-stone-800 rounded-3xl w-full max-w-md p-6 space-y-4 shadow-2xl">
+                <h3 class="text-base font-black text-white">Reject Prepress Artwork</h3>
+                <textarea wire:model="prepressRejectReason" rows="3" placeholder="Explain what the customer must fix in their PDF..." class="w-full bg-stone-950 border border-stone-800 rounded-xl p-3 text-xs text-white"></textarea>
+                @error('reason') <p class="text-[11px] text-red-400">{{ $message }}</p> @enderror
+                <div class="flex justify-end gap-2">
+                    <button type="button" wire:click="$set('showPrepressRejectModal', false)" class="px-4 py-2 rounded-xl bg-stone-800 text-xs font-bold text-stone-300 cursor-pointer">Cancel</button>
+                    <button type="button" wire:click="confirmPrepressRejection" class="px-4 py-2 rounded-xl bg-red-500 hover:bg-red-400 text-xs font-black text-white cursor-pointer">Confirm Reject &amp; Hold</button>
+                </div>
+            </div>
+        </div>
+    @endif
+
+    <!-- Cover-Only Reject -> Shift to Shop Paper Modal -->
+    @if ($showShiftToShopPaperModal)
+        <div class="fixed inset-0 z-50 bg-stone-950/80 backdrop-blur-md flex items-center justify-center p-4">
+            <div class="bg-stone-900 border border-stone-800 rounded-3xl w-full max-w-md p-6 space-y-4 shadow-2xl">
+                <h3 class="text-base font-black text-white">Reject Customer Paper &amp; Shift to Shop Paper</h3>
+                <div class="grid grid-cols-2 gap-3 text-xs">
+                    <div>
+                        <label class="block font-bold text-stone-400 mb-1">B&amp;W Pages</label>
+                        <input type="number" min="0" wire:model="shiftBwPages" class="w-full bg-stone-950 border border-stone-800 rounded-xl px-3 py-2 text-white" />
+                    </div>
+                    <div>
+                        <label class="block font-bold text-stone-400 mb-1">Color Pages</label>
+                        <input type="number" min="0" wire:model="shiftColorPages" class="w-full bg-stone-950 border border-stone-800 rounded-xl px-3 py-2 text-white" />
+                    </div>
+                </div>
+                <textarea wire:model="shiftReason" rows="2" placeholder="e.g. Supplied pages damp or mismatched paper size..." class="w-full bg-stone-950 border border-stone-800 rounded-xl p-3 text-xs text-white"></textarea>
+                @error('reason') <p class="text-[11px] text-red-400">{{ $message }}</p> @enderror
+                <div class="flex justify-end gap-2">
+                    <button type="button" wire:click="$set('showShiftToShopPaperModal', false)" class="px-4 py-2 rounded-xl bg-stone-800 text-xs font-bold text-stone-300 cursor-pointer">Cancel</button>
+                    <button type="button" wire:click="confirmShiftToShopPaper" class="px-4 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-xs font-black text-stone-950 cursor-pointer">Shift to Full Package</button>
+                </div>
+            </div>
+        </div>
+    @endif
+
+    <!-- Item QA Pass (Shelf / Bin Location) Modal -->
+    @if ($showItemQaPassModal)
+        <div class="fixed inset-0 z-50 bg-stone-950/80 backdrop-blur-md flex items-center justify-center p-4">
+            <div class="bg-stone-900 border border-stone-800 rounded-3xl w-full max-w-sm p-6 space-y-4 shadow-2xl">
+                <h3 class="text-base font-black text-white">Assign Pickup Shelf / Bin</h3>
+                <input type="text" wire:model="qaPassShelfBin" placeholder="e.g. BIN-B2" class="w-full bg-stone-950 border border-stone-800 rounded-xl px-3 py-2 text-xs text-white font-mono" />
+                @error('shelf_bin_code') <p class="text-[11px] text-red-400">{{ $message }}</p> @enderror
+                <div class="flex justify-end gap-2">
+                    <button type="button" wire:click="$set('showItemQaPassModal', false)" class="px-4 py-2 rounded-xl bg-stone-800 text-xs font-bold text-stone-300 cursor-pointer">Cancel</button>
+                    <button type="button" wire:click="confirmItemQaPass" class="px-4 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-xs font-black text-stone-950 cursor-pointer">Mark Ready</button>
+                </div>
+            </div>
+        </div>
+    @endif
+
+    <!-- Item QA Fail (Dual Paper + Ink Rework Spoilage) Modal -->
+    @if ($showItemQaFailModal)
+        <div class="fixed inset-0 z-50 bg-stone-950/80 backdrop-blur-md flex items-center justify-center p-4">
+            <div class="bg-stone-900 border border-stone-800 rounded-3xl w-full max-w-md p-6 space-y-4 shadow-2xl text-xs">
+                <h3 class="text-base font-black text-white">QC Fail &amp; Dual Material Rework Spoilage</h3>
+                <p class="text-stone-400">Deducts spoiled paper and ink/toner while keeping customer billing locked.</p>
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block font-bold text-stone-400 mb-1">Paper Item</label>
+                        <select wire:model="qaFailPaperItemId" class="w-full bg-stone-950 border border-stone-800 rounded-xl px-2.5 py-2 text-white">
+                            <option value="">None</option>
+                            @foreach ($this->inventoryItems as $inv)
+                                <option value="{{ $inv->id }}">{{ $inv->name }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block font-bold text-stone-400 mb-1">Spoiled Sheets</label>
+                        <input type="number" step="0.1" min="0.1" wire:model="qaFailSpoiledSheets" class="w-full bg-stone-950 border border-stone-800 rounded-xl px-2.5 py-2 text-white" />
+                    </div>
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block font-bold text-stone-400 mb-1">Ink / Toner Item</label>
+                        <select wire:model="qaFailInkItemId" class="w-full bg-stone-950 border border-stone-800 rounded-xl px-2.5 py-2 text-white">
+                            <option value="">None</option>
+                            @foreach ($this->inventoryItems as $inv)
+                                <option value="{{ $inv->id }}">{{ $inv->name }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block font-bold text-stone-400 mb-1">Ink Used (Units)</label>
+                        <input type="number" step="0.01" min="0" wire:model="qaFailInkQty" class="w-full bg-stone-950 border border-stone-800 rounded-xl px-2.5 py-2 text-white" />
+                    </div>
+                </div>
+                <textarea wire:model="qaFailReason" rows="2" placeholder="Describe defect (e.g. Roller smudge, ink streaking)..." class="w-full bg-stone-950 border border-stone-800 rounded-xl p-2.5 text-white"></textarea>
+                @error('reason') <p class="text-[11px] text-red-400">{{ $message }}</p> @enderror
+                <div class="flex justify-end gap-2">
+                    <button type="button" wire:click="$set('showItemQaFailModal', false)" class="px-4 py-2 rounded-xl bg-stone-800 font-bold text-stone-300 cursor-pointer">Cancel</button>
+                    <button type="button" wire:click="confirmItemQaFail" class="px-4 py-2 rounded-xl bg-red-500 hover:bg-red-400 font-black text-white cursor-pointer">Log Rework &amp; Reprint</button>
                 </div>
             </div>
         </div>

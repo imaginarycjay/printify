@@ -27,7 +27,7 @@ new class extends Component {
             <p class="text-sm text-stone-500 dark:text-stone-400">Your public profile, service availability and production team, in one place.</p>
         </div>
         <nav aria-label="Shop settings sections" class="flex flex-wrap gap-2">
-            @foreach (['profile' => 'Profile & approval', 'availability' => 'Service availability', 'team' => 'Team access'] as $section => $label)
+            @foreach (['profile' => 'Profile & approval', 'printers' => 'Printer fleet', 'availability' => 'Service availability', 'team' => 'Team access'] as $section => $label)
                 <a href="#{{ $section }}" class="inline-flex min-h-11 items-center rounded-xl border border-stone-200 bg-white px-4 text-sm font-semibold hover:border-amber-500 dark:border-stone-800 dark:bg-stone-900">{{ $label }}</a>
             @endforeach
         </nav>
@@ -55,6 +55,12 @@ new class extends Component {
                     @csrf
                     <flux:input name="address" label="Shop address" value="{{ old('address', $shop->getAttribute('address')) }}" required />
                     <flux:input name="contact" label="Contact information" value="{{ old('contact', $shop->getAttribute('contact')) }}" required />
+                    <flux:input name="operating_hours" label="Operating hours" value="{{ old('operating_hours', $shop->operating_hours) }}" placeholder="e.g. Mon-Sat 8:00 AM - 6:00 PM" />
+                    <div class="grid gap-4 sm:grid-cols-3">
+                        <flux:input type="number" min="1" max="500" name="busy_threshold" label="Busy queue threshold (items)" value="{{ old('busy_threshold', $shop->busy_threshold) }}" />
+                        <flux:input type="number" min="1" max="1000" name="at_capacity_threshold" label="At capacity threshold (items)" value="{{ old('at_capacity_threshold', $shop->at_capacity_threshold) }}" />
+                        <flux:input type="number" min="1" max="365" name="file_retention_days" label="Completed file retention (days)" value="{{ old('file_retention_days', $shop->file_retention_days) }}" placeholder="Platform default ({{ App\Models\PlatformSetting::current()->default_retention_days }}d)" />
+                    </div>
                     <flux:textarea name="description" label="About your shop" rows="3">{{ old('description', $shop->getAttribute('description')) }}</flux:textarea>
                     <div class="flex justify-end border-t border-stone-200 pt-4 dark:border-stone-800">
                         <flux:button type="submit" variant="primary" class="!bg-amber-500 !text-stone-950">{{ $approval === 'rejected' ? 'Save & resubmit application' : 'Save shop profile' }}</flux:button>
@@ -67,6 +73,77 @@ new class extends Component {
                 <a href="{{ route('owner.wizard') }}" wire:navigate class="inline-flex min-h-11 items-center gap-2 text-sm font-bold text-amber-700 dark:text-amber-400">Review shop setup <flux:icon name="arrow-right" class="size-4" /></a>
             </aside>
         </div>
+        <section id="printers" class="scroll-mt-6 space-y-5 rounded-3xl border border-stone-200 bg-white p-6 dark:border-stone-800 dark:bg-stone-900/80">
+            <div>
+                <h2 class="flex items-center gap-2 text-xl font-extrabold"><flux:icon name="printer" class="size-5 text-amber-600 dark:text-amber-400" /> Printer fleet &amp; failover</h2>
+                <p class="mt-1 text-sm text-stone-500 dark:text-stone-400">Register your physical workstations, supported paper sizes, and failover routing during maintenance.</p>
+            </div>
+
+            <form method="POST" action="{{ route('owner.printers.store') }}" class="grid items-end gap-4 border-b border-stone-200 pb-5 sm:grid-cols-4 dark:border-stone-800">
+                @csrf
+                <flux:input name="name" :error:bag="'printers'" label="Printer name" placeholder="Canon Laser Pro 1" required />
+                <flux:input name="supported_sizes_input" :error:bag="'printers'" label="Supported sizes (comma-separated)" placeholder="A4, Letter, Legal" />
+                <label class="flex min-h-11 items-center gap-2 text-sm font-medium text-stone-700 dark:text-stone-300">
+                    <input type="checkbox" name="is_wide_format" value="1" class="rounded border-stone-300 text-amber-600 dark:border-stone-700 dark:bg-stone-900" />
+                    Wide-format / RIP export
+                </label>
+                <flux:button type="submit" variant="primary" class="!bg-amber-500 !text-stone-950">Add printer</flux:button>
+            </form>
+
+            @php
+                $shopPrinters = $shop->printers()->get();
+                $onlinePrinters = $shopPrinters->where('status', App\Models\Printer::STATUS_ONLINE);
+            @endphp
+
+            <div class="divide-y divide-stone-200 dark:divide-stone-800">
+                @forelse ($shopPrinters as $printer)
+                    <div wire:key="printer-{{ $printer->id }}" class="flex flex-col gap-3 py-4 lg:flex-row lg:items-center lg:justify-between">
+                        <div class="space-y-1">
+                            <div class="flex flex-wrap items-center gap-2">
+                                <span class="font-bold">{{ $printer->name }}</span>
+                                <flux:badge :color="match ($printer->status) { 'online' => 'emerald', 'maintenance' => 'amber', default => 'red' }" size="sm">{{ ucfirst($printer->status) }}</flux:badge>
+                                @if ($printer->is_wide_format)
+                                    <flux:badge color="indigo" size="sm">Wide Format (RIP)</flux:badge>
+                                @endif
+                            </div>
+                            <p class="text-xs text-stone-500 dark:text-stone-400">
+                                Sizes: {{ ! empty($printer->supported_sizes) ? implode(', ', $printer->supported_sizes) : 'All sizes' }}
+                                &bull; Active queued items: {{ $printer->activeJobsCount() }}
+                            </p>
+                        </div>
+
+                        <div class="flex flex-wrap items-center gap-2">
+                            <form method="POST" action="{{ route('owner.printers.update', $printer->id) }}" class="flex flex-wrap items-center gap-2">
+                                @csrf
+                                @method('PATCH')
+                                <select name="status" class="min-h-10 rounded-xl border border-stone-300 bg-white px-3 text-xs font-semibold dark:border-stone-700 dark:bg-stone-950">
+                                    @foreach (['online' => 'Online', 'maintenance' => 'Maintenance', 'offline' => 'Offline'] as $statusKey => $statusLabel)
+                                        <option value="{{ $statusKey }}" @selected($printer->status === $statusKey)>{{ $statusLabel }}</option>
+                                    @endforeach
+                                </select>
+                                @if ($onlinePrinters->where('id', '!=', $printer->id)->isNotEmpty())
+                                    <select name="target_printer_id" class="min-h-10 rounded-xl border border-stone-300 bg-white px-3 text-xs dark:border-stone-700 dark:bg-stone-950">
+                                        <option value="">Failover target (unassign if empty)</option>
+                                        @foreach ($onlinePrinters->where('id', '!=', $printer->id) as $candidate)
+                                            <option value="{{ $candidate->id }}">Failover → {{ $candidate->name }}</option>
+                                        @endforeach
+                                    </select>
+                                @endif
+                                <flux:button type="submit" size="sm">Save status</flux:button>
+                            </form>
+                            <form method="POST" action="{{ route('owner.printers.destroy', $printer->id) }}" x-data x-on:submit="if (! confirm('Remove this printer workstation?')) $event.preventDefault()">
+                                @csrf
+                                @method('DELETE')
+                                <flux:button type="submit" size="sm" variant="danger">Delete</flux:button>
+                            </form>
+                        </div>
+                    </div>
+                @empty
+                    <p class="py-4 text-sm text-stone-500 dark:text-stone-400">No printers registered yet. Add printers above to enable item-level machine scheduling and maintenance failover.</p>
+                @endforelse
+            </div>
+        </section>
+
         <section id="availability" class="scroll-mt-6 space-y-4">
             <div><h2 class="text-xl font-extrabold">Service availability</h2><p class="mt-1 text-sm text-stone-500 dark:text-stone-400">Workload updates automatically. Pause a service when you need to stop accepting new orders.</p></div>
             <div class="grid items-start gap-5 md:grid-cols-2">

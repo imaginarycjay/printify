@@ -19,10 +19,14 @@ Route::middleware(['auth', 'role:platform_admin'])->group(function (): void {
 Route::middleware(['auth', 'role:business_owner'])->group(function (): void {
     Route::livewire('owner/platform', 'pages::owner-platform')->name('owner.platform');
     Route::post('owner/platform', [PlatformController::class, 'saveShop'])->name('owner.platform.save');
+    Route::post('owner/printers', [PlatformController::class, 'storePrinter'])->name('owner.printers.store');
+    Route::patch('owner/printers/{printer}', [PlatformController::class, 'updatePrinter'])->name('owner.printers.update');
+    Route::delete('owner/printers/{printer}', [PlatformController::class, 'destroyPrinter'])->name('owner.printers.destroy');
     Route::post('owner/services/{service}/availability', [PlatformController::class, 'availability'])->name('owner.availability');
     Route::post('owner/staff/invite', [PlatformController::class, 'invite'])->name('owner.staff.invite');
     Route::delete('owner/staff/{staff}', [PlatformController::class, 'revoke'])->name('owner.staff.revoke');
 });
+Route::get('orders/{order}/files/preview/{item}', [PlatformController::class, 'previewDocument'])->middleware('auth')->name('orders.file.preview');
 Route::get('orders/{order}/files/{kind}/{item?}', [PlatformController::class, 'file'])->middleware('auth')->name('orders.file');
 Route::get('orders/{order}/receipt', [PlatformController::class, 'receipt'])->middleware('auth')->name('orders.receipt');
 

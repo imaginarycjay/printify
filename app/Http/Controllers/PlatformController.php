@@ -7,9 +7,11 @@ use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\Payment;
 use App\Models\PlatformSetting;
+use App\Models\Printer;
 use App\Models\PrintShop;
 use App\Models\User;
 use App\Services\AuditLogger;
+use App\Services\ProductionQueueService;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
@@ -130,13 +132,123 @@ class PlatformController extends Controller
     {
         $shop = $request->user()?->operationalShop();
         abort_unless($shop !== null, 403);
-        $data = $request->validate(['address' => 'required|string|max:255', 'contact' => 'required|string|max:255', 'description' => 'nullable|string|max:2000']);
+        $settings = PlatformSetting::current();
+
+        $data = $request->validate([
+            'address' => 'required|string|max:255',
+            'contact' => 'required|string|max:255',
+            'description' => 'nullable|string|max:2000',
+            'operating_hours' => 'nullable|string|max:255',
+            'busy_threshold' => 'nullable|integer|min:1|max:500',
+            'at_capacity_threshold' => 'nullable|integer|gte:busy_threshold|max:1000',
+            'file_retention_days' => 'nullable|integer|min:'.$settings->min_retention_days.'|max:'.$settings->max_retention_days,
+        ]);
+
+        if (($data['busy_threshold'] ?? null) === null) {
+            unset($data['busy_threshold']);
+        }
+        if (($data['at_capacity_threshold'] ?? null) === null) {
+            unset($data['at_capacity_threshold']);
+        }
+        if (! $request->exists('file_retention_days')) {
+            unset($data['file_retention_days']);
+        }
+
         $shop->update($data);
         if ($shop->getAttribute('approval_status') === 'rejected') {
             $shop->update(['approval_status' => 'pending', 'rejection_reason' => null]);
         }
 
         return back()->with('status', 'Profile saved and available for review.');
+    }
+
+    public function storePrinter(Request $request): RedirectResponse
+    {
+        $shop = $request->user()?->operationalShop();
+        abort_unless($shop !== null, 403);
+
+        $data = $request->validateWithBag('printers', [
+            'name' => ['required', 'string', 'max:120'],
+            'supported_sizes_input' => ['nullable', 'string', 'max:255'],
+            'status' => ['nullable', 'in:online,maintenance,offline'],
+            'is_wide_format' => ['nullable', 'boolean'],
+        ]);
+
+        $sizes = array_values(array_filter(array_map(
+            static fn (string $token): string => trim($token),
+            explode(',', (string) ($data['supported_sizes_input'] ?? '')),
+        )));
+
+        Printer::create([
+            'print_shop_id' => $shop->id,
+            'name' => trim($data['name']),
+            'supported_sizes' => $sizes !== [] ? $sizes : null,
+            'status' => $data['status'] ?? Printer::STATUS_ONLINE,
+            'is_wide_format' => $request->boolean('is_wide_format'),
+        ]);
+
+        return back()->with('status', 'Printer workstation added to shop fleet.');
+    }
+
+    public function updatePrinter(Request $request, Printer $printer, ProductionQueueService $queueService): RedirectResponse
+    {
+        $shop = $request->user()?->operationalShop();
+        abort_unless($shop !== null && $printer->print_shop_id === $shop->id, 403);
+
+        $data = $request->validate([
+            'name' => ['nullable', 'string', 'max:120'],
+            'supported_sizes_input' => ['nullable', 'string', 'max:255'],
+            'status' => ['required', 'in:online,maintenance,offline'],
+            'target_printer_id' => ['nullable', 'integer'],
+            'is_wide_format' => ['nullable', 'boolean'],
+        ]);
+
+        $updates = [];
+        if (isset($data['name']) && trim($data['name']) !== '') {
+            $updates['name'] = trim($data['name']);
+        }
+        if ($request->exists('supported_sizes_input')) {
+            $sizes = array_values(array_filter(array_map(
+                static fn (string $token): string => trim($token),
+                explode(',', (string) ($data['supported_sizes_input'] ?? '')),
+            )));
+            $updates['supported_sizes'] = $sizes !== [] ? $sizes : null;
+        }
+        if ($request->exists('is_wide_format')) {
+            $updates['is_wide_format'] = $request->boolean('is_wide_format');
+        }
+        if ($updates !== []) {
+            $printer->update($updates);
+        }
+
+        /** @var User $actor */
+        $actor = $request->user();
+        $reassigned = $queueService->setPrinterStatusWithFailover(
+            printer: $printer,
+            actor: $actor,
+            newStatus: $data['status'],
+            targetPrinterId: $request->filled('target_printer_id') ? $request->integer('target_printer_id') : null,
+        );
+
+        $message = $reassigned > 0
+            ? "Printer status updated and {$reassigned} queued job(s) failed over automatically."
+            : 'Printer configuration updated.';
+
+        return back()->with('status', $message);
+    }
+
+    public function destroyPrinter(Request $request, Printer $printer): RedirectResponse
+    {
+        $shop = $request->user()?->operationalShop();
+        abort_unless($shop !== null && $printer->print_shop_id === $shop->id, 403);
+
+        if ($printer->activeJobsCount() > 0) {
+            return back()->withErrors(['printer' => 'Reassign or fail over active jobs before removing this printer.']);
+        }
+
+        $printer->delete();
+
+        return back()->with('status', 'Printer removed from fleet.');
     }
 
     public function availability(Request $request, int $service): RedirectResponse
@@ -208,6 +320,24 @@ class PlatformController extends Controller
         DB::table('staff_invitations')->where('print_shop_id', $shop->id)->where('email', $staff->email)->whereNull('accepted_at')->delete();
 
         return back()->with('status', 'Staff access revoked.');
+    }
+
+    public function previewDocument(Request $request, Order $order, OrderItem $item): StreamedResponse
+    {
+        Gate::authorize('update', $order);
+        abort_unless($item->order_id === $order->id, 404);
+
+        $path = $item->document_file_path;
+        abort_unless(is_string($path) && $path !== '' && Storage::disk('local')->exists($path), 404);
+
+        $filename = $item->document_original_name ?: basename($path);
+        $mime = Storage::disk('local')->mimeType($path) ?: 'application/pdf';
+
+        return Storage::disk('local')->response($path, $filename, [
+            'Content-Type' => $mime,
+            'X-Content-Type-Options' => 'nosniff',
+            'Cache-Control' => 'private, no-store',
+        ], 'inline');
     }
 
     public function file(Request $request, Order $order, string $kind, ?OrderItem $item = null): StreamedResponse

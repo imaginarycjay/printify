@@ -80,11 +80,15 @@ class Order extends Model
     // Order Lifecycle Statuses
     public const STATUS_PENDING_PAYMENT = 'pending_payment';
 
+    public const STATUS_ON_HOLD = 'on_hold';
+
     public const STATUS_IN_QUEUE = 'in_queue';
 
     public const STATUS_IN_PRODUCTION = 'in_production';
 
     public const STATUS_QUALITY_CHECK = 'quality_check';
+
+    public const STATUS_PARTIALLY_READY = 'partially_ready';
 
     public const STATUS_READY_FOR_PICKUP = 'ready_for_pickup';
 
@@ -447,15 +451,83 @@ class Order extends Model
     }
 
     /**
+     * Synchronize parent order lifecycle status and stage from constituent item states.
+     */
+    public function syncParentStateFromItems(): void
+    {
+        if ($this->order_status === self::STATUS_CANCELLED) {
+            return;
+        }
+
+        $items = $this->items()->get();
+        if ($items->isEmpty()) {
+            return;
+        }
+
+        $totalCount = $items->count();
+        $claimedCount = $items->filter(fn (OrderItem $item): bool => $item->isClaimed())->count();
+        $readyCount = $items->filter(fn (OrderItem $item): bool => $item->isReadyForPickup())->count();
+        $onHoldCount = $items->filter(fn (OrderItem $item): bool => ($item->production_stage ?? OrderItem::STAGE_QUEUE) === OrderItem::STAGE_ON_HOLD)->count();
+        $printingCount = $items->filter(fn (OrderItem $item): bool => in_array($item->production_stage ?? OrderItem::STAGE_QUEUE, [OrderItem::STAGE_PRINTING, OrderItem::STAGE_BINDING], true))->count();
+        $qcCount = $items->filter(fn (OrderItem $item): bool => ($item->production_stage ?? OrderItem::STAGE_QUEUE) === OrderItem::STAGE_QUALITY_CHECK)->count();
+
+        if ($claimedCount === $totalCount && (float) $this->balance_due <= 0.001) {
+            $this->order_status = self::STATUS_COMPLETED;
+            $this->production_stage = self::STAGE_COMPLETED;
+            $this->production_completed_at = $this->production_completed_at ?? now();
+            $this->completed_at = $this->completed_at ?? now();
+        } elseif (($readyCount + $claimedCount) > 0 && ($readyCount + $claimedCount) < $totalCount) {
+            $this->order_status = self::STATUS_PARTIALLY_READY;
+            if ($printingCount > 0) {
+                $this->production_stage = $items->contains('production_stage', OrderItem::STAGE_BINDING)
+                    ? self::STAGE_BINDING
+                    : self::STAGE_PRINTING;
+            } elseif ($qcCount > 0) {
+                $this->production_stage = self::STAGE_QUALITY_CHECK;
+            } elseif ($readyCount > 0) {
+                $this->production_stage = self::STAGE_READY_FOR_PICKUP;
+            } else {
+                $this->production_stage = self::STAGE_QUEUE;
+            }
+        } elseif (($readyCount + $claimedCount) === $totalCount && $readyCount > 0) {
+            $this->order_status = self::STATUS_READY_FOR_PICKUP;
+            $this->production_stage = self::STAGE_READY_FOR_PICKUP;
+            $this->production_completed_at = $this->production_completed_at ?? now();
+        } elseif ($this->order_status === self::STATUS_PENDING_PAYMENT) {
+            $this->save();
+
+            return;
+        } elseif ($onHoldCount > 0 && ($onHoldCount + $claimedCount) === $totalCount) {
+            $this->order_status = self::STATUS_ON_HOLD;
+        } elseif ($printingCount > 0) {
+            $this->order_status = self::STATUS_IN_PRODUCTION;
+            $this->production_stage = $items->contains('production_stage', OrderItem::STAGE_BINDING)
+                ? self::STAGE_BINDING
+                : self::STAGE_PRINTING;
+            $this->production_started_at = $this->production_started_at ?? now();
+        } elseif ($qcCount > 0) {
+            $this->order_status = self::STATUS_QUALITY_CHECK;
+            $this->production_stage = self::STAGE_QUALITY_CHECK;
+        } else {
+            $this->order_status = self::STATUS_IN_QUEUE;
+            $this->production_stage = self::STAGE_QUEUE;
+        }
+
+        $this->save();
+    }
+
+    /**
      * Get user-friendly status badge styling classes.
      */
     public function statusBadgeColor(): string
     {
         return match ($this->order_status) {
             self::STATUS_PENDING_PAYMENT => 'bg-amber-500/15 text-amber-400 border-amber-500/30',
+            self::STATUS_ON_HOLD => 'bg-rose-500/15 text-rose-300 border-rose-500/30',
             self::STATUS_IN_QUEUE => 'bg-blue-500/15 text-blue-400 border-blue-500/30',
             self::STATUS_IN_PRODUCTION => 'bg-purple-500/15 text-purple-400 border-purple-500/30',
             self::STATUS_QUALITY_CHECK => 'bg-cyan-500/15 text-cyan-400 border-cyan-500/30',
+            self::STATUS_PARTIALLY_READY => 'bg-teal-500/20 text-teal-300 border-teal-500/40',
             self::STATUS_READY_FOR_PICKUP => 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40',
             self::STATUS_COMPLETED => 'bg-emerald-500/15 text-emerald-400 border-emerald-500/30',
             self::STATUS_CANCELLED => 'bg-red-500/15 text-red-400 border-red-500/30',
