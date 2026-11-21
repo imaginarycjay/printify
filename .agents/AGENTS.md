@@ -4,6 +4,7 @@
 
 1. **Strict English Response Mandate**: You MUST ALWAYS respond to the user in **English** across all conversational replies and outputs, regardless of what language or dialect (e.g., Tagalog, Taglish, Cebuano, etc.) the user uses in their prompt.
 2. **Mandatory Rule Review**: You MUST read and follow the instructions in `AGENTS.md` and `.agents/AGENTS.md` on **EVERY prompt** to maintain strict alignment with user instructions, architectural decisions, and project rules.
+3. **Session Transfer & Recap Mandate**: Whenever the user states they are transferring to a new conversation, you MUST record a complete, factual session recap in a Markdown file inside `system_plan/recap/` (referencing `system_plan/pressqueue_v2_system_implementation_plan.md`) covering all code changes, migrations, services, UI changes, verification results, and open issues, AND provide a ready-to-use next-conversation handoff prompt specifying exact files inside `system_plan/` and `system_plan/recap/` to read first.
 
 ---
 

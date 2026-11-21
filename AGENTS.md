@@ -4,6 +4,9 @@
 
 - **Language Mandate**: You MUST ALWAYS respond in **English**, regardless of the language or dialect (e.g., Tagalog, Taglish, Cebuano, etc.) the user uses when prompting.
 - **Rule & Convention Review**: You MUST read and adhere to `AGENTS.md` and `.agents/AGENTS.md` on **EVERY prompt** to maintain strict consistency with user instructions and project standards.
+- **Session Transfer & Recap Mandate**:
+  - The authoritative system implementation roadmap lives at `system_plan/pressqueue_v2_system_implementation_plan.md`, and session handoff recaps live in `system_plan/recap/`.
+  - Whenever the user indicates they are transferring or moving to a new conversation (e.g., due to context window size or session handoff), you MUST create or append a dated Markdown recap file inside `system_plan/recap/` (e.g., `YYYY-MM-DD_session_NN_<topic>.md`) documenting all code changes, migrations, services, UI updates, plan work packages completed/remaining, verification results, and open issues from the current session, AND provide a ready-to-copy prompt telling the next agent which files inside `system_plan/` and `system_plan/recap/` to read first.
 
 ---
 
@@ -218,4 +221,4 @@ This project has domain-specific skills available in `**/skills/**`. You MUST ac
 - When a user message contains `/ponytail` or another installed skill name as a slash command, treat it as an invocation of the matching shared SKILL.md, preserving its arguments. Keep Ponytail's selected level in the conversation until changed or disabled; `off` or `normal mode` disables it. Do not execute Antigravity's lifecycle adapter in Codex: its `injectSteps` output is specific to Antigravity.
 - Codex tools equivalent to `view_file`/`list_dir` are shell file reads and directory listings. Use the available tools rather than requiring Antigravity tool names.
 - Preserve `.agents/hooks.json`, `.agents/hooks/`, `.agents/rules/`, and `opencode.json` for their existing clients. Codex MCP configuration belongs in `.codex/config.toml` and requires a trusted project and a new session to load. Check `/mcp` after restarting; never claim a configured integration is connected until verified.
-- Current application context supersedes the introductory starter-kit description: routes include business-owner setup, analytics, web builder, inventory and printing/binding management, production-staff workflows, and customer ordering. Inspect the relevant implementation before making domain changes. Academic sources and diagrams are in `capstone_paper/`.
+- Current application context supersedes the introductory starter-kit description: routes include platform-admin governance, business-owner setup/operations/analytics/standardized reports, inventory and printing/binding management, production-staff workflows, and customer multi-item ordering/tracking (`Web Builder` is retired/removed). Inspect the relevant implementation before making domain changes. System implementation plan and session recaps live in `system_plan/` (`system_plan/recap/`), and academic manuscript sources/diagrams live in `capstone_paper/`.

@@ -107,6 +107,22 @@ html:not(.dark) [class*="bg-stone-700"]:not([data-theme-keep]) {
     background-color: var(--color-stone-200, #e7e5e4);
 }
 
+/* Dark-stone gradient panels & alert banners in light mode */
+html:not(.dark) .from-stone-900:not([data-theme-keep]),
+html:not(.dark) .from-stone-950:not([data-theme-keep]) {
+    --tw-gradient-from: #ffffff;
+}
+
+html:not(.dark) .via-stone-900:not([data-theme-keep]),
+html:not(.dark) .via-stone-950:not([data-theme-keep]) {
+    --tw-gradient-via: var(--color-stone-50, #fafaf9);
+}
+
+html:not(.dark) .to-stone-900:not([data-theme-keep]),
+html:not(.dark) .to-stone-950:not([data-theme-keep]) {
+    --tw-gradient-to: var(--color-stone-50, #fafaf9);
+}
+
 /* Borders in light mode */
 html:not(.dark) [class*="border-stone-800"]:not([data-theme-keep]),
 html:not(.dark) [class*="border-stone-900"]:not([data-theme-keep]),

@@ -12,6 +12,7 @@ use App\Models\PrintShop;
 use App\Models\User;
 use App\Services\AuditLogger;
 use App\Services\ProductionQueueService;
+use App\Services\ReportService;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
@@ -376,6 +377,54 @@ class PlatformController extends Controller
 
         return view('receipts.official-receipt', [
             'order' => $order,
+            'isPdf' => false,
+        ]);
+    }
+
+    public function report(Request $request, string $type, ReportService $reportService): View|Response|StreamedResponse
+    {
+        $shop = $request->user()?->operationalShop();
+        abort_unless($shop !== null, 403);
+
+        $period = (string) $request->query('period', 'this_month');
+        if (! in_array($period, ['today', '7d', 'this_month', 'ytd', 'all_time'], true)) {
+            $period = 'this_month';
+        }
+
+        $format = (string) $request->query('format', 'html');
+
+        if ($format === 'csv') {
+            $csv = $reportService->exportCsv($shop, $type, $period);
+            $shopSlug = Str::slug($shop->name) ?: 'shop-'.$shop->id;
+            $filename = "pressqueue-{$type}-report-{$shopSlug}-".now()->format('Y-m-d').'.csv';
+
+            return response()->streamDownload(function () use ($csv): void {
+                echo $csv;
+            }, $filename, [
+                'Content-Type' => 'text/csv; charset=UTF-8',
+            ]);
+        }
+
+        $report = match ($type) {
+            'inventory' => $reportService->buildInventoryReport($shop, $period),
+            'sales' => $reportService->buildSalesReport($shop, $period),
+            default => $reportService->buildProductionScheduleReport($shop),
+        };
+
+        if ($format === 'pdf') {
+            $shopSlug = Str::slug($shop->name) ?: 'shop-'.$shop->id;
+            $filename = "pressqueue-{$type}-report-{$shopSlug}-".now()->format('Y-m-d').'.pdf';
+
+            return Pdf::loadView('reports.standardized-report', [
+                'shop' => $shop,
+                'report' => $report,
+                'isPdf' => true,
+            ])->download($filename);
+        }
+
+        return view('reports.standardized-report', [
+            'shop' => $shop,
+            'report' => $report,
             'isPdf' => false,
         ]);
     }

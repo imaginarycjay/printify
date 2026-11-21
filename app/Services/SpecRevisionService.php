@@ -8,6 +8,7 @@ use App\Models\OrderItem;
 use App\Models\Payment;
 use App\Models\SpecRevision;
 use App\Models\User;
+use App\Notifications\SpecRevisionNotification;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 
@@ -225,6 +226,12 @@ class SpecRevisionService
                 ],
             );
 
+            $order->loadMissing(['printShop.user', 'customer']);
+            $recipient = $actor->id === $order->customer_id ? $order->printShop?->user : $order->customer;
+            if ($recipient instanceof User) {
+                $recipient->notify((new SpecRevisionNotification($revision, 'requested'))->afterCommit());
+            }
+
             return $revision;
         });
     }
@@ -344,7 +351,13 @@ class SpecRevisionService
                 ],
             );
 
-            return $lockedRevision->fresh() ?? $lockedRevision;
+            $freshRevision = $lockedRevision->fresh() ?? $lockedRevision;
+            $lockedOrder->loadMissing('customer');
+            if ($lockedOrder->customer instanceof User) {
+                $lockedOrder->customer->notify((new SpecRevisionNotification($freshRevision, 'applied'))->afterCommit());
+            }
+
+            return $freshRevision;
         });
     }
 
@@ -393,7 +406,13 @@ class SpecRevisionService
                 metadata: ['reason' => trim($reason)],
             );
 
-            return $revision->fresh() ?? $revision;
+            $freshRevision = $revision->fresh() ?? $revision;
+            $order->loadMissing('customer');
+            if ($order->customer instanceof User) {
+                $order->customer->notify((new SpecRevisionNotification($freshRevision, 'rejected', trim($reason)))->afterCommit());
+            }
+
+            return $freshRevision;
         });
     }
 
@@ -460,6 +479,16 @@ class SpecRevisionService
                     'reference_no' => $normalizedRef,
                 ],
             );
+
+            $latestRev = SpecRevision::whereIn('order_item_id', $lockedOrder->items()->pluck('id'))->latest()->first();
+            $lockedOrder->loadMissing('customer');
+            if ($latestRev instanceof SpecRevision && $lockedOrder->customer instanceof User) {
+                $lockedOrder->customer->notify((new SpecRevisionNotification(
+                    $latestRev,
+                    'refund_settled',
+                    'Settled manual refund of ₱'.number_format($refundAmount, 2)." (Ref: {$normalizedRef}).",
+                ))->afterCommit());
+            }
 
             return $payment;
         });

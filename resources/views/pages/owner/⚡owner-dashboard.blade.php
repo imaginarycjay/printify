@@ -104,6 +104,7 @@ new class extends Component {
                     Shop Settings
                 </a>
             @endif
+            <livewire:notification-bell />
             <x-theme-toggle />
 
             <a href="{{ route('owner.wizard') }}" wire:navigate class="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-stone-800 bg-stone-900/60 text-xs font-semibold text-stone-300 hover:text-white hover:border-stone-700 transition-all">

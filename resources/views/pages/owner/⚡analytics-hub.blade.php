@@ -4,6 +4,7 @@ use App\Models\Order;
 use App\Models\Payment;
 use App\Models\PrintShop;
 use App\Services\PaymentService;
+use App\Services\ReportService;
 use App\Services\SalesAnalyticsService;
 use App\Services\SpecRevisionService;
 use Livewire\Attributes\Locked;
@@ -17,7 +18,8 @@ new #[Title('Sales & Financial Analytics Hub')] class extends Component {
         $view->layout('layouts.blank');
     }
 
-    public string $active_tab = 'overview'; // overview, payments
+    public string $active_tab = 'overview'; // overview, payments, reports
+    public string $report_type = 'sales'; // inventory, sales, schedule
     public string $selected_period = 'this_month'; // today, 7d, this_month, ytd, all_time
     public string $selected_service = 'all'; // all, thesis_binding
     public string $selected_fulfillment = 'all'; // all, full_package, cover_only
@@ -337,6 +339,15 @@ new #[Title('Sales & Financial Analytics Hub')] class extends Component {
                 ->latest('updated_at')
                 ->get()
             : collect();
+
+        $reportService = app(ReportService::class);
+        $reportData = ($shop && $active_tab === 'reports')
+            ? match ($report_type) {
+                'inventory' => $reportService->buildInventoryReport($shop, $selected_period),
+                'schedule' => $reportService->buildProductionScheduleReport($shop),
+                default => $reportService->buildSalesReport($shop, $selected_period),
+            }
+            : null;
     @endphp
 
     <!-- Top Navigation Header -->
@@ -362,6 +373,7 @@ new #[Title('Sales & Financial Analytics Hub')] class extends Component {
 
         <!-- Quick Actions & Back to Launcher -->
         <div class="flex items-center gap-2.5 sm:gap-3">
+            <livewire:notification-bell />
             <x-theme-toggle />
 
             <button 
@@ -423,6 +435,13 @@ new #[Title('Sales & Financial Analytics Hub')] class extends Component {
                         {{ $pendingProofs->count() }}
                     </span>
                 @endif
+            </button>
+            <button
+                wire:click="$set('active_tab', 'reports')"
+                class="px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center gap-2 {{ $active_tab === 'reports' ? 'bg-amber-500 text-stone-950 font-black shadow-md shadow-amber-500/20' : 'bg-stone-900 text-stone-400 hover:text-white border border-stone-800' }}"
+            >
+                <flux:icon name="document-chart-bar" class="size-3.5" />
+                <span>Standardized Reports</span>
             </button>
         </div>
 
@@ -1043,6 +1062,331 @@ new #[Title('Sales & Financial Analytics Hub')] class extends Component {
                             </table>
                         </div>
                     </div>
+                @endif
+            </div>
+        @endif
+
+        @if ($active_tab === 'reports' && $shop && $reportData)
+            @php($reportSummary = $reportData['summary'])
+            <div class="space-y-6">
+                <!-- Report Sub-Tabs, Period Filter & Standardized Exports -->
+                <div class="p-4 rounded-2xl bg-stone-900/80 border border-stone-800/90 flex flex-col xl:flex-row items-start xl:items-center justify-between gap-4">
+                    <div class="flex flex-wrap items-center gap-2">
+                        @foreach ([
+                            'inventory' => 'Inventory & Stock',
+                            'sales' => 'Sales & Revenue',
+                            'schedule' => 'Live Production Schedule',
+                        ] as $typeKey => $typeLabel)
+                            <button
+                                type="button"
+                                wire:click="$set('report_type', '{{ $typeKey }}')"
+                                class="px-3.5 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer {{ $report_type === $typeKey ? 'bg-amber-500 text-stone-950 font-black shadow-md shadow-amber-500/20' : 'bg-stone-950 text-stone-300 hover:text-white border border-stone-800' }}"
+                            >
+                                {{ $typeLabel }}
+                            </button>
+                        @endforeach
+
+                        @if ($report_type !== 'schedule')
+                            <select
+                                wire:model.live="selected_period"
+                                aria-label="Report period"
+                                class="ml-0 sm:ml-2 rounded-xl bg-stone-950 border border-stone-800 px-3 py-2 text-xs font-bold text-stone-200"
+                            >
+                                <option value="today">Today</option>
+                                <option value="7d">Last 7 Days</option>
+                                <option value="this_month">This Month</option>
+                                <option value="ytd">Year-to-Date</option>
+                                <option value="all_time">All Time</option>
+                            </select>
+                        @endif
+                    </div>
+
+                    <div class="flex flex-wrap items-center gap-2">
+                        <a
+                            href="{{ route('owner.reports.show', ['type' => $report_type, 'period' => $selected_period]) }}"
+                            target="_blank"
+                            class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold bg-stone-950 hover:bg-stone-800 text-stone-200 border border-stone-800 transition-colors"
+                        >
+                            <flux:icon name="printer" class="size-3.5" />
+                            <span>Print View</span>
+                        </a>
+                        <a
+                            href="{{ route('owner.reports.show', ['type' => $report_type, 'period' => $selected_period, 'format' => 'pdf']) }}"
+                            class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-black bg-amber-500 hover:bg-amber-400 text-stone-950 transition-colors"
+                        >
+                            <flux:icon name="document-arrow-down" class="size-3.5" />
+                            <span>Download PDF</span>
+                        </a>
+                        <a
+                            href="{{ route('owner.reports.show', ['type' => $report_type, 'period' => $selected_period, 'format' => 'csv']) }}"
+                            class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold bg-emerald-500/15 hover:bg-emerald-500/25 text-emerald-300 border border-emerald-500/30 transition-colors"
+                        >
+                            <flux:icon name="arrow-down-tray" class="size-3.5" />
+                            <span>Export CSV</span>
+                        </a>
+                    </div>
+                </div>
+
+                @if ($report_type === 'inventory')
+                    <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
+                        <div class="p-4 rounded-2xl bg-stone-900 border border-stone-800">
+                            <p class="text-[11px] font-bold uppercase text-stone-500">Total SKUs</p>
+                            <p class="text-xl font-black text-white mt-1">{{ $reportSummary['total_skus'] }}</p>
+                        </div>
+                        <div class="p-4 rounded-2xl bg-stone-900 border border-stone-800">
+                            <p class="text-[11px] font-bold uppercase text-stone-500">Stock Valuation</p>
+                            <p class="text-xl font-black text-amber-400 mt-1">₱{{ number_format((float) $reportSummary['total_valuation'], 2) }}</p>
+                        </div>
+                        <div class="p-4 rounded-2xl bg-stone-900 border border-stone-800">
+                            <p class="text-[11px] font-bold uppercase text-stone-500">Low / Out of Stock</p>
+                            <p class="text-xl font-black text-rose-400 mt-1">{{ $reportSummary['low_stock_count'] }} / {{ $reportSummary['out_of_stock_count'] }}</p>
+                        </div>
+                        <div class="p-4 rounded-2xl bg-stone-900 border border-stone-800">
+                            <p class="text-[11px] font-bold uppercase text-stone-500">Spoilage &amp; Rework Loss</p>
+                            <p class="text-xl font-black text-white mt-1">₱{{ number_format((float) $reportSummary['spoilage_loss_cost'], 2) }}</p>
+                        </div>
+                    </div>
+
+                    <div class="rounded-2xl border border-stone-800 bg-stone-900 overflow-hidden">
+                        <div class="px-4 py-3 border-b border-stone-800 flex items-center justify-between">
+                            <h3 class="text-xs font-extrabold uppercase tracking-wider text-stone-300">Current Stock Ledger</h3>
+                            <span class="text-[11px] text-stone-500">{{ count($reportData['items']) }} items</span>
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left text-xs">
+                                <thead class="bg-stone-950/70 text-[10px] uppercase text-stone-500">
+                                    <tr>
+                                        <th class="p-3">SKU</th>
+                                        <th class="p-3">Item</th>
+                                        <th class="p-3">Category</th>
+                                        <th class="p-3 text-right">Physical</th>
+                                        <th class="p-3 text-right">Reserved</th>
+                                        <th class="p-3 text-right">Available</th>
+                                        <th class="p-3 text-right">Valuation</th>
+                                        <th class="p-3">Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-stone-800/60">
+                                    @forelse ($reportData['items'] as $invRow)
+                                        <tr>
+                                            <td class="p-3 font-mono text-stone-400">{{ $invRow['sku'] }}</td>
+                                            <td class="p-3 font-bold text-white">{{ $invRow['name'] }}</td>
+                                            <td class="p-3 text-stone-400">{{ $invRow['category'] }}</td>
+                                            <td class="p-3 text-right font-mono">{{ $invRow['stock_qty'] }} {{ $invRow['unit'] }}</td>
+                                            <td class="p-3 text-right font-mono text-amber-300">{{ $invRow['reserved_qty'] }} {{ $invRow['unit'] }}</td>
+                                            <td class="p-3 text-right font-mono font-bold text-white">{{ $invRow['available_qty'] }} {{ $invRow['unit'] }}</td>
+                                            <td class="p-3 text-right font-mono">₱{{ number_format((float) $invRow['stock_value'], 2) }}</td>
+                                            <td class="p-3">
+                                                <span class="px-2 py-0.5 rounded-full text-[10px] font-black {{ $invRow['status'] === 'Out of Stock' ? 'bg-red-500/20 text-red-300' : ($invRow['status'] === 'Low Stock' ? 'bg-amber-500/20 text-amber-300' : 'bg-emerald-500/20 text-emerald-300') }}">
+                                                    {{ $invRow['status'] }}
+                                                </span>
+                                            </td>
+                                        </tr>
+                                    @empty
+                                        <tr><td colspan="8" class="p-4 text-center text-stone-500">No inventory items recorded.</td></tr>
+                                    @endforelse
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div class="rounded-2xl border border-stone-800 bg-stone-900 overflow-hidden">
+                        <div class="px-4 py-3 border-b border-stone-800 flex items-center justify-between">
+                            <h3 class="text-xs font-extrabold uppercase tracking-wider text-stone-300">Stock Movements &amp; Rework Audit</h3>
+                            <span class="text-[11px] text-stone-500">{{ count($reportData['movements']) }} entries</span>
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left text-xs">
+                                <thead class="bg-stone-950/70 text-[10px] uppercase text-stone-500">
+                                    <tr>
+                                        <th class="p-3">Date</th>
+                                        <th class="p-3">Item</th>
+                                        <th class="p-3">Type</th>
+                                        <th class="p-3 text-right">Qty</th>
+                                        <th class="p-3 text-right">Before &rarr; After</th>
+                                        <th class="p-3">Reference</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-stone-800/60">
+                                    @forelse ($reportData['movements'] as $movRow)
+                                        <tr>
+                                            <td class="p-3 text-stone-400">{{ $movRow['created_at'] }}</td>
+                                            <td class="p-3 font-bold text-white">{{ $movRow['item_name'] }}</td>
+                                            <td class="p-3">{{ ucwords(str_replace('_', ' ', $movRow['movement_type'])) }}</td>
+                                            <td class="p-3 text-right font-mono">{{ $movRow['quantity'] }} {{ $movRow['unit'] }}</td>
+                                            <td class="p-3 text-right font-mono text-stone-400">{{ $movRow['previous_stock'] }} &rarr; {{ $movRow['resulting_stock'] }}</td>
+                                            <td class="p-3 text-stone-400">{{ $movRow['reference_note'] }}</td>
+                                        </tr>
+                                    @empty
+                                        <tr><td colspan="6" class="p-4 text-center text-stone-500">No stock movements during this period.</td></tr>
+                                    @endforelse
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                @elseif ($report_type === 'sales')
+                    <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
+                        <div class="p-4 rounded-2xl bg-stone-900 border border-stone-800">
+                            <p class="text-[11px] font-bold uppercase text-stone-500">Gross Billed</p>
+                            <p class="text-xl font-black text-white mt-1">₱{{ number_format((float) $reportSummary['gross_billed'], 2) }}</p>
+                        </div>
+                        <div class="p-4 rounded-2xl bg-stone-900 border border-stone-800">
+                            <p class="text-[11px] font-bold uppercase text-stone-500">50% Downpayments / 100% Full</p>
+                            <p class="text-sm font-black text-amber-400 mt-1">₱{{ number_format((float) $reportSummary['downpayments_50'], 2) }} / ₱{{ number_format((float) $reportSummary['full_prepayments_100'], 2) }}</p>
+                        </div>
+                        <div class="p-4 rounded-2xl bg-stone-900 border border-stone-800">
+                            <p class="text-[11px] font-bold uppercase text-stone-500">Counter &amp; Net Cash Collected</p>
+                            <p class="text-xl font-black text-emerald-400 mt-1">₱{{ number_format((float) $reportSummary['net_cash_collected'], 2) }}</p>
+                            <p class="text-[10px] text-stone-500 mt-0.5">Counter/Balance: ₱{{ number_format((float) $reportSummary['counter_balance_settlements'], 2) }}</p>
+                        </div>
+                        <div class="p-4 rounded-2xl bg-stone-900 border border-stone-800">
+                            <p class="text-[11px] font-bold uppercase text-stone-500">Receivables / Refunds Settled</p>
+                            <p class="text-sm font-black text-rose-300 mt-1">Due: ₱{{ number_format((float) $reportSummary['outstanding_receivables'], 2) }}</p>
+                            <p class="text-[10px] text-stone-400 mt-0.5">Refunded: ₱{{ number_format((float) $reportSummary['manual_refunds_settled'], 2) }}</p>
+                        </div>
+                    </div>
+
+                    <div class="rounded-2xl border border-stone-800 bg-stone-900 overflow-hidden">
+                        <div class="px-4 py-3 border-b border-stone-800 flex items-center justify-between">
+                            <h3 class="text-xs font-extrabold uppercase tracking-wider text-stone-300">Verified Payment &amp; Refund Ledger</h3>
+                            <span class="text-[11px] text-stone-500">{{ count($reportData['payments']) }} verified entries</span>
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left text-xs">
+                                <thead class="bg-stone-950/70 text-[10px] uppercase text-stone-500">
+                                    <tr>
+                                        <th class="p-3">Date</th>
+                                        <th class="p-3">Order #</th>
+                                        <th class="p-3">Customer</th>
+                                        <th class="p-3">Type</th>
+                                        <th class="p-3">Reference</th>
+                                        <th class="p-3 text-right">Amount</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-stone-800/60">
+                                    @forelse ($reportData['payments'] as $payRow)
+                                        <tr>
+                                            <td class="p-3 text-stone-400">{{ $payRow['verified_at'] }}</td>
+                                            <td class="p-3 font-mono font-bold text-white">{{ $payRow['order_number'] }}</td>
+                                            <td class="p-3">{{ $payRow['customer_name'] }}</td>
+                                            <td class="p-3">{{ ucwords(str_replace('_', ' ', $payRow['payment_type'])) }}</td>
+                                            <td class="p-3 font-mono text-stone-400">{{ $payRow['reference_no'] }}</td>
+                                            <td class="p-3 text-right font-mono font-bold {{ (float) $payRow['amount'] < 0 ? 'text-rose-300' : 'text-emerald-400' }}">₱{{ number_format((float) $payRow['amount'], 2) }}</td>
+                                        </tr>
+                                    @empty
+                                        <tr><td colspan="6" class="p-4 text-center text-stone-500">No verified payments recorded in this period.</td></tr>
+                                    @endforelse
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div class="rounded-2xl border border-stone-800 bg-stone-900 overflow-hidden">
+                        <div class="px-4 py-3 border-b border-stone-800 flex items-center justify-between">
+                            <h3 class="text-xs font-extrabold uppercase tracking-wider text-stone-300">Orders Reconciliation Summary</h3>
+                            <span class="text-[11px] text-stone-500">{{ count($reportData['orders']) }} orders</span>
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left text-xs">
+                                <thead class="bg-stone-950/70 text-[10px] uppercase text-stone-500">
+                                    <tr>
+                                        <th class="p-3">Order #</th>
+                                        <th class="p-3">Customer</th>
+                                        <th class="p-3">Service</th>
+                                        <th class="p-3">Payment Status</th>
+                                        <th class="p-3 text-right">Total</th>
+                                        <th class="p-3 text-right">Paid</th>
+                                        <th class="p-3 text-right">Balance Due</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-stone-800/60">
+                                    @forelse ($reportData['orders'] as $ordRow)
+                                        <tr>
+                                            <td class="p-3 font-mono font-bold text-white">{{ $ordRow['order_number'] }}</td>
+                                            <td class="p-3">{{ $ordRow['customer_name'] }}</td>
+                                            <td class="p-3">{{ $ordRow['service_label'] }}</td>
+                                            <td class="p-3 text-stone-300">{{ $ordRow['payment_status'] }}</td>
+                                            <td class="p-3 text-right font-mono">₱{{ number_format((float) $ordRow['total_amount'], 2) }}</td>
+                                            <td class="p-3 text-right font-mono text-emerald-400">₱{{ number_format((float) $ordRow['amount_paid'], 2) }}</td>
+                                            <td class="p-3 text-right font-mono text-amber-300">₱{{ number_format((float) $ordRow['balance_due'], 2) }}</td>
+                                        </tr>
+                                    @empty
+                                        <tr><td colspan="7" class="p-4 text-center text-stone-500">No orders recorded in this period.</td></tr>
+                                    @endforelse
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                @else
+                    <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
+                        <div class="p-4 rounded-2xl bg-stone-900 border border-stone-800">
+                            <p class="text-[11px] font-bold uppercase text-stone-500">Shop Workload Status</p>
+                            <p class="text-xl font-black text-amber-400 mt-1">{{ $reportSummary['workload_status'] }}</p>
+                        </div>
+                        <div class="p-4 rounded-2xl bg-stone-900 border border-stone-800">
+                            <p class="text-[11px] font-bold uppercase text-stone-500">Currently Printing</p>
+                            <p class="text-xl font-black text-white mt-1">{{ $reportSummary['currently_printing_count'] }}</p>
+                        </div>
+                        <div class="p-4 rounded-2xl bg-stone-900 border border-stone-800">
+                            <p class="text-[11px] font-bold uppercase text-stone-500">In Finishing / QC</p>
+                            <p class="text-xl font-black text-white mt-1">{{ $reportSummary['in_finishing_count'] }}</p>
+                        </div>
+                        <div class="p-4 rounded-2xl bg-stone-900 border border-stone-800">
+                            <p class="text-[11px] font-bold uppercase text-stone-500">Ready for Pickup (Aging)</p>
+                            <p class="text-xl font-black text-emerald-400 mt-1">{{ $reportSummary['ready_for_pickup_count'] }} ({{ $reportSummary['aging_pickup_count'] }})</p>
+                        </div>
+                    </div>
+
+                    @foreach ([
+                        'Currently Printing' => $reportData['currently_printing'],
+                        'Already Printed / In Finishing & QC' => $reportData['in_finishing'],
+                        'Ready for Pickup (Shelf / Bin & Aging)' => $reportData['ready_for_pickup'],
+                    ] as $bucketHeading => $bucketItems)
+                        <div class="rounded-2xl border border-stone-800 bg-stone-900 overflow-hidden">
+                            <div class="px-4 py-3 border-b border-stone-800 flex items-center justify-between">
+                                <h3 class="text-xs font-extrabold uppercase tracking-wider text-stone-300">{{ $bucketHeading }}</h3>
+                                <span class="text-[11px] text-stone-500">{{ count($bucketItems) }} jobs</span>
+                            </div>
+                            <div class="overflow-x-auto">
+                                <table class="w-full text-left text-xs">
+                                    <thead class="bg-stone-950/70 text-[10px] uppercase text-stone-500">
+                                        <tr>
+                                            <th class="p-3">Order #</th>
+                                            <th class="p-3">Customer</th>
+                                            <th class="p-3">Service &amp; Qty</th>
+                                            <th class="p-3">Printer</th>
+                                            <th class="p-3">Operator</th>
+                                            <th class="p-3">Shelf / Bin</th>
+                                            <th class="p-3 text-right">Balance Due</th>
+                                            <th class="p-3">Status / Aging</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="divide-y divide-stone-800/60">
+                                        @forelse ($bucketItems as $jobRow)
+                                            <tr>
+                                                <td class="p-3 font-mono font-bold text-white">{{ $jobRow['order_number'] }}</td>
+                                                <td class="p-3">{{ $jobRow['customer_name'] }}</td>
+                                                <td class="p-3">{{ $jobRow['service_label'] }} (x{{ $jobRow['copies_count'] }}, {{ $jobRow['paper_size'] }})</td>
+                                                <td class="p-3 text-stone-300">{{ $jobRow['printer_name'] }}</td>
+                                                <td class="p-3 text-stone-400">{{ $jobRow['staff_name'] }}</td>
+                                                <td class="p-3 font-mono font-bold text-amber-300">{{ $jobRow['shelf_bin_code'] }}</td>
+                                                <td class="p-3 text-right font-mono">₱{{ number_format((float) $jobRow['balance_due'], 2) }}</td>
+                                                <td class="p-3">
+                                                    @if ($jobRow['is_aging'])
+                                                        <span class="px-2 py-0.5 rounded-full text-[10px] font-black bg-rose-500/20 text-rose-300">Aging ({{ $jobRow['aging_days'] }}d)</span>
+                                                    @else
+                                                        <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-stone-800 text-stone-300">{{ $jobRow['stage_label'] }}</span>
+                                                    @endif
+                                                </td>
+                                            </tr>
+                                        @empty
+                                            <tr><td colspan="8" class="p-4 text-center text-stone-500">No jobs currently in this bucket.</td></tr>
+                                        @endforelse
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    @endforeach
                 @endif
             </div>
         @endif

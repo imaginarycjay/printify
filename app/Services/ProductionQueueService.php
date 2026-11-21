@@ -9,6 +9,8 @@ use App\Models\Printer;
 use App\Models\SpecRevision;
 use App\Models\StockMovement;
 use App\Models\User;
+use App\Notifications\OrderPickupReadyNotification;
+use App\Notifications\PrepressActionRequiredNotification;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
@@ -92,6 +94,11 @@ class ProductionQueueService
             metadata: ['order_id' => $order->id, 'reason' => $trimmed],
         );
 
+        $order->loadMissing('customer');
+        if ($order->customer instanceof User) {
+            $order->customer->notify((new PrepressActionRequiredNotification($item, 'rejected', $trimmed))->afterCommit());
+        }
+
         return $item->fresh() ?? $item;
     }
 
@@ -138,6 +145,12 @@ class ProductionQueueService
             actor: $customer,
             metadata: ['order_id' => $order->id],
         );
+
+        $order->loadMissing('printShop.user');
+        $owner = $order->printShop?->user;
+        if ($owner instanceof User) {
+            $owner->notify((new PrepressActionRequiredNotification($item, 'reuploaded'))->afterCommit());
+        }
 
         return $item->fresh() ?? $item;
     }
@@ -222,6 +235,11 @@ class ProductionQueueService
                     'reason' => $trimmed,
                 ],
             );
+
+            $order->loadMissing('customer');
+            if ($order->customer instanceof User) {
+                $order->customer->notify((new PrepressActionRequiredNotification($item->fresh() ?? $item, 'shifted_to_shop_paper', $trimmed))->afterCommit());
+            }
 
             return $applied;
         });
@@ -470,7 +488,16 @@ class ProductionQueueService
                 ],
             );
 
-            return $item->fresh() ?? $item;
+            $freshItem = $item->fresh() ?? $item;
+            $order->loadMissing('customer');
+            if ($order->customer instanceof User) {
+                $order->customer->notify((new OrderPickupReadyNotification(
+                    $freshItem,
+                    $order->order_status === Order::STATUS_PARTIALLY_READY,
+                ))->afterCommit());
+            }
+
+            return $freshItem;
         });
     }
 

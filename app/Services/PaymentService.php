@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\Order;
 use App\Models\Payment;
 use App\Models\User;
+use App\Notifications\PaymentStatusNotification;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
@@ -158,6 +159,12 @@ class PaymentService
                 ],
             );
 
+            $lockedOrder->loadMissing('printShop.user');
+            $owner = $lockedOrder->printShop?->user;
+            if ($owner instanceof User) {
+                $owner->notify((new PaymentStatusNotification($lockedOrder, 'proof_submitted'))->afterCommit());
+            }
+
             return $payment;
         });
     }
@@ -198,6 +205,11 @@ class PaymentService
                     'balance_due' => $lockedOrder->balance_due,
                 ],
             );
+
+            $lockedOrder->loadMissing('customer');
+            if ($lockedOrder->customer instanceof User) {
+                $lockedOrder->customer->notify((new PaymentStatusNotification($lockedOrder, 'verified'))->afterCommit());
+            }
 
             return $lockedPayment->fresh() ?? $lockedPayment;
         });
@@ -250,6 +262,11 @@ class PaymentService
                     'reason' => $trimmedReason,
                 ],
             );
+
+            $lockedOrder->loadMissing('customer');
+            if ($lockedOrder->customer instanceof User) {
+                $lockedOrder->customer->notify((new PaymentStatusNotification($lockedOrder, 'rejected', $trimmedReason))->afterCommit());
+            }
 
             return $lockedPayment->fresh() ?? $lockedPayment;
         });
@@ -351,6 +368,11 @@ class PaymentService
                     'balance_due' => $lockedOrder->balance_due,
                 ],
             );
+
+            $lockedOrder->loadMissing('customer');
+            if ($lockedOrder->customer instanceof User) {
+                $lockedOrder->customer->notify((new PaymentStatusNotification($lockedOrder, 'counter_settled'))->afterCommit());
+            }
 
             return $payment;
         });

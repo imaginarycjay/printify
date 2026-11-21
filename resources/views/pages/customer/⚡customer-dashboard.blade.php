@@ -274,6 +274,7 @@ new class extends Component {
                 <flux:icon name="building-storefront" class="size-4" />
                 Find shops
             </a>
+            <livewire:notification-bell />
             <x-theme-toggle />
 
             <!-- Profile Settings Link -->

@@ -42,6 +42,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::livewire('inventory', 'pages::owner.⚡inventory-hub')->name('inventory-hub');
         Route::livewire('thesis-binding', 'pages::owner.⚡thesis-binding')->name('thesis-binding');
         Route::livewire('document-printing', 'pages::owner.⚡document-printing')->name('document-printing');
+        Route::get('reports/{type}', [PlatformController::class, 'report'])
+            ->whereIn('type', ['inventory', 'sales', 'schedule'])
+            ->name('reports.show');
     });
 
     // Production Staff Routes (Strictly Restricted to Production Staff)

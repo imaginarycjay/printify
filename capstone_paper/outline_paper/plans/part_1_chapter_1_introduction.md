@@ -24,7 +24,7 @@
   - Update Chapter 3 subsections to the ethics-exempt structure (`Research Design`, `Project Locale`, `Testing Personnel and Materials`, `Data Collection Procedure`, `Data Analysis Procedure`, `Validity of the Testing Procedure`, `Ethical Consideration`, `System Architecture`, `Software Development Methodology: Modified Waterfall Model`, `Project Assessment and System Testing Plan`, `Deployment Planning and Readiness`).
 - **List of Tables and Appendices**:
   - Replace v1's ISO/IEC 25010 respondent and Likert scale tables with Smoke Testing (`ST`), Role-Based Functional Testing (`FT`), Functional Requirements Specification (`FR`), and Deployment Specification tables.
-  - Replace v1's questionnaire appendix with Smoke Testing Plan (`Appendix A`), Functional Testing Plan (`Appendix B`), and Regression Test Record Template (`Appendix C`).
+  - Replace v1's questionnaire appendix with Smoke Testing Plan (`Appendix F`), Functional Testing Plan (`Appendix G`), Regression Test Records (`Appendix H`), and Task Allocation Matrix (`Appendix I`), keeping USM institutional forms in `Appendices A–E`.
 
 ### 1.2 Ready-to-Use Title Page Text
 ```text

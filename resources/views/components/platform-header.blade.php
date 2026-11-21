@@ -27,6 +27,7 @@
             @if (! $backUrl)
                 <a href="{{ route('dashboard') }}" data-theme-keep class="inline-flex min-h-11 items-center rounded-xl px-3 text-sm font-semibold text-stone-700 hover:bg-stone-200/60 dark:text-stone-300 dark:hover:bg-stone-800">My dashboard</a>
             @endif
+            <livewire:notification-bell />
             <a href="{{ route('profile.edit') }}" data-theme-keep aria-label="Account settings" class="flex size-11 items-center justify-center rounded-full border border-stone-200 bg-white text-xs font-bold text-amber-700 dark:border-stone-800 dark:bg-stone-900 dark:text-amber-400">{{ auth()->user()->initials() }}</a>
             <form method="POST" action="{{ route('logout') }}">
                 @csrf

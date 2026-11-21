@@ -5,6 +5,7 @@ use App\Models\OrderItem;
 use App\Models\User;
 use Illuminate\Foundation\Inspiring;
 use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\Schedule;
 use Illuminate\Support\Facades\Storage;
 
 Artisan::command('inspire', function () {
@@ -42,3 +43,6 @@ Artisan::command('platform:privatize-files', function (): void {
     }
     $this->info('Referenced order files are now private.');
 })->purpose('Move existing order documents and payment proofs from public to private storage');
+
+Schedule::command('pressqueue:purge-expired-files')->daily()->withoutOverlapping();
+Schedule::command('pressqueue:check-aging-alerts')->hourly()->withoutOverlapping();

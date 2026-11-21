@@ -768,7 +768,8 @@ new #[Title('Production Operations Hub')] class extends Component {
                 </a>
             @endif
 
-            <!-- Theme Toggle -->
+            <!-- Notifications & Theme Toggle -->
+            <livewire:notification-bell />
             <x-theme-toggle />
 
             <!-- Profile Settings Link -->

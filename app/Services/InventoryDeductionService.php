@@ -13,7 +13,9 @@ use App\Models\StockMovement;
 use App\Models\ThesisBindingBomItem;
 use App\Models\ThesisBindingConfig;
 use App\Models\User;
+use App\Notifications\LowStockReorderNotification;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Notifications\DatabaseNotification;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 
@@ -159,6 +161,14 @@ class InventoryDeductionService
                 }
             }
         });
+
+        $reservedIds = array_values(array_unique(array_column($reservations, 'inventory_item_id')));
+        if ($reservedIds !== []) {
+            InventoryItem::whereIn('id', $reservedIds)
+                ->with('printShop.user')
+                ->get()
+                ->each(fn (InventoryItem $inv): null => $this->notifyIfLowStock($inv));
+        }
 
         return $reservations;
     }
@@ -370,6 +380,14 @@ class InventoryDeductionService
             }
         });
 
+        $involvedIds = array_values($involvedItemIds);
+        if ($involvedIds !== []) {
+            InventoryItem::whereIn('id', $involvedIds)
+                ->with('printShop.user')
+                ->get()
+                ->each(fn (InventoryItem $inv): null => $this->notifyIfLowStock($inv));
+        }
+
         return $deductions;
     }
 
@@ -421,7 +439,7 @@ class InventoryDeductionService
         ?int $orderItemId = null,
         string $movementType = StockMovement::TYPE_SPOILAGE_WASTE,
     ): StockMovement {
-        return DB::transaction(function () use ($item, $wastedQty, $reason, $staff, $orderItemId, $movementType): StockMovement {
+        $movement = DB::transaction(function () use ($item, $wastedQty, $reason, $staff, $orderItemId, $movementType): StockMovement {
             $lockedItem = InventoryItem::whereKey($item->id)->lockForUpdate()->firstOrFail();
             $prevStock = (float) $lockedItem->stock_qty;
             $newStock = max(0.0, round($prevStock - $wastedQty, 2));
@@ -439,6 +457,39 @@ class InventoryDeductionService
                 'logged_by' => $staff?->id,
             ]);
         });
+
+        $freshItem = InventoryItem::with('printShop.user')->find($item->id);
+        if ($freshItem instanceof InventoryItem) {
+            $this->notifyIfLowStock($freshItem);
+        }
+
+        return $movement;
+    }
+
+    /**
+     * Dispatch a deduplicated low-stock ROP alert when available quantity meets/falls below reorder point.
+     */
+    public function notifyIfLowStock(InventoryItem $item): void
+    {
+        if (! $item->isLowStock()) {
+            return;
+        }
+
+        $item->loadMissing('printShop.user');
+        $owner = $item->printShop?->user;
+        if (! $owner instanceof User) {
+            return;
+        }
+
+        $alreadyAlerted = $owner->notifications()
+            ->where('type', LowStockReorderNotification::class)
+            ->where('created_at', '>=', now()->subHours(12))
+            ->get()
+            ->contains(fn (DatabaseNotification $n): bool => (int) ($n->data['inventory_item_id'] ?? 0) === $item->id);
+
+        if (! $alreadyAlerted) {
+            $owner->notify((new LowStockReorderNotification($item))->afterCommit());
+        }
     }
 
     /**
