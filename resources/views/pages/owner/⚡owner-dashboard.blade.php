@@ -68,7 +68,7 @@ new class extends Component {
         $shop = $user?->printShop;
         $catalog = PrintServiceCatalog::all();
 
-        // Installed services (always includes pre-installed core apps like web_builder)
+        // Installed services (always includes pre-installed core apps)
         $dbActiveKeys = $shop ? $shop->services()->where('is_active', true)->pluck('service_key')->toArray() : [];
         $activeServiceKeys = array_values(array_unique(array_merge(PrintServiceCatalog::preinstalledKeys(), $dbActiveKeys)));
 
@@ -90,7 +90,7 @@ new class extends Component {
             </span>
             <div>
                 <div class="flex items-center gap-2">
-                    <h1 class="text-base font-bold text-white tracking-tight">{{ $shop ? $shop->name : config('app.name', 'Printify') }}</h1>
+                    <h1 class="text-base font-bold text-white tracking-tight">{{ $shop ? $shop->name : config('app.name', 'PressQueue') }}</h1>
                     <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-500/20 text-amber-400 border border-amber-500/30">Owner Hub</span>
                 </div>
                 <p class="text-[11px] text-stone-400">Single Sign-On Print Operations Facility</p>
@@ -145,7 +145,7 @@ new class extends Component {
 
     @if ($shop && $shop->getAttribute('approval_status') !== 'approved')
         <aside class="relative z-20 mx-auto mt-4 flex w-full max-w-6xl flex-wrap items-center justify-between gap-3 rounded-2xl border border-amber-500/30 bg-amber-500/10 p-4 text-sm">
-            <p class="text-amber-700 dark:text-amber-300"><strong>{{ $shop->getAttribute('approval_status') === 'rejected' ? 'Application needs changes.' : 'Shop approval pending.' }}</strong> Your shop is hidden from customers until approved.</p>
+            <p class="text-amber-700 dark:text-amber-300"><strong>{{ match ($shop->getAttribute('approval_status')) { 'rejected' => 'Application needs changes.', 'suspended' => 'Shop suspended.', default => 'Shop approval pending.' } }}</strong> Your shop is hidden from customers until approved.</p>
             <a href="{{ route('owner.platform') }}" wire:navigate class="inline-flex min-h-11 items-center gap-2 font-bold text-amber-700 dark:text-amber-400">Review shop profile <flux:icon name="arrow-right" class="size-4" /></a>
         </aside>
     @endif
@@ -156,7 +156,7 @@ new class extends Component {
         <div class="text-center space-y-3">
             <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-400 text-xs font-semibold uppercase tracking-wider">
                 <flux:icon name="squares-2x2" class="size-3.5" />
-                Printify App Launcher
+                PressQueue App Launcher
             </div>
             <h2 class="text-3xl sm:text-4xl font-extrabold tracking-tight text-white">App Launcher</h2>
             <p class="text-xs sm:text-sm text-stone-400">
@@ -223,7 +223,6 @@ new class extends Component {
                         'analytics_hub' => route('owner.analytics-hub'),
                         'inventory_hub' => route('owner.inventory-hub'),
                         'production_hub' => route('staff.production-hub'),
-                        'web_builder' => route('owner.web-builder'),
                         'thesis_binding' => route('owner.thesis-binding'),
                         'document_printing' => route('owner.document-printing'),
                         default => null,
@@ -282,7 +281,7 @@ new class extends Component {
 
     <!-- Footer Bar -->
     <footer class="w-full max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between text-xs text-stone-600 border-t border-stone-800/80 pt-4 gap-2 relative z-20">
-        <span>&copy; {{ date('Y') }} {{ config('app.name', 'Printify') }} &bull; {{ $shop ? $shop->name : 'Print Shop' }}</span>
+        <span>&copy; {{ date('Y') }} {{ config('app.name', 'PressQueue') }} &bull; {{ $shop ? $shop->name : 'Print Shop' }}</span>
         <span class="text-stone-500 font-medium">
             {{ count($activeServiceKeys) }} installed apps &bull; {{ count($catalog) - count($activeServiceKeys) }} available in More Services
         </span>

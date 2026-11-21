@@ -1,58 +1,46 @@
-<x-layouts::auth :title="__('Create Account')">
-    <div class="flex flex-col gap-6">
-        <!-- Auth Header & Navigation Pills -->
-        <div class="space-y-4">
-            <div class="flex items-center justify-between border-b border-stone-200 dark:border-stone-800 pb-3">
-                <div class="flex items-center gap-2">
-                    <span class="flex size-7 items-center justify-center rounded-lg bg-amber-500/10 text-amber-600 dark:text-amber-400">
-                        <flux:icon name="user-plus" class="size-4" />
-                    </span>
-                    <span class="text-sm font-bold text-stone-900 dark:text-stone-100 uppercase tracking-wide">Customer Registration</span>
-                </div>
-                <div class="flex items-center gap-1 rounded-lg bg-stone-100 p-1 dark:bg-stone-800/60">
-                    <a href="{{ route('login') }}" class="rounded-md px-3 py-1 text-xs font-medium text-stone-600 hover:text-stone-900 dark:text-stone-400 dark:hover:text-white" wire:navigate>
-                        {{ __('Login') }}
-                    </a>
-                    <a href="{{ route('register') }}" class="rounded-md bg-white px-3 py-1 text-xs font-semibold text-stone-900 shadow-xs dark:bg-stone-950 dark:text-white" wire:navigate>
-                        {{ __('Register') }}
-                    </a>
-                </div>
-            </div>
+<x-layouts::auth :title="__('Create customer account')">
+    <div class="flex flex-col gap-4">
+        <nav aria-label="{{ __('Account type') }}" data-theme-keep class="grid grid-cols-2 gap-1 rounded-xl border border-[var(--auth-border)] bg-[var(--auth-input-bg)] p-1">
+            <a
+                href="{{ route('register') }}"
+                aria-current="page"
+                data-theme-keep
+                class="flex min-h-9 items-center justify-center rounded-lg bg-white px-3 text-xs font-semibold text-stone-900 shadow-2xs dark:bg-stone-700/90 dark:text-white"
+            >
+                {{ __('Customer') }}
+            </a>
+            <a
+                href="{{ route('owner.register') }}"
+                data-theme-keep
+                class="flex min-h-9 items-center justify-center rounded-lg px-3 text-xs font-medium text-stone-600 transition-colors hover:text-stone-900 dark:text-stone-300 dark:hover:text-white"
+            >
+                {{ __('Print shop owner') }}
+            </a>
+        </nav>
 
-            <div>
-                <h1 class="text-xl font-extrabold tracking-tight text-stone-900 dark:text-stone-100">
-                    {{ __('Create Customer Account') }}
-                </h1>
-                <p class="text-xs text-stone-500 dark:text-stone-400">
-                    {{ __('Sign up to order custom printing services, track job status, and manage specs') }}
-                </p>
-            </div>
-        </div>
+        <x-auth-header
+            :title="__('Create your customer account')"
+            :description="__('Browse approved print shops, upload files, and follow every stage to pickup.')"
+        />
 
-        <!-- Role Info Banner -->
-        <div class="flex items-center gap-3 rounded-xl bg-amber-500/10 p-3 text-xs text-amber-800 dark:text-amber-300 border border-amber-500/20">
-            <flux:icon name="information-circle" class="size-4 shrink-0 text-amber-600 dark:text-amber-400" />
-            <span>Public registration creates a <strong>Customer Account</strong>. Shop owners can register their business separately; staff join by invitation.</span>
-        </div>
+        <x-auth-feedback />
 
-        <a href="{{ route('owner.register') }}" wire:navigate class="flex min-h-11 items-center justify-between gap-3 rounded-xl border border-stone-200 p-3 text-sm font-semibold text-stone-700 hover:border-amber-500 dark:border-stone-800 dark:text-stone-300">
-            <span class="flex items-center gap-2"><flux:icon name="building-storefront" class="size-4 text-amber-600 dark:text-amber-400" /> Register your print shop</span>
-            <flux:icon name="arrow-right" class="size-4" />
-        </a>
-        <!-- Session Status -->
-        <x-auth-session-status class="text-center" :status="session('status')" />
-
-        <form method="POST" action="{{ route('register.store') }}" class="flex flex-col gap-4">
+        <form
+            method="POST"
+            action="{{ route('register.store') }}"
+            class="flex flex-col gap-3.5"
+            x-data="{ submitting: false }"
+            @submit="submitting = true"
+            @pageshow.window="submitting = false"
+        >
             @csrf
 
-            <!-- Name -->
             <flux:field>
-                <flux:label>{{ __('Full Name') }}</flux:label>
+                <flux:label>{{ __('Full name') }}</flux:label>
                 <flux:input
                     name="name"
                     :value="old('name')"
                     type="text"
-                    icon="user"
                     required
                     autofocus
                     autocomplete="name"
@@ -61,68 +49,75 @@
                 <flux:error name="name" />
             </flux:field>
 
-            <!-- Email Address -->
             <flux:field>
-                <flux:label>{{ __('Email Address') }}</flux:label>
+                <flux:label>{{ __('Email address') }}</flux:label>
                 <flux:input
                     name="email"
                     :value="old('email')"
                     type="email"
-                    icon="envelope"
                     required
                     autocomplete="email"
-                    placeholder="name@example.com"
+                    placeholder="you@example.com"
                 />
                 <flux:error name="email" />
             </flux:field>
 
-            <!-- Password -->
             <flux:field>
                 <flux:label>{{ __('Password') }}</flux:label>
                 <flux:input
                     name="password"
                     type="password"
-                    icon="key"
                     required
                     autocomplete="new-password"
-                    placeholder="••••••••"
+                    :placeholder="__('Create a password')"
                     passwordrules="{{ \Illuminate\Validation\Rules\Password::defaults()->toPasswordRulesString() }}"
                     viewable
                 />
                 <flux:error name="password" />
             </flux:field>
 
-            <!-- Confirm Password -->
             <flux:field>
-                <flux:label>{{ __('Confirm Password') }}</flux:label>
+                <flux:label>{{ __('Confirm password') }}</flux:label>
                 <flux:input
                     name="password_confirmation"
                     type="password"
-                    icon="key"
                     required
                     autocomplete="new-password"
-                    placeholder="••••••••"
+                    :placeholder="__('Re-enter your password')"
                     passwordrules="{{ \Illuminate\Validation\Rules\Password::defaults()->toPasswordRulesString() }}"
                     viewable
                 />
                 <flux:error name="password_confirmation" />
             </flux:field>
 
-            <!-- Submit Button -->
-            <flux:button variant="primary" type="submit" class="w-full bg-amber-500 hover:bg-amber-600 text-stone-950 font-semibold shadow-md shadow-amber-500/20 mt-2" data-test="register-user-button">
-                {{ __('Create Customer Account') }}
+            <flux:button
+                variant="primary"
+                type="submit"
+                data-theme-keep
+                class="mt-1 w-full !bg-amber-500 !text-stone-950 font-semibold hover:!bg-amber-400"
+                data-test="register-user-button"
+                x-bind:disabled="submitting"
+            >
+                {{ __('Create customer account') }}
             </flux:button>
         </form>
-
-        <!-- Footer Link -->
-        <div class="text-xs text-center text-stone-500 dark:text-stone-400 border-t border-stone-100 dark:border-stone-800/60 pt-4">
-            <span>{{ __('Already have an account?') }}</span>
-            <flux:link class="font-semibold text-amber-600 hover:text-amber-500 dark:text-amber-400 ms-1" :href="route('login')" wire:navigate>
-                {{ __('Log in') }}
-            </flux:link>
-        </div>
-
-        <!-- Dev Role Switcher -->
-        <x-dev-role-switcher />
     </div>
+
+    <x-slot:footer>
+        <div data-theme-keep class="space-y-1.5 text-center text-sm text-stone-600 dark:text-stone-300">
+            <p>
+                <span>{{ __('Already have an account?') }}</span>
+                <flux:link
+                    data-theme-keep
+                    class="ms-1 font-semibold !text-amber-700 hover:!text-amber-800 dark:!text-amber-400 dark:hover:!text-amber-300"
+                    :href="route('login')"
+                >
+                    {{ __('Sign in') }}
+                </flux:link>
+            </p>
+            <p data-theme-keep class="text-xs text-stone-500 dark:text-stone-400">
+                {{ __('Production staff join through an invitation from their shop owner.') }}
+            </p>
+        </div>
+    </x-slot:footer>
 </x-layouts::auth>

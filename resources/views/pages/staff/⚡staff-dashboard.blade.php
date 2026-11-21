@@ -3,10 +3,12 @@
 use App\Models\InventoryItem;
 use App\Models\Order;
 use App\Models\OrderItem;
+use App\Models\Payment;
 use App\Models\PrintShop;
 use App\Models\StockMovement;
 use App\Models\User;
 use App\Services\InventoryDeductionService;
+use App\Services\PaymentService;
 use Flux\Flux;
 use Illuminate\Support\Facades\Storage;
 use Livewire\Attributes\Title;
@@ -69,7 +71,10 @@ new #[Title('Production Operations Hub')] class extends Component {
             ->latest('created_at');
 
         if ($this->selectedService !== 'all') {
-            $query->where('service_key', $this->selectedService);
+            $query->where(function ($q): void {
+                $q->where('service_key', $this->selectedService)
+                    ->orWhereHas('items', fn ($iq) => $iq->where('service_key', $this->selectedService));
+            });
         }
 
         if ($this->selectedFilter === 'rush_only') {
@@ -96,6 +101,7 @@ new #[Title('Production Operations Hub')] class extends Component {
             $search = '%' . trim($this->searchQuery) . '%';
             $query->where(function ($q) use ($search) {
                 $q->where('order_number', 'like', $search)
+                    ->orWhere('tracking_code', 'like', $search)
                     ->orWhereHas('customer', fn ($c) => $c->where('name', 'like', $search)->orWhere('email', 'like', $search))
                     ->orWhereHas('items', fn ($i) => $i->where('custom_fields_data', 'like', $search));
             });
@@ -233,20 +239,58 @@ new #[Title('Production Operations Hub')] class extends Component {
      */
     public function verifyPayment(int $orderId): void
     {
-        $order = Order::where('print_shop_id', auth()->user()?->operationalShop()?->id ?? 0)->find($orderId);
-        if ($order) {
-            $order->update([
-                'payment_status' => Order::PAYMENT_VERIFIED_PAID,
-                'payment_verified_at' => now(),
-                'payment_verified_by' => auth()->id(),
-            ]);
-
-            Flux::toast(
-                text: "Payment for Order {$order->order_number} verified and confirmed at counter.",
-                heading: 'Payment Confirmed',
-                variant: 'success'
-            );
+        $user = auth()->user();
+        $shopId = $user?->operationalShop()?->id ?? 0;
+        $order = Order::where('print_shop_id', $shopId)->find($orderId);
+        if (! $order || ! $user) {
+            return;
         }
+
+        $pendingPayment = $order->payments()->where('status', Payment::STATUS_PENDING)->latest()->first();
+        if ($pendingPayment) {
+            app(PaymentService::class)->verifyPayment($pendingPayment, $user);
+        } else {
+            $remaining = max(0.0, round((float) $order->total_amount - (float) $order->amount_paid, 2));
+            if ($remaining > 0.0) {
+                app(PaymentService::class)->recordOfflineCounterPayment($order, $user, $remaining);
+            } else {
+                $order->update([
+                    'payment_status' => Order::PAYMENT_VERIFIED_PAID,
+                    'payment_verified_at' => now(),
+                    'payment_verified_by' => $user->id,
+                ]);
+            }
+        }
+
+        Flux::toast(
+            text: "Payment for Order {$order->order_number} verified and confirmed at counter.",
+            heading: 'Payment Confirmed',
+            variant: 'success'
+        );
+    }
+
+    /**
+     * Collect remaining balance at pickup / counter via PaymentService.
+     */
+    public function settleCounterBalance(int $orderId): void
+    {
+        $user = auth()->user();
+        $shopId = $user?->operationalShop()?->id ?? 0;
+        $order = Order::where('print_shop_id', $shopId)->find($orderId);
+        if (! $order || ! $user) {
+            return;
+        }
+
+        $remaining = max(0.0, round((float) $order->total_amount - (float) $order->amount_paid, 2));
+        if ($remaining > 0.0) {
+            app(PaymentService::class)->recordOfflineCounterPayment($order, $user, $remaining);
+        }
+
+        Flux::toast(
+            text: "Remaining balance for Order {$order->order_number} settled at counter.",
+            heading: 'Balance Settled',
+            variant: 'success'
+        );
     }
 
     /**
@@ -354,7 +398,7 @@ new #[Title('Production Operations Hub')] class extends Component {
                         Shop Floor Live
                     </span>
                 </div>
-                <p class="text-[11px] text-stone-400">{{ $shop ? $shop->name : 'Printify' }} &bull; Digital Job Queue, Machine Scheduling & BOM Consumption</p>
+                <p class="text-[11px] text-stone-400">{{ $shop ? $shop->name : 'PressQueue' }} &bull; Digital Job Queue, Machine Scheduling & BOM Consumption</p>
             </div>
         </div>
 
@@ -943,7 +987,7 @@ new #[Title('Production Operations Hub')] class extends Component {
 
     <!-- Footer Bar -->
     <footer class="w-full bg-stone-900/60 border-t border-stone-800/80 px-4 sm:px-8 py-3 flex flex-col sm:flex-row items-center justify-between text-xs text-stone-500 gap-2">
-        <span>&copy; {{ date('Y') }} {{ $shop ? $shop->name : 'Printify' }} &bull; Floor Operations System</span>
+        <span>&copy; {{ date('Y') }} {{ $shop ? $shop->name : 'PressQueue' }} &bull; Floor Operations System</span>
         <span class="text-stone-500 font-medium">
             Active in Floor: {{ $totalActive }} jobs &bull; Ready: {{ $readyPickup }}
         </span>
@@ -969,13 +1013,20 @@ new #[Title('Production Operations Hub')] class extends Component {
                         <div>
                             <div class="flex items-center gap-2">
                                 <h3 class="text-lg font-black text-white">Digital Job Ticket: {{ $ticketOrder->order_number }}</h3>
+                                @if ($ticketOrder->tracking_code)
+                                    <span class="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-stone-800 text-stone-200 border border-stone-700">{{ $ticketOrder->tracking_code }}</span>
+                                @endif
                                 @if ($ticketOrder->is_rush)
                                     <span class="px-2 py-0.5 rounded text-[10px] font-black bg-amber-500/20 text-amber-400 border border-amber-500/30">
                                         ⚡ RUSH ORDER
                                     </span>
                                 @endif
                             </div>
-                            <p class="text-xs text-stone-400">Customer: {{ $ticketOrder->customer->name }} ({{ $ticketOrder->customer->email }})</p>
+                            <p class="text-xs text-stone-400">
+                                Customer: {{ $ticketOrder->customer->name }} ({{ $ticketOrder->customer->email }})
+                                &bull; Paid: ₱{{ number_format((float) $ticketOrder->amount_paid, 2) }}
+                                &bull; Balance: ₱{{ number_format(max(0.0, (float) $ticketOrder->total_amount - (float) $ticketOrder->amount_paid), 2) }}
+                            </p>
                         </div>
                     </div>
 
@@ -1222,14 +1273,21 @@ new #[Title('Production Operations Hub')] class extends Component {
                         Status: <strong class="text-amber-400">{{ $ticketOrder->stageLabel() }}</strong>
                     </span>
                     
-                    <div class="flex items-center gap-2">
+                    <div class="flex flex-wrap items-center gap-2">
+                        <a
+                            href="{{ route('orders.receipt', $ticketOrder) }}"
+                            target="_blank"
+                            class="px-3.5 py-2 rounded-xl text-xs font-bold bg-stone-800 hover:bg-stone-700 text-amber-400 transition-colors"
+                        >
+                            Official Receipt
+                        </a>
                         @if (! in_array($ticketOrder->payment_status, [Order::PAYMENT_VERIFIED_PAID, 'paid', 'verified']))
                             <button 
                                 wire:click="verifyPayment({{ $ticketOrder->id }})"
                                 class="px-4 py-2 rounded-xl text-xs font-black bg-emerald-500 hover:bg-emerald-400 text-stone-950 transition-colors shadow-sm flex items-center gap-1.5 cursor-pointer"
                             >
                                 <flux:icon name="check" class="size-3.5" />
-                                <span>Verify Payment (₱{{ number_format($ticketOrder->total_amount, 2) }})</span>
+                                <span>Verify / Collect (₱{{ number_format(max(0.0, (float) $ticketOrder->total_amount - (float) $ticketOrder->amount_paid), 2) }})</span>
                             </button>
                         @endif
                         <button 

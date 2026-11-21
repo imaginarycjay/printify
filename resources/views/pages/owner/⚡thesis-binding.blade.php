@@ -63,6 +63,7 @@ new class extends Component {
     public int $daily_production_quota = 20;
     public int $standard_lead_time_days = 4;
     public int $rush_lead_time_days = 1;
+    public int $max_binding_sheets = 250;
 
     // 5. Customer Form Requirements
     public bool $require_pdf_upload = true;
@@ -111,6 +112,7 @@ new class extends Component {
                 'daily_production_quota' => 20,
                 'standard_lead_time_days' => 4,
                 'rush_lead_time_days' => 1,
+                'max_binding_sheets' => 250,
                 'require_pdf_upload' => true,
                 'custom_cover_fields' => ThesisBindingConfig::defaultCustomCoverFields(),
             ]
@@ -133,6 +135,7 @@ new class extends Component {
         $this->daily_production_quota = (int) $config->daily_production_quota;
         $this->standard_lead_time_days = (int) $config->standard_lead_time_days;
         $this->rush_lead_time_days = (int) $config->rush_lead_time_days;
+        $this->max_binding_sheets = (int) ($config->max_binding_sheets ?? 250);
 
         $this->require_pdf_upload = (bool) $config->require_pdf_upload;
         $this->custom_cover_fields = $config->custom_cover_fields ?? ThesisBindingConfig::defaultCustomCoverFields();
@@ -358,6 +361,7 @@ new class extends Component {
             'daily_production_quota' => ['required', 'integer', 'min:1'],
             'standard_lead_time_days' => ['required', 'integer', 'min:1'],
             'rush_lead_time_days' => ['required', 'integer', 'min:1'],
+            'max_binding_sheets' => ['required', 'integer', 'min:10', 'max:5000'],
         ]);
 
         $config = $this->getConfig();
@@ -366,6 +370,7 @@ new class extends Component {
                 'daily_production_quota' => $this->daily_production_quota,
                 'standard_lead_time_days' => $this->standard_lead_time_days,
                 'rush_lead_time_days' => $this->rush_lead_time_days,
+                'max_binding_sheets' => $this->max_binding_sheets,
             ]);
 
             $this->statusMessage = 'Production Limits & Lead Times saved successfully!';
@@ -417,7 +422,12 @@ new class extends Component {
     @php
         $user = auth()->user();
         $shop = $user?->printShop;
-        $inventoryList = $shop ? $shop->inventoryItems()->forService('thesis_binding')->orderBy('name')->get() : collect();
+        $inventoryList = $shop
+            ? $shop->inventoryItems()
+                ->where(fn ($q) => $q->forService('thesis_binding')->orWhere('item_type', InventoryItem::TYPE_CONSUMABLE))
+                ->orderBy('name')
+                ->get()
+            : collect();
         if ($inventoryList->isEmpty() && $shop) {
             $inventoryList = $shop->inventoryItems()->orderBy('name')->get();
         }
@@ -538,11 +548,6 @@ new class extends Component {
                         <flux:icon name="archive-box" class="size-4 text-emerald-400" />
                         <span>Central Inventory Hub</span>
                     </a>
-
-                    <a href="{{ route('owner.web-builder') }}" wire:navigate class="flex items-center gap-3 px-3.5 py-2 rounded-xl text-xs font-semibold text-stone-400 hover:text-white hover:bg-stone-800/60 transition-all">
-                        <flux:icon name="globe-alt" class="size-4 text-violet-400" />
-                        <span>Storefront Web Builder</span>
-                    </a>
                 </nav>
             </div>
         </div>
@@ -616,7 +621,6 @@ new class extends Component {
                         <nav class="space-y-1">
                             <a href="{{ route('dashboard') }}" wire:navigate class="block px-3 py-2 text-xs text-stone-400 hover:text-white">App Launcher</a>
                             <a href="{{ route('owner.inventory-hub') }}" wire:navigate class="block px-3 py-2 text-xs text-stone-400 hover:text-white">Inventory Hub</a>
-                            <a href="{{ route('owner.web-builder') }}" wire:navigate class="block px-3 py-2 text-xs text-stone-400 hover:text-white">Web Builder</a>
                         </nav>
                     </div>
                 </div>
@@ -1289,6 +1293,21 @@ new class extends Component {
                             </div>
                             <p class="text-[10px] text-stone-500">Expedited rush turnaround time (e.g. 1 day)</p>
                         </div>
+                    </div>
+
+                    <div class="space-y-1.5 border-t border-stone-800/80 pt-4">
+                        <label class="text-xs font-bold text-stone-200">Maximum Binding Sheet Limit (Physical Sheets / Copy)</label>
+                        <div class="relative max-w-sm">
+                            <input
+                                wire:model="max_binding_sheets"
+                                type="number"
+                                min="10"
+                                max="5000"
+                                class="w-full px-4 py-2.5 rounded-xl bg-stone-950 border border-stone-800 text-stone-100 text-sm focus:border-amber-500 focus:outline-none"
+                            />
+                        </div>
+                        <p class="text-[10px] text-stone-500">Physical sheet ceiling checked against simplex/duplex page count at customer checkout.</p>
+                        @error('max_binding_sheets') <p class="text-[10px] text-red-400">{{ $message }}</p> @enderror
                     </div>
 
                     <div class="flex justify-end border-t border-stone-800 pt-4">

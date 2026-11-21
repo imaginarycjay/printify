@@ -222,7 +222,7 @@ new #[Title('Document Printing & Finishing Configuration')] class extends Compon
                         Service App
                     </span>
                 </div>
-                <p class="text-[11px] text-stone-400">{{ $shop ? $shop->name : 'Printify' }} &bull; Page Rates, Duplex Rules, Finishing Options & BOM Recipes</p>
+                <p class="text-[11px] text-stone-400">{{ $shop ? $shop->name : 'PressQueue' }} &bull; Page Rates, Duplex Rules, Finishing Options & BOM Recipes</p>
             </div>
         </div>
 
@@ -671,7 +671,7 @@ new #[Title('Document Printing & Finishing Configuration')] class extends Compon
 
     <!-- Footer Bar -->
     <footer class="w-full bg-stone-900/60 border-t border-stone-800/80 px-4 sm:px-8 py-3 flex flex-col sm:flex-row items-center justify-between text-xs text-stone-500 gap-2">
-        <span>&copy; {{ date('Y') }} {{ $shop ? $shop->name : 'Printify' }} &bull; Document Printing Service Module</span>
+        <span>&copy; {{ date('Y') }} {{ $shop ? $shop->name : 'PressQueue' }} &bull; Document Printing Service Module</span>
         <span class="text-stone-500 font-medium">
             Duplex Sheet Calculation & Automated Ring BOM Burn
         </span>

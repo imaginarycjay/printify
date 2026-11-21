@@ -2,7 +2,7 @@ let cleanupLandingHeader = () => {};
 
 function initializeLandingHeader() {
     cleanupLandingHeader();
-    const header = document.querySelector('body.printify-landing > header');
+    const header = document.querySelector('body.pressqueue-landing > header');
     if (!header) {
         return;
     }

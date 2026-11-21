@@ -35,11 +35,13 @@ new class extends Component {
             <section id="profile" class="scroll-mt-6 space-y-5 rounded-3xl border border-stone-200 bg-white p-6 lg:col-span-2 dark:border-stone-800 dark:bg-stone-900/80">
                 <div class="flex flex-wrap items-center justify-between gap-3">
                     <h2 class="flex items-center gap-2 text-lg font-extrabold"><flux:icon name="building-storefront" class="size-5 text-amber-600 dark:text-amber-400" /> Shop profile</h2>
-                    <flux:badge :color="match ($approval) { 'approved' => 'emerald', 'rejected' => 'red', default => 'amber' }" size="sm">{{ ucfirst($approval) }}</flux:badge>
+                    <flux:badge :color="match ($approval) { 'approved' => 'emerald', 'rejected' => 'red', 'suspended' => 'zinc', default => 'amber' }" size="sm">{{ ucfirst($approval) }}</flux:badge>
                 </div>
                 <p class="text-sm leading-relaxed text-stone-500 dark:text-stone-400">
                     @if ($approval === 'approved')
                         Your approved shop is listed for customers once setup is complete.
+                    @elseif ($approval === 'suspended')
+                        Your shop is currently suspended and hidden from the marketplace. Contact the platform administrator for assistance.
                     @elseif ($approval === 'rejected')
                         Your application needs changes. Update the details below and resubmit for review.
                     @else

@@ -66,12 +66,12 @@ new class extends Component {
                     <div class="rounded-3xl border border-dashed border-stone-300 p-10 text-center md:col-span-2 lg:col-span-3 dark:border-stone-700">
                         <flux:icon name="building-storefront" class="mx-auto mb-3 size-10 text-stone-400" />
                         <h2 class="font-bold">No shops match this service yet</h2>
-                        <p class="mt-2 text-sm text-stone-500 dark:text-stone-400">Try another service or check back when more shops join Printify.</p>
+                        <p class="mt-2 text-sm text-stone-500 dark:text-stone-400">Try another service or check back when more shops join PressQueue.</p>
                         <a href="{{ route('shops.index') }}" class="mt-4 inline-flex min-h-11 items-center font-bold text-amber-700 dark:text-amber-400">Browse all shops &rarr;</a>
                     </div>
                 @endforelse
             </div>
         </div>
-        <p class="flex items-start gap-2 text-xs leading-relaxed text-stone-500 dark:text-stone-400"><flux:icon name="information-circle" class="size-4 shrink-0" /> Workload updates every 30 seconds from active jobs recorded in Printify. It is not a promised completion time. A busy shop may still accept orders.</p>
+        <p class="flex items-start gap-2 text-xs leading-relaxed text-stone-500 dark:text-stone-400"><flux:icon name="information-circle" class="size-4 shrink-0" /> Workload updates every 30 seconds from active jobs recorded in PressQueue. It is not a promised completion time. A busy shop may still accept orders.</p>
     </main>
 </div>

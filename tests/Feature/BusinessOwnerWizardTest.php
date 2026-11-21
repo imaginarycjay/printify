@@ -14,15 +14,15 @@ class BusinessOwnerWizardTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_print_service_catalog_contains_all_services_including_web_builder(): void
+    public function test_print_service_catalog_contains_all_active_services_without_web_builder(): void
     {
         $services = PrintServiceCatalog::all();
 
-        $this->assertCount(12, $services);
+        $this->assertCount(11, $services);
         $this->assertArrayHasKey('analytics_hub', $services);
         $this->assertArrayHasKey('inventory_hub', $services);
         $this->assertArrayHasKey('production_hub', $services);
-        $this->assertArrayHasKey('web_builder', $services);
+        $this->assertArrayNotHasKey('web_builder', $services);
         $this->assertArrayHasKey('thesis_binding', $services);
         $this->assertArrayHasKey('document_printing', $services);
         $this->assertArrayHasKey('tarpaulin', $services);
@@ -31,9 +31,10 @@ class BusinessOwnerWizardTest extends TestCase
         $this->assertArrayHasKey('trophy', $services);
         $this->assertArrayHasKey('mug', $services);
         $this->assertArrayHasKey('sticker', $services);
+        $this->assertTrue(PrintServiceCatalog::isPreinstalled('analytics_hub'));
         $this->assertTrue(PrintServiceCatalog::isPreinstalled('inventory_hub'));
         $this->assertTrue(PrintServiceCatalog::isPreinstalled('production_hub'));
-        $this->assertTrue(PrintServiceCatalog::isPreinstalled('web_builder'));
+        $this->assertFalse(PrintServiceCatalog::isPreinstalled('web_builder'));
     }
 
     public function test_business_owner_can_complete_setup_wizard(): void

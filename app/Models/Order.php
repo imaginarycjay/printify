@@ -2,23 +2,31 @@
 
 namespace App\Models;
 
+use App\Services\PrintServiceCatalog;
 use Carbon\CarbonInterface;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Str;
 
 /**
  * @property int $id
  * @property string $order_number
+ * @property string|null $tracking_code
  * @property int $print_shop_id
  * @property int $customer_id
- * @property string $service_key
+ * @property string|null $service_key
  * @property string $order_status
  * @property string $payment_status
+ * @property string $payment_option
  * @property float $subtotal_amount
  * @property float $rush_fee_amount
  * @property float $total_amount
+ * @property float $amount_paid
+ * @property float $balance_due
+ * @property float $refund_due
+ * @property string $refund_status
  * @property bool $is_rush
  * @property CarbonInterface|null $target_completion_date
  * @property string|null $payment_proof_path
@@ -30,6 +38,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property string $production_stage
  * @property CarbonInterface|null $production_started_at
  * @property CarbonInterface|null $production_completed_at
+ * @property CarbonInterface|null $completed_at
  * @property string|null $staff_notes
  * @property string|null $rejection_reason
  * @property CarbonInterface|null $created_at
@@ -37,14 +46,20 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  */
 #[Fillable([
     'order_number',
+    'tracking_code',
     'print_shop_id',
     'customer_id',
     'service_key',
     'order_status',
     'payment_status',
+    'payment_option',
     'subtotal_amount',
     'rush_fee_amount',
     'total_amount',
+    'amount_paid',
+    'balance_due',
+    'refund_due',
+    'refund_status',
     'is_rush',
     'target_completion_date',
     'payment_proof_path',
@@ -56,6 +71,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
     'production_stage',
     'production_started_at',
     'production_completed_at',
+    'completed_at',
     'staff_notes',
     'rejection_reason',
 ])]
@@ -94,11 +110,27 @@ class Order extends Model
 
     public const PAYMENT_PENDING_VERIFICATION = 'pending_verification';
 
+    public const PAYMENT_PARTIALLY_PAID = 'partially_paid';
+
     public const PAYMENT_VERIFIED_PAID = 'verified_paid';
 
     public const PAYMENT_PAID = 'verified_paid';
 
     public const PAYMENT_REJECTED = 'rejected';
+
+    // Payment Options
+    public const PAYMENT_OPTION_DOWNPAYMENT_50 = 'downpayment_50';
+
+    public const PAYMENT_OPTION_FULL_100 = 'full_100';
+
+    public const PAYMENT_OPTION_COUNTER_OFFLINE = 'counter_offline';
+
+    // Refund Statuses
+    public const REFUND_NONE = 'none';
+
+    public const REFUND_MANUAL_PENDING = 'manual_refund_pending';
+
+    public const REFUND_SETTLED = 'settled';
 
     /**
      * Get the attributes that should be cast.
@@ -111,11 +143,15 @@ class Order extends Model
             'subtotal_amount' => 'float',
             'rush_fee_amount' => 'float',
             'total_amount' => 'float',
+            'amount_paid' => 'float',
+            'balance_due' => 'float',
+            'refund_due' => 'float',
             'is_rush' => 'boolean',
             'target_completion_date' => 'date',
             'payment_verified_at' => 'datetime',
             'production_started_at' => 'datetime',
             'production_completed_at' => 'datetime',
+            'completed_at' => 'datetime',
         ];
     }
 
@@ -150,6 +186,16 @@ class Order extends Model
     }
 
     /**
+     * Payment ledger records submitted or settled for this order.
+     *
+     * @return HasMany<Payment, $this>
+     */
+    public function payments(): HasMany
+    {
+        return $this->hasMany(Payment::class)->latest();
+    }
+
+    /**
      * User who verified the payment.
      *
      * @return BelongsTo<User, $this>
@@ -179,6 +225,79 @@ class Order extends Model
         $nextNum = $lastOrder ? ((int) substr($lastOrder->order_number, -4)) + 1 : 1;
 
         return sprintf('ORD-%s-%04d', $year, $nextNum);
+    }
+
+    /**
+     * Generate a unique customer-facing tracking code (e.g. TRK-AB12CD34).
+     */
+    public static function generateTrackingCode(): string
+    {
+        do {
+            $code = 'TRK-'.strtoupper(Str::random(8));
+        } while (static::where('tracking_code', $code)->exists());
+
+        return $code;
+    }
+
+    /**
+     * Minimum required upfront payment amount (50% of total order value).
+     */
+    public function minimumUpfrontAmount(): float
+    {
+        return round(((float) $this->total_amount) * 0.50, 2);
+    }
+
+    /**
+     * Determine whether this order contains items from more than one print service.
+     */
+    public function isMultiService(): bool
+    {
+        return $this->items
+            ->map(fn (OrderItem $item): string => $item->resolvedServiceKey())
+            ->unique()
+            ->count() > 1;
+    }
+
+    /**
+     * Human-readable service summary supporting both single and multi-service orders.
+     */
+    public function displayServiceLabel(): string
+    {
+        $keys = $this->items
+            ->map(fn (OrderItem $item): string => $item->resolvedServiceKey())
+            ->filter()
+            ->unique()
+            ->values();
+
+        if ($keys->count() > 1) {
+            return 'Multi-Service Order';
+        }
+
+        $key = $keys->first() ?? $this->service_key ?? 'printing_order';
+
+        return PrintServiceCatalog::find($key)['name'] ?? ucwords(str_replace('_', ' ', $key));
+    }
+
+    /**
+     * Check whether this order has any unverified proof older than the given hours.
+     */
+    public function hasAgingUnverifiedPayment(int $hours = 2): bool
+    {
+        if ($this->relationLoaded('payments')) {
+            return $this->payments->contains(fn (Payment $payment): bool => $payment->isAging($hours));
+        }
+
+        $cutoff = now()->subHours($hours);
+
+        return $this->payments()
+            ->where('status', Payment::STATUS_PENDING)
+            ->where(function ($query) use ($cutoff): void {
+                $query->where('submitted_at', '<=', $cutoff)
+                    ->orWhere(function ($nested) use ($cutoff): void {
+                        $nested->whereNull('submitted_at')->where('created_at', '<=', $cutoff);
+                    });
+            })
+            ->exists();
     }
 
     /**
@@ -231,6 +350,7 @@ class Order extends Model
             case self::STAGE_READY_FOR_PICKUP:
                 $this->production_stage = self::STAGE_COMPLETED;
                 $this->order_status = self::STATUS_COMPLETED;
+                $this->completed_at = $this->completed_at ?? now();
                 if ($this->payment_status !== self::PAYMENT_VERIFIED_PAID && $this->payment_status !== self::PAYMENT_REJECTED) {
                     $this->payment_status = self::PAYMENT_VERIFIED_PAID;
                     $this->payment_verified_at = now();
@@ -350,6 +470,7 @@ class Order extends Model
     {
         return match ($this->payment_status) {
             self::PAYMENT_VERIFIED_PAID => 'Verified Paid',
+            self::PAYMENT_PARTIALLY_PAID => 'Partially Paid (DP Verified)',
             self::PAYMENT_PENDING_VERIFICATION => 'Pending Verification',
             self::PAYMENT_UNPAID => 'Pay at Counter (Unpaid)',
             self::PAYMENT_REJECTED => 'Payment Rejected',
@@ -364,6 +485,7 @@ class Order extends Model
     {
         return match ($this->payment_status) {
             self::PAYMENT_VERIFIED_PAID => 'bg-emerald-500/15 text-emerald-400 border-emerald-500/30',
+            self::PAYMENT_PARTIALLY_PAID => 'bg-cyan-500/15 text-cyan-400 border-cyan-500/30',
             self::PAYMENT_PENDING_VERIFICATION => 'bg-amber-500/15 text-amber-400 border-amber-500/30',
             self::PAYMENT_UNPAID => 'bg-orange-500/15 text-orange-400 border-orange-500/30',
             self::PAYMENT_REJECTED => 'bg-red-500/15 text-red-400 border-red-500/30',

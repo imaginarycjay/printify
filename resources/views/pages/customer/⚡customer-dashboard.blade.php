@@ -1,11 +1,18 @@
 <?php
 
 use App\Models\Order;
+use App\Models\Payment;
 use App\Models\PrintShop;
+use App\Services\PaymentService;
 use App\Services\PrintServiceCatalog;
+use Illuminate\Http\UploadedFile;
+use Livewire\Attributes\Locked;
 use Livewire\Component;
+use Livewire\WithFileUploads;
 
 new class extends Component {
+    use WithFileUploads;
+
     public function rendering(mixed $view): void
     {
         $view->layout('layouts.blank');
@@ -13,6 +20,16 @@ new class extends Component {
 
     public string $active_tab = 'services'; // 'services' or 'orders'
     public ?int $viewing_order_id = null;
+
+    #[Locked]
+    public ?int $paying_order_id = null;
+
+    public string $payment_option = Order::PAYMENT_OPTION_FULL_100;
+    public string $payment_method = 'gcash';
+    public float $payment_amount = 0.0;
+    public string $payment_reference_no = '';
+    public mixed $payment_proof_file = null;
+    public ?string $payment_feedback = null;
 
     public function viewOrderDetails(int $id): void
     {
@@ -22,6 +39,79 @@ new class extends Component {
     public function closeOrderModal(): void
     {
         $this->viewing_order_id = null;
+    }
+
+    public function openPaymentModal(int $orderId): void
+    {
+        $this->resetValidation();
+        $this->payment_feedback = null;
+        $order = Order::where('customer_id', auth()->id())->findOrFail($orderId);
+
+        $this->paying_order_id = $order->id;
+        $remaining = max(0.0, round((float) $order->total_amount - (float) $order->amount_paid, 2));
+
+        if ((float) $order->amount_paid <= 0.0 && $order->payment_option === Order::PAYMENT_OPTION_DOWNPAYMENT_50) {
+            $this->payment_option = Order::PAYMENT_OPTION_DOWNPAYMENT_50;
+            $this->payment_amount = $order->minimumUpfrontAmount();
+        } else {
+            $this->payment_option = Order::PAYMENT_OPTION_FULL_100;
+            $this->payment_amount = $remaining;
+        }
+
+        $this->payment_method = 'gcash';
+        $this->payment_reference_no = '';
+        $this->payment_proof_file = null;
+    }
+
+    public function selectPaymentOption(string $option): void
+    {
+        if (! in_array($option, [Order::PAYMENT_OPTION_DOWNPAYMENT_50, Order::PAYMENT_OPTION_FULL_100], true)) {
+            return;
+        }
+
+        $this->payment_option = $option;
+
+        if ($this->paying_order_id) {
+            $order = Order::where('customer_id', auth()->id())->find($this->paying_order_id);
+            if ($order) {
+                $remaining = max(0.0, round((float) $order->total_amount - (float) $order->amount_paid, 2));
+                $this->payment_amount = ($option === Order::PAYMENT_OPTION_DOWNPAYMENT_50 && (float) $order->amount_paid <= 0.0)
+                    ? $order->minimumUpfrontAmount()
+                    : $remaining;
+            }
+        }
+    }
+
+    public function closePaymentModal(): void
+    {
+        $this->paying_order_id = null;
+        $this->payment_proof_file = null;
+        $this->resetValidation();
+    }
+
+    public function submitPaymentProof(): void
+    {
+        $this->resetValidation();
+        $user = auth()->user();
+        if (! $user || ! $this->paying_order_id) {
+            return;
+        }
+
+        $order = Order::where('customer_id', $user->id)->findOrFail($this->paying_order_id);
+        $uploadedFile = $this->payment_proof_file instanceof UploadedFile ? $this->payment_proof_file : null;
+
+        app(PaymentService::class)->submitProof(
+            order: $order,
+            customer: $user,
+            paymentOption: $this->payment_option,
+            paymentMethod: $this->payment_method,
+            amount: (float) $this->payment_amount,
+            referenceNo: $this->payment_reference_no,
+            proofFile: $uploadedFile,
+        );
+
+        $this->payment_feedback = "Payment proof submitted for Order {$order->order_number}. Awaiting shop verification.";
+        $this->closePaymentModal();
     }
 }; ?>
 
@@ -33,10 +123,11 @@ new class extends Component {
     @php
         $user = auth()->user();
         $shop = null;
-        $orders = $user ? $user->orders()->with(['items', 'printShop'])->get() : collect();
+        $orders = $user ? $user->orders()->with(['items', 'printShop', 'payments'])->get() : collect();
         $activeOrdersCount = $orders->whereNotIn('order_status', [Order::STATUS_COMPLETED, Order::STATUS_CANCELLED])->count();
         $catalog = PrintServiceCatalog::all();
-        $selectedOrder = $this->viewing_order_id ? Order::where('customer_id', auth()->id())->with(['items', 'printShop'])->find($this->viewing_order_id) : null;
+        $selectedOrder = $this->viewing_order_id ? Order::where('customer_id', auth()->id())->with(['items', 'printShop', 'payments'])->find($this->viewing_order_id) : null;
+        $payingOrder = $this->paying_order_id ? Order::where('customer_id', auth()->id())->find($this->paying_order_id) : null;
     @endphp
 
     <!-- Top Navigation Header -->
@@ -47,7 +138,7 @@ new class extends Component {
             </span>
             <div>
                 <div class="flex items-center gap-2">
-                    <h1 class="text-base font-extrabold text-white tracking-tight">{{ $shop ? $shop->name : 'Printify' }}</h1>
+                    <h1 class="text-base font-extrabold text-white tracking-tight">{{ $shop ? $shop->name : 'PressQueue' }}</h1>
                     <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-500/20 text-amber-400 border border-amber-500/30">Customer Portal</span>
                 </div>
                 <p class="text-[11px] text-stone-400">Order Online & Track Real-Time Print Production</p>
@@ -188,6 +279,12 @@ new class extends Component {
         <!-- TAB 2: MY ORDERS & REAL-TIME PROGRESS TRACKER -->
         @if ($active_tab === 'orders')
             <div class="space-y-6 animate-fadeIn">
+                @if ($payment_feedback)
+                    <div class="p-4 rounded-2xl bg-emerald-500/15 border border-emerald-500/30 text-xs font-bold text-emerald-300">
+                        {{ $payment_feedback }}
+                    </div>
+                @endif
+
                 @if ($orders->isEmpty())
                     <div class="p-12 text-center text-stone-500 border border-dashed border-stone-800 rounded-3xl space-y-3 bg-stone-900/40">
                         <flux:icon name="shopping-bag" class="size-12 mx-auto text-stone-600" />
@@ -202,13 +299,24 @@ new class extends Component {
                         @foreach ($orders as $order)
                             @php
                                 $stage = $order->currentStageIndex();
+                                $remainingBalance = max(0.0, round((float) $order->total_amount - (float) $order->amount_paid, 2));
+                                $latestRejectedPayment = $order->payments->firstWhere('status', Payment::STATUS_REJECTED);
+                                $hasPendingProof = $order->payments->contains('status', Payment::STATUS_PENDING);
+                                $canSubmitPayment = $order->order_status !== Order::STATUS_CANCELLED
+                                    && $remainingBalance > 0.0
+                                    && ($order->payment_status !== Order::PAYMENT_VERIFIED_PAID)
+                                    && (! $hasPendingProof || $order->payment_status === Order::PAYMENT_REJECTED);
                             @endphp
-                            <div class="p-6 sm:p-8 rounded-3xl bg-stone-900/90 border border-stone-800 space-y-6 shadow-2xl">
+                            <div wire:key="customer-order-{{ $order->id }}" class="p-6 sm:p-8 rounded-3xl bg-stone-900/90 border border-stone-800 space-y-6 shadow-2xl">
                                 <!-- Order Header Info -->
                                 <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 border-b border-stone-800 pb-4">
                                     <div>
                                         <div class="flex flex-wrap items-center gap-2">
-                                            <span class="font-mono font-black text-amber-400 text-sm sm:text-base">{{ $order->order_number }}</span><span class="text-sm text-stone-300">{{ $order->printShop?->name }}</span>
+                                            <span class="font-mono font-black text-amber-400 text-sm sm:text-base">{{ $order->order_number }}</span>
+                                            @if ($order->tracking_code)
+                                                <span class="px-2 py-0.5 rounded bg-stone-950 border border-stone-700 font-mono text-[10px] font-bold text-stone-200">{{ $order->tracking_code }}</span>
+                                            @endif
+                                            <span class="text-sm text-stone-300">{{ $order->printShop?->name }}</span>
                                             <span class="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold border {{ $order->statusBadgeColor() }}">
                                                 {{ $order->order_status === \App\Models\Order::STATUS_COMPLETED || $order->production_stage === \App\Models\Order::STAGE_COMPLETED ? 'Completed / Received' : ucfirst(str_replace('_', ' ', $order->order_status)) }}
                                             </span>
@@ -218,7 +326,11 @@ new class extends Component {
                                             @php
                                                 $firstItem = $order->items->first();
                                             @endphp
-                                            @if ($order->service_key === 'document_printing' || ($firstItem && $firstItem->isDocumentPrinting()))
+                                            @if ($order->isMultiService())
+                                                <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">
+                                                    Multi-Service Order
+                                                </span>
+                                            @elseif ($order->service_key === 'document_printing' || ($firstItem && $firstItem->isDocumentPrinting()))
                                                 <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-blue-500/20 text-blue-300 border border-blue-500/30">
                                                     📄 Document Print
                                                 </span>
@@ -239,20 +351,43 @@ new class extends Component {
                                         </div>
                                         <p class="text-[11px] text-stone-400 mt-1">
                                             Placed on {{ $order->created_at->format('M d, Y • h:i A') }} &bull; Promised Ready: <strong class="text-stone-200">{{ $order->target_completion_date ? $order->target_completion_date->format('M d, Y') : 'N/A' }}</strong>
+                                            @if ((float) $order->amount_paid > 0)
+                                                &bull; Paid: <strong class="text-emerald-400">₱{{ number_format((float) $order->amount_paid, 2) }}</strong>
+                                                &bull; Balance Due: <strong class="text-amber-300">₱{{ number_format($remainingBalance, 2) }}</strong>
+                                            @endif
                                         </p>
+                                        @if ($order->payment_status === Order::PAYMENT_REJECTED && $latestRejectedPayment?->rejection_reason)
+                                            <p class="text-[11px] text-red-300 font-semibold mt-1">
+                                                Payment Proof Rejected: {{ $latestRejectedPayment->rejection_reason }}
+                                            </p>
+                                        @endif
                                     </div>
 
-                                    <div class="flex items-center gap-3">
-                                        <div class="text-right">
-                                            <span class="text-[10px] text-stone-500 block">{{ $order->payment_status === \App\Models\Order::PAYMENT_VERIFIED_PAID ? 'Total Paid' : 'Amount Due' }}</span>
+                                    <div class="flex flex-wrap items-center gap-2.5">
+                                        <div class="text-right mr-1">
+                                            <span class="text-[10px] text-stone-500 block">{{ $order->payment_status === \App\Models\Order::PAYMENT_VERIFIED_PAID ? 'Total Paid' : 'Order Total' }}</span>
                                             <span class="text-lg font-black text-white">₱{{ number_format($order->total_amount, 2) }}</span>
                                         </div>
+                                        @if ($canSubmitPayment)
+                                            <button
+                                                wire:click="openPaymentModal({{ $order->id }})"
+                                                class="px-3.5 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-stone-950 text-xs font-black transition-all cursor-pointer"
+                                            >
+                                                {{ $order->payment_status === Order::PAYMENT_REJECTED ? 'Retry Payment Proof' : ($order->payment_status === Order::PAYMENT_PARTIALLY_PAID ? 'Pay Balance' : 'Submit Payment Proof') }}
+                                            </button>
+                                        @endif
                                         <button
                                             wire:click="viewOrderDetails({{ $order->id }})"
                                             class="px-3.5 py-2 rounded-xl bg-stone-800 hover:bg-stone-700 text-stone-200 text-xs font-bold transition-all cursor-pointer"
                                         >
                                             View Receipt
                                         </button>
+                                        <a
+                                            href="{{ route('orders.receipt', ['order' => $order, 'format' => 'pdf']) }}"
+                                            class="px-3 py-2 rounded-xl bg-stone-950 border border-stone-800 hover:border-amber-500/40 text-amber-400 text-xs font-bold transition-all"
+                                        >
+                                            PDF
+                                        </a>
                                     </div>
                                 </div>
 
@@ -391,15 +526,121 @@ new class extends Component {
                     </div>
 
                     <!-- Total Amount / Paid -->
-                    <div class="flex justify-between items-center p-4 rounded-2xl bg-stone-950 border border-amber-500/30 text-sm font-extrabold text-white">
-                        <span>{{ $selectedOrder->payment_status === \App\Models\Order::PAYMENT_VERIFIED_PAID ? 'Grand Total Paid:' : 'Total Amount Due:' }}</span>
-                        <span class="text-lg text-amber-400">₱{{ number_format($selectedOrder->total_amount, 2) }}</span>
+                    <div class="p-4 rounded-2xl bg-stone-950 border border-amber-500/30 space-y-1.5 text-xs">
+                        <div class="flex justify-between text-stone-400">
+                            <span>Order Total:</span>
+                            <strong class="text-white">₱{{ number_format($selectedOrder->total_amount, 2) }}</strong>
+                        </div>
+                        <div class="flex justify-between text-stone-400">
+                            <span>Verified Amount Paid:</span>
+                            <strong class="text-emerald-400">₱{{ number_format((float) $selectedOrder->amount_paid, 2) }}</strong>
+                        </div>
+                        <div class="flex justify-between items-center text-sm font-extrabold text-white pt-1 border-t border-stone-800">
+                            <span>Remaining Balance Due:</span>
+                            <span class="text-lg text-amber-400">₱{{ number_format(max(0.0, round((float) $selectedOrder->total_amount - (float) $selectedOrder->amount_paid, 2)), 2) }}</span>
+                        </div>
+                    </div>
+
+                    @if ($selectedOrder->payments->isNotEmpty())
+                        <div class="space-y-1.5">
+                            <span class="font-bold text-stone-300 block">Payment History</span>
+                            @foreach ($selectedOrder->payments as $payment)
+                                <div wire:key="receipt-payment-{{ $payment->id }}" class="flex items-center justify-between p-2.5 rounded-xl bg-stone-950 border border-stone-800 text-[11px]">
+                                    <div>
+                                        <span class="font-mono font-bold text-white">{{ $payment->reference_no ?? 'Counter' }}</span>
+                                        <span class="text-stone-400 ml-1">({{ ucwords(str_replace('_', ' ', $payment->status)) }})</span>
+                                    </div>
+                                    <span class="font-bold text-emerald-400">₱{{ number_format((float) $payment->amount, 2) }}</span>
+                                </div>
+                            @endforeach
+                        </div>
+                    @endif
+                </div>
+
+                <div class="pt-2 flex flex-wrap gap-2">
+                    <a href="{{ route('orders.receipt', $selectedOrder) }}" target="_blank" class="flex-1 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-stone-950 text-xs font-black text-center">
+                        Printable Official Receipt
+                    </a>
+                    <a href="{{ route('orders.receipt', ['order' => $selectedOrder, 'format' => 'pdf']) }}" class="px-4 py-2.5 rounded-xl bg-stone-800 hover:bg-stone-700 text-amber-400 text-xs font-bold text-center">
+                        Download PDF
+                    </a>
+                    <button wire:click="closeOrderModal" class="w-full py-2.5 rounded-xl bg-stone-800 hover:bg-stone-700 text-stone-200 text-xs font-bold cursor-pointer">
+                        Close Receipt
+                    </button>
+                </div>
+            </div>
+        </div>
+    @endif
+
+    <!-- PAYMENT PROOF SUBMISSION / RETRY MODAL -->
+    @if ($payingOrder)
+        <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-stone-950/80 backdrop-blur-md">
+            <div class="w-full max-w-md rounded-3xl border border-stone-800 bg-stone-900 p-6 shadow-2xl space-y-5">
+                <div class="flex items-center justify-between border-b border-stone-800 pb-3">
+                    <div>
+                        <span class="text-[10px] font-bold text-amber-400 uppercase">Submit Payment Proof</span>
+                        <h3 class="text-base font-black text-white font-mono">{{ $payingOrder->order_number }}</h3>
+                    </div>
+                    <button type="button" wire:click="closePaymentModal" class="text-stone-400 hover:text-white text-lg cursor-pointer">✕</button>
+                </div>
+
+                @if ((float) $payingOrder->amount_paid <= 0.0)
+                    <div class="grid grid-cols-2 gap-2">
+                        <button
+                            type="button"
+                            wire:click="selectPaymentOption('{{ Order::PAYMENT_OPTION_DOWNPAYMENT_50 }}')"
+                            class="p-3 rounded-xl border text-left text-xs cursor-pointer {{ $payment_option === Order::PAYMENT_OPTION_DOWNPAYMENT_50 ? 'border-amber-500 bg-amber-500/10 text-white' : 'border-stone-800 bg-stone-950 text-stone-400' }}"
+                        >
+                            <div class="font-black">50% Downpayment</div>
+                            <div class="text-[10px]">Min ₱{{ number_format($payingOrder->minimumUpfrontAmount(), 2) }}</div>
+                        </button>
+                        <button
+                            type="button"
+                            wire:click="selectPaymentOption('{{ Order::PAYMENT_OPTION_FULL_100 }}')"
+                            class="p-3 rounded-xl border text-left text-xs cursor-pointer {{ $payment_option === Order::PAYMENT_OPTION_FULL_100 ? 'border-emerald-500 bg-emerald-500/10 text-white' : 'border-stone-800 bg-stone-950 text-stone-400' }}"
+                        >
+                            <div class="font-black">100% Full</div>
+                            <div class="text-[10px]">₱{{ number_format((float) $payingOrder->total_amount, 2) }}</div>
+                        </button>
+                    </div>
+                @endif
+
+                <div class="space-y-3 text-xs">
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="block font-bold text-stone-300 mb-1">Method</label>
+                            <select wire:model="payment_method" class="w-full rounded-xl bg-stone-950 border border-stone-800 px-3 py-2 text-xs text-white">
+                                <option value="gcash">GCash</option>
+                                <option value="maya">Maya</option>
+                                <option value="bank_transfer">Bank Transfer</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block font-bold text-stone-300 mb-1">Amount (PHP)</label>
+                            <input type="number" step="0.01" wire:model="payment_amount" class="w-full rounded-xl bg-stone-950 border border-stone-800 px-3 py-2 text-xs text-white" />
+                            @error('amount') <p class="text-[11px] text-red-400 mt-1">{{ $message }}</p> @enderror
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block font-bold text-stone-300 mb-1">Reference Number</label>
+                        <input type="text" wire:model="payment_reference_no" placeholder="e.g. GCASH-12345678" class="w-full rounded-xl bg-stone-950 border border-stone-800 px-3 py-2 text-xs text-white font-mono" />
+                        @error('reference_no') <p class="text-[11px] text-red-400 mt-1">{{ $message }}</p> @enderror
+                    </div>
+
+                    <div>
+                        <label class="block font-bold text-stone-300 mb-1">Receipt Screenshot / PDF (Optional)</label>
+                        <input type="file" wire:model="payment_proof_file" class="block w-full text-xs text-stone-400 file:mr-3 file:py-1.5 file:px-3 file:rounded-xl file:border-0 file:bg-stone-800 file:text-stone-200 file:font-bold" />
+                        @error('proof_file') <p class="text-[11px] text-red-400 mt-1">{{ $message }}</p> @enderror
                     </div>
                 </div>
 
-                <div class="pt-2">
-                    <button wire:click="closeOrderModal" class="w-full py-2.5 rounded-xl bg-stone-800 hover:bg-stone-700 text-stone-200 text-xs font-bold cursor-pointer">
-                        Close Receipt
+                <div class="flex items-center justify-end gap-2 pt-2">
+                    <button type="button" wire:click="closePaymentModal" class="px-4 py-2 rounded-xl bg-stone-800 text-xs font-bold text-stone-300 cursor-pointer">
+                        Cancel
+                    </button>
+                    <button type="button" wire:click="submitPaymentProof" class="px-4 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-xs font-black text-stone-950 cursor-pointer">
+                        Submit Proof
                     </button>
                 </div>
             </div>

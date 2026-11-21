@@ -101,7 +101,12 @@ class SalesAnalyticsService
             ->where('created_at', '>=', $startDate)
             ->where('created_at', '<=', $endDate)
             ->whereNotIn('payment_status', [Order::PAYMENT_REJECTED, 'cancelled'])
-            ->when($serviceKey !== 'all', fn (Builder $q) => $q->where('service_key', $serviceKey))
+            ->when($serviceKey !== 'all', function (Builder $q) use ($serviceKey): void {
+                $q->where(function (Builder $nested) use ($serviceKey): void {
+                    $nested->where('service_key', $serviceKey)
+                        ->orWhereHas('items', fn (Builder $iq) => $iq->where('service_key', $serviceKey));
+                });
+            })
             ->get();
 
         $labels = [];
@@ -186,10 +191,12 @@ class SalesAnalyticsService
             ->all();
 
         // Service Distribution
-        $serviceBreakdown = $orders->groupBy('service_key')
+        $serviceBreakdown = $orders->groupBy(fn (Order $o): string => $o->service_key ?? ($o->isMultiService() ? 'mixed_services' : ($o->items->first()?->resolvedServiceKey() ?? 'mixed_services')))
             ->map(fn (Collection $group, string|int $key): array => [
                 'service_key' => (string) $key,
-                'name' => PrintServiceCatalog::find((string) $key)['name'] ?? ucwords(str_replace('_', ' ', (string) $key)),
+                'name' => (string) $key === 'mixed_services'
+                    ? 'Mixed Services'
+                    : (PrintServiceCatalog::find((string) $key)['name'] ?? ucwords(str_replace('_', ' ', (string) $key))),
                 'count' => $group->count(),
                 'percentage' => round(($group->count() / $totalOrders) * 100, 1),
             ])
@@ -232,7 +239,7 @@ class SalesAnalyticsService
                 $order->created_at ? $order->created_at->format('Y-m-d H:i:s') : '',
                 $order->customer ? $order->customer->name : 'Guest',
                 $order->customer ? $order->customer->email : '',
-                $order->service_key,
+                $order->service_key ?? ($order->items->count() > 1 ? 'mixed_services' : ($item?->resolvedServiceKey() ?? 'mixed_services')),
                 $item ? $item->fulfillment_type : 'full_package',
                 $item ? $item->binding_type : 'hardbound',
                 $item ? $item->copies_count : 1,
@@ -274,7 +281,10 @@ class SalesAnalyticsService
         $query = Order::where('print_shop_id', $shop->id);
 
         if ($serviceKey !== 'all') {
-            $query->where('service_key', $serviceKey);
+            $query->where(function (Builder $nested) use ($serviceKey): void {
+                $nested->where('service_key', $serviceKey)
+                    ->orWhereHas('items', fn (Builder $iq) => $iq->where('service_key', $serviceKey));
+            });
         }
 
         if ($fulfillmentType !== 'all') {

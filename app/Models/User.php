@@ -116,6 +116,39 @@ class User extends Authenticatable implements PasskeyUser
     }
 
     /**
+     * Check whether this owner or staff account belongs to a suspended print shop.
+     */
+    public function belongsToSuspendedShop(): bool
+    {
+        return $this->suspendedShop() !== null;
+    }
+
+    /**
+     * Retrieve the suspended operational print shop for this owner or staff member without caching relations.
+     */
+    public function suspendedShop(): ?PrintShop
+    {
+        if ($this->isOwner()) {
+            return PrintShop::query()
+                ->where('user_id', $this->id)
+                ->where('approval_status', PrintShop::STATUS_SUSPENDED)
+                ->first();
+        }
+
+        if ($this->isStaff()) {
+            $staffShopId = $this->getAttribute('staff_shop_id');
+            if (is_numeric($staffShopId)) {
+                return PrintShop::query()
+                    ->whereKey((int) $staffShopId)
+                    ->where('approval_status', PrintShop::STATUS_SUSPENDED)
+                    ->first();
+            }
+        }
+
+        return null;
+    }
+
+    /**
      * Get the orders placed by the customer.
      *
      * @return HasMany<Order, $this>

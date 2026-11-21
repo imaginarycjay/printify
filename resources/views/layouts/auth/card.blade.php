@@ -3,30 +3,61 @@
     <head>
         @include('partials.head')
     </head>
-    <body class="min-h-screen bg-neutral-100 antialiased dark:bg-linear-to-b dark:from-neutral-950 dark:to-neutral-900 relative">
-        <div class="absolute top-4 right-4 z-50">
-            <x-theme-toggle />
-        </div>
-        <div class="bg-muted flex min-h-svh flex-col items-center justify-center gap-6 p-6 md:p-10">
-            <div class="flex w-full max-w-md flex-col gap-6">
-                <a href="{{ route('home') }}" class="flex flex-col items-center gap-2 font-medium">
-                    <span class="flex h-9 w-9 items-center justify-center rounded-md">
-                        <x-app-logo-icon class="size-9 fill-current text-black dark:text-white" />
+    <body data-theme-keep class="pressqueue-auth min-h-svh font-sans antialiased selection:bg-amber-500 selection:text-stone-950">
+        <header data-theme-keep class="w-full border-b border-[var(--auth-border-subtle)] bg-[var(--auth-bar)]">
+            <div class="mx-auto flex w-full max-w-5xl items-center justify-between gap-4 px-4 py-3 sm:px-6">
+                <div class="flex items-center gap-2.5">
+                    <a href="{{ route('home') }}" data-theme-keep class="inline-flex items-center gap-2.5 rounded-xl focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-amber-600 dark:focus-visible:outline-amber-400">
+                        <span data-theme-keep class="flex size-9 items-center justify-center rounded-xl bg-amber-500 text-stone-950">
+                            <x-app-logo-icon class="size-5 fill-current" />
+                        </span>
+                        <span data-theme-keep class="text-base font-extrabold tracking-tight text-stone-900 dark:text-white">{{ config('app.name', 'PressQueue') }}</span>
+                    </a>
+                    <span data-theme-keep class="hidden border-s border-[var(--auth-border)] ps-2.5 text-xs font-medium text-stone-500 dark:text-stone-400 sm:inline">
+                        {{ __('Print shop platform') }}
                     </span>
+                </div>
 
-                    <span class="sr-only">{{ config('app.name', 'Printify') }}</span>
-                </a>
-
-                <div class="flex flex-col gap-6">
-                    <div class="rounded-xl border bg-white dark:bg-stone-950 dark:border-stone-800 text-stone-800 shadow-xs">
-                        <div class="px-10 py-8">{{ $slot }}</div>
-                    </div>
+                <div class="flex items-center gap-2">
+                    @guest
+                        <a href="{{ route('shops.index') }}" data-theme-keep class="inline-flex min-h-9 items-center gap-1.5 rounded-xl px-3 text-sm font-semibold text-stone-600 transition-colors hover:bg-stone-200/70 hover:text-stone-900 dark:text-stone-300 dark:hover:bg-stone-800/80 dark:hover:text-white">
+                            <flux:icon name="building-storefront" class="size-4" />
+                            <span>{{ __('Browse shops') }}</span>
+                        </a>
+                    @endguest
+                    <x-theme-toggle />
                 </div>
             </div>
-        </div>
+        </header>
+
+        <main class="flex min-h-[calc(100svh-3.85rem)] flex-col items-center justify-center px-4 py-5 sm:px-6 sm:py-8">
+            <div class="w-full max-w-[448px] space-y-3">
+                <div data-theme-keep class="overflow-hidden rounded-2xl border border-[var(--auth-border)] bg-[var(--auth-card)]">
+                    <div class="p-6 sm:p-7">
+                        {{ $slot }}
+                    </div>
+
+                    @isset($footer)
+                        <div data-theme-keep class="border-t border-[var(--auth-border-subtle)] bg-[var(--auth-card-footer)] px-6 py-4 sm:px-7">
+                            {{ $footer }}
+                        </div>
+                    @endisset
+                </div>
+
+                @isset($below)
+                    <div class="w-full">
+                        {{ $below }}
+                    </div>
+                @endisset
+
+                <p data-theme-keep class="text-center text-xs text-stone-500 dark:text-stone-400">
+                    &copy; {{ date('Y') }} {{ config('app.name', 'PressQueue') }}
+                </p>
+            </div>
+        </main>
 
         @persist('toast')
-            <flux:toast.group>
+            <flux:toast.group position="top end">
                 <flux:toast />
             </flux:toast.group>
         @endpersist

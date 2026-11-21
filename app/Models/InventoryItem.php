@@ -18,6 +18,7 @@ use Illuminate\Support\Carbon;
  * @property string $item_type
  * @property string|null $service_tag
  * @property float $stock_qty
+ * @property float $reserved_qty
  * @property string $unit
  * @property float $reorder_level
  * @property float $unit_cost
@@ -34,6 +35,7 @@ use Illuminate\Support\Carbon;
     'item_type',
     'service_tag',
     'stock_qty',
+    'reserved_qty',
     'unit',
     'reorder_level',
     'unit_cost',
@@ -57,6 +59,7 @@ class InventoryItem extends Model
     {
         return [
             'stock_qty' => 'float',
+            'reserved_qty' => 'float',
             'reorder_level' => 'float',
             'unit_cost' => 'float',
             'selling_price' => 'float',
@@ -104,11 +107,21 @@ class InventoryItem extends Model
     }
 
     /**
+     * Compute unreserved stock available for new orders.
+     */
+    public function availableQty(): float
+    {
+        return max(0.0, round((float) $this->stock_qty - (float) $this->reserved_qty, 2));
+    }
+
+    /**
      * Check if the item is low on stock.
      */
     public function isLowStock(): bool
     {
-        return $this->stock_qty > 0 && $this->stock_qty <= $this->reorder_level;
+        $available = $this->availableQty();
+
+        return $available > 0.0 && $available <= $this->reorder_level;
     }
 
     /**
@@ -116,7 +129,7 @@ class InventoryItem extends Model
      */
     public function isOutOfStock(): bool
     {
-        return $this->stock_qty <= 0;
+        return $this->availableQty() <= 0.0;
     }
 
     /**
@@ -162,7 +175,7 @@ class InventoryItem extends Model
      */
     public function scopeLowStock(Builder $query): void
     {
-        $query->whereColumn('stock_qty', '<=', 'reorder_level');
+        $query->whereRaw('(stock_qty - reserved_qty) <= reorder_level');
     }
 
     /**

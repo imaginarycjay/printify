@@ -1,8 +1,11 @@
 <?php
 
 use App\Models\Order;
+use App\Models\Payment;
 use App\Models\PrintShop;
+use App\Services\PaymentService;
 use App\Services\SalesAnalyticsService;
+use Livewire\Attributes\Locked;
 use Livewire\Attributes\Title;
 use Livewire\Component;
 use Symfony\Component\HttpFoundation\StreamedResponse;
@@ -13,10 +16,21 @@ new #[Title('Sales & Financial Analytics Hub')] class extends Component {
         $view->layout('layouts.blank');
     }
 
+    public string $active_tab = 'overview'; // overview, payments
     public string $selected_period = 'this_month'; // today, 7d, this_month, ytd, all_time
     public string $selected_service = 'all'; // all, thesis_binding
     public string $selected_fulfillment = 'all'; // all, full_package, cover_only
     public string $search_query = '';
+
+    #[Locked]
+    public ?int $rejecting_payment_id = null;
+    public string $rejection_reason = '';
+
+    #[Locked]
+    public ?int $settling_order_id = null;
+    public float $counter_amount = 0.0;
+    public string $counter_method = 'cash_counter';
+    public string $counter_reference_no = '';
 
     public function getShopProperty(): ?PrintShop
     {
@@ -58,20 +72,148 @@ new #[Title('Sales & Financial Analytics Hub')] class extends Component {
      */
     public function verifyPayment(int $orderId): void
     {
-        $order = Order::where('print_shop_id', auth()->user()?->operationalShop()?->id ?? 0)->find($orderId);
-        if ($order) {
-            $order->update([
-                'payment_status' => Order::PAYMENT_VERIFIED_PAID,
-                'payment_verified_at' => now(),
-                'payment_verified_by' => auth()->id(),
-            ]);
-
-            \Flux\Flux::toast(
-                text: "Payment of ₱" . number_format($order->total_amount, 2) . " for Order {$order->order_number} verified and confirmed.",
-                heading: 'Payment Confirmed',
-                variant: 'success'
-            );
+        $shop = $this->shop;
+        $user = auth()->user();
+        if (! $shop || ! $user) {
+            return;
         }
+
+        $order = Order::where('print_shop_id', $shop->id)->find($orderId);
+        if (! $order) {
+            return;
+        }
+
+        $pendingPayment = $order->payments()->where('status', Payment::STATUS_PENDING)->latest()->first();
+        if ($pendingPayment) {
+            app(PaymentService::class)->verifyPayment($pendingPayment, $user);
+        } else {
+            $remaining = max(0.0, round((float) $order->total_amount - (float) $order->amount_paid, 2));
+            if ($remaining > 0.0) {
+                app(PaymentService::class)->recordOfflineCounterPayment($order, $user, $remaining);
+            }
+        }
+
+        \Flux\Flux::toast(
+            text: "Payment for Order {$order->order_number} verified and confirmed.",
+            heading: 'Payment Confirmed',
+            variant: 'success'
+        );
+    }
+
+    public function approvePayment(int $paymentId): void
+    {
+        $shop = $this->shop;
+        $user = auth()->user();
+        if (! $shop || ! $user) {
+            return;
+        }
+
+        $payment = Payment::where('print_shop_id', $shop->id)->findOrFail($paymentId);
+        app(PaymentService::class)->verifyPayment($payment, $user);
+
+        \Flux\Flux::toast(
+            text: "Verified ₱".number_format((float) $payment->amount, 2)." (Ref: {$payment->reference_no}).",
+            heading: 'Payment Approved',
+            variant: 'success'
+        );
+    }
+
+    public function openRejectModal(int $paymentId): void
+    {
+        $shop = $this->shop;
+        if (! $shop) {
+            return;
+        }
+
+        Payment::where('print_shop_id', $shop->id)->findOrFail($paymentId);
+        $this->rejecting_payment_id = $paymentId;
+        $this->rejection_reason = '';
+        $this->resetValidation();
+    }
+
+    public function closeRejectModal(): void
+    {
+        $this->rejecting_payment_id = null;
+        $this->rejection_reason = '';
+        $this->resetValidation();
+    }
+
+    public function confirmRejectPayment(): void
+    {
+        $this->validate([
+            'rejection_reason' => ['required', 'string', 'min:3', 'max:500'],
+        ]);
+
+        $shop = $this->shop;
+        $user = auth()->user();
+        if (! $shop || ! $user || ! $this->rejecting_payment_id) {
+            return;
+        }
+
+        $payment = Payment::where('print_shop_id', $shop->id)->findOrFail($this->rejecting_payment_id);
+        app(PaymentService::class)->rejectPayment($payment, $user, $this->rejection_reason);
+
+        $this->closeRejectModal();
+
+        \Flux\Flux::toast(
+            text: 'Payment proof rejected and customer notified to resubmit.',
+            heading: 'Payment Proof Rejected',
+            variant: 'warning'
+        );
+    }
+
+    public function openCounterSettlementModal(int $orderId): void
+    {
+        $shop = $this->shop;
+        if (! $shop) {
+            return;
+        }
+
+        $order = Order::where('print_shop_id', $shop->id)->findOrFail($orderId);
+        $this->settling_order_id = $order->id;
+        $this->counter_amount = max(0.0, round((float) $order->total_amount - (float) $order->amount_paid, 2));
+        $this->counter_method = 'cash_counter';
+        $this->counter_reference_no = '';
+        $this->resetValidation();
+    }
+
+    public function closeCounterSettlementModal(): void
+    {
+        $this->settling_order_id = null;
+        $this->counter_amount = 0.0;
+        $this->counter_reference_no = '';
+        $this->resetValidation();
+    }
+
+    public function recordCounterSettlement(): void
+    {
+        $this->validate([
+            'counter_amount' => ['required', 'numeric', 'min:0.01'],
+            'counter_method' => ['required', 'in:cash_counter,gcash,maya,bank_transfer'],
+        ]);
+
+        $shop = $this->shop;
+        $user = auth()->user();
+        if (! $shop || ! $user || ! $this->settling_order_id) {
+            return;
+        }
+
+        $order = Order::where('print_shop_id', $shop->id)->findOrFail($this->settling_order_id);
+        app(PaymentService::class)->recordOfflineCounterPayment(
+            order: $order,
+            actor: $user,
+            amount: (float) $this->counter_amount,
+            paymentMethod: $this->counter_method,
+            referenceNo: trim($this->counter_reference_no) !== '' ? trim($this->counter_reference_no) : null,
+        );
+
+        $this->closeCounterSettlementModal();
+
+        \Flux\Flux::toast(
+            text: "Counter settlement recorded for Order {$order->order_number}.",
+            heading: 'Counter Payment Recorded',
+            variant: 'success'
+        );
     }
 }; ?>
 
@@ -120,11 +262,14 @@ new #[Title('Sales & Financial Analytics Hub')] class extends Component {
 
         // Recent Orders query
         $ordersQuery = Order::where('print_shop_id', $shop?->id ?? 0)
-            ->with(['customer', 'items'])
+            ->with(['customer', 'items', 'payments'])
             ->latest('created_at');
 
         if ($selected_service !== 'all') {
-            $ordersQuery->where('service_key', $selected_service);
+            $ordersQuery->where(function ($q) use ($selected_service): void {
+                $q->where('service_key', $selected_service)
+                    ->orWhereHas('items', fn ($iq) => $iq->where('service_key', $selected_service));
+            });
         }
 
         if ($selected_fulfillment !== 'all') {
@@ -135,11 +280,35 @@ new #[Title('Sales & Financial Analytics Hub')] class extends Component {
             $search = '%' . trim($search_query) . '%';
             $ordersQuery->where(function ($q) use ($search) {
                 $q->where('order_number', 'like', $search)
+                    ->orWhere('tracking_code', 'like', $search)
                     ->orWhereHas('customer', fn ($c) => $c->where('name', 'like', $search)->orWhere('email', 'like', $search));
             });
         }
 
         $recentOrders = $ordersQuery->take(15)->get();
+
+        $pendingProofs = $shop
+            ? Payment::where('print_shop_id', $shop->id)
+                ->where('status', Payment::STATUS_PENDING)
+                ->with(['order.customer', 'submittedBy'])
+                ->orderBy('submitted_at')
+                ->orderBy('created_at')
+                ->get()
+            : collect();
+
+        $balanceDueOrders = $shop
+            ? Order::where('print_shop_id', $shop->id)
+                ->where('order_status', '!=', Order::STATUS_CANCELLED)
+                ->where('balance_due', '>', 0)
+                ->with(['customer', 'items', 'payments'])
+                ->latest('created_at')
+                ->take(25)
+                ->get()
+            : collect();
+
+        $settlingOrder = $settling_order_id && $shop
+            ? Order::where('print_shop_id', $shop->id)->find($settling_order_id)
+            : null;
     @endphp
 
     <!-- Top Navigation Header -->
@@ -159,7 +328,7 @@ new #[Title('Sales & Financial Analytics Hub')] class extends Component {
                         Live Cashflow
                     </span>
                 </div>
-                <p class="text-[11px] text-stone-400">{{ $shop ? $shop->name : 'Printify' }} &bull; Gross Sales, BOM Net Profit Margins & Cashflow Intelligence</p>
+                <p class="text-[11px] text-stone-400">{{ $shop ? $shop->name : 'PressQueue' }} &bull; Gross Sales, BOM Net Profit Margins & Cashflow Intelligence</p>
             </div>
         </div>
 
@@ -208,7 +377,28 @@ new #[Title('Sales & Financial Analytics Hub')] class extends Component {
 
     <!-- Main Analytics Hub Body -->
     <main class="flex-1 w-full px-4 sm:px-8 py-6 space-y-6 max-w-full">
-        
+        <!-- Hub Navigation Tabs -->
+        <div class="flex flex-wrap items-center gap-2 border-b border-stone-800/80 pb-3">
+            <button
+                wire:click="$set('active_tab', 'overview')"
+                class="px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer {{ $active_tab === 'overview' ? 'bg-amber-500 text-stone-950 font-black shadow-md shadow-amber-500/20' : 'bg-stone-900 text-stone-400 hover:text-white border border-stone-800' }}"
+            >
+                Analytics Overview
+            </button>
+            <button
+                wire:click="$set('active_tab', 'payments')"
+                class="px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center gap-2 {{ $active_tab === 'payments' ? 'bg-amber-500 text-stone-950 font-black shadow-md shadow-amber-500/20' : 'bg-stone-900 text-stone-400 hover:text-white border border-stone-800' }}"
+            >
+                <span>Payments &amp; Audit Queue</span>
+                @if ($pendingProofs->isNotEmpty())
+                    <span class="px-1.5 py-0.2 rounded-full text-[10px] font-black {{ $active_tab === 'payments' ? 'bg-stone-950 text-amber-400' : 'bg-amber-500 text-stone-950' }}">
+                        {{ $pendingProofs->count() }}
+                    </span>
+                @endif
+            </button>
+        </div>
+
+        @if ($active_tab === 'overview')
         <!-- Filter Controls Bar (Timeframe, Service, and Mode Drilldown) -->
         <div class="p-4 rounded-2xl bg-stone-900/80 border border-stone-800/90 flex flex-col lg:flex-row items-center justify-between gap-4 backdrop-blur-sm shadow-md">
             <!-- Timeframe Filter Pills -->
@@ -628,8 +818,12 @@ new #[Title('Sales & Financial Analytics Hub')] class extends Component {
                                         @endif
                                     </div>
                                 </td>
-                                <td class="p-3.5 text-right font-mono font-black text-emerald-400 text-sm">
-                                    ₱{{ number_format($order->total_amount, 2) }}
+                                <td class="p-3.5 text-right font-mono font-black text-emerald-400 text-sm space-y-1">
+                                    <div>₱{{ number_format($order->total_amount, 2) }}</div>
+                                    <div class="flex items-center justify-end gap-2 text-[10px] font-sans font-bold">
+                                        <a href="{{ route('orders.receipt', $order) }}" target="_blank" class="text-amber-400 hover:text-amber-300">Receipt</a>
+                                        <a href="{{ route('orders.receipt', ['order' => $order, 'format' => 'pdf']) }}" class="text-stone-400 hover:text-white">PDF</a>
+                                    </div>
                                 </td>
                             </tr>
                         @empty
@@ -643,11 +837,207 @@ new #[Title('Sales & Financial Analytics Hub')] class extends Component {
                 </table>
             </div>
         </div>
+        @endif
+
+        @if ($active_tab === 'payments')
+            <div class="space-y-6">
+                <!-- Pending Online Proofs Queue -->
+                <div class="p-6 rounded-3xl bg-stone-900/80 border border-stone-800/90 space-y-4">
+                    <div class="flex items-center justify-between border-b border-stone-800 pb-3">
+                        <div>
+                            <h3 class="text-base font-black text-white">Pending Payment Proof Audit Queue</h3>
+                            <p class="text-xs text-stone-400">Proofs pending over 2 hours are flagged as aging for priority review.</p>
+                        </div>
+                        <span class="px-3 py-1 rounded-full text-xs font-bold bg-amber-500/15 text-amber-400 border border-amber-500/30">
+                            {{ $pendingProofs->count() }} Pending
+                        </span>
+                    </div>
+
+                    @if ($pendingProofs->isEmpty())
+                        <div class="p-8 text-center text-xs text-stone-500 border border-dashed border-stone-800 rounded-2xl">
+                            No pending online payment proofs requiring verification.
+                        </div>
+                    @else
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left text-xs text-stone-300">
+                                <thead class="bg-stone-950/80 border-b border-stone-800 text-[11px] font-bold text-stone-400 uppercase">
+                                    <tr>
+                                        <th class="p-3">Order &amp; Tracking</th>
+                                        <th class="p-3">Customer</th>
+                                        <th class="p-3">Type &amp; Method</th>
+                                        <th class="p-3">Reference</th>
+                                        <th class="p-3">Submitted</th>
+                                        <th class="p-3 text-right">Amount</th>
+                                        <th class="p-3 text-right">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-stone-800/60">
+                                    @foreach ($pendingProofs as $proof)
+                                        <tr wire:key="pending-proof-{{ $proof->id }}">
+                                            <td class="p-3 font-mono font-bold text-white">
+                                                {{ $proof->order?->order_number }}
+                                                @if ($proof->order?->tracking_code)
+                                                    <span class="block text-[10px] text-amber-400">{{ $proof->order->tracking_code }}</span>
+                                                @endif
+                                            </td>
+                                            <td class="p-3">{{ $proof->order?->customer?->name ?? $proof->submittedBy?->name ?? 'Customer' }}</td>
+                                            <td class="p-3">
+                                                <span class="font-bold text-stone-200">{{ ucwords(str_replace('_', ' ', $proof->payment_type)) }}</span>
+                                                <span class="block text-[10px] text-stone-400">{{ strtoupper($proof->payment_method) }}</span>
+                                            </td>
+                                            <td class="p-3 font-mono">
+                                                <span class="text-amber-300 font-bold">{{ $proof->reference_no ?? '—' }}</span>
+                                                @if ($proof->proof_path)
+                                                    <a href="{{ route('orders.file', ['order' => $proof->order_id, 'kind' => 'payment', 'payment' => $proof->id]) }}" target="_blank" class="block text-[10px] text-blue-400 hover:underline mt-0.5">
+                                                        Download Proof
+                                                    </a>
+                                                @endif
+                                            </td>
+                                            <td class="p-3 text-stone-400">
+                                                {{ ($proof->submitted_at ?? $proof->created_at)?->diffForHumans() }}
+                                                @if ($proof->isAging(2))
+                                                    <span class="block mt-1 inline-flex px-2 py-0.5 rounded bg-red-500/20 text-red-300 border border-red-500/40 text-[10px] font-black">
+                                                        Aging (&gt;2h)
+                                                    </span>
+                                                @endif
+                                            </td>
+                                            <td class="p-3 text-right font-mono font-black text-emerald-400">₱{{ number_format((float) $proof->amount, 2) }}</td>
+                                            <td class="p-3 text-right space-x-1.5 whitespace-nowrap">
+                                                <button type="button" wire:click="approvePayment({{ $proof->id }})" class="px-2.5 py-1 rounded-lg bg-emerald-500 hover:bg-emerald-400 text-stone-950 text-[11px] font-black cursor-pointer">
+                                                    Accept &amp; Queue
+                                                </button>
+                                                <button type="button" wire:click="openRejectModal({{ $proof->id }})" class="px-2.5 py-1 rounded-lg bg-red-500/20 hover:bg-red-500/30 text-red-300 border border-red-500/40 text-[11px] font-bold cursor-pointer">
+                                                    Reject
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
+                        </div>
+                    @endif
+                </div>
+
+                <!-- Counter & Pickup Balance Settlement Table -->
+                <div class="p-6 rounded-3xl bg-stone-900/80 border border-stone-800/90 space-y-4">
+                    <div class="border-b border-stone-800 pb-3">
+                        <h3 class="text-base font-black text-white">Counter &amp; Pickup Balance Settlement</h3>
+                        <p class="text-xs text-stone-400">Record cash or offline counter payments for unpaid orders or remaining 50% downpayment balances.</p>
+                    </div>
+
+                    @if ($balanceDueOrders->isEmpty())
+                        <div class="p-6 text-center text-xs text-stone-500 border border-dashed border-stone-800 rounded-2xl">
+                            All active orders have zero balance due.
+                        </div>
+                    @else
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left text-xs text-stone-300">
+                                <thead class="bg-stone-950/80 border-b border-stone-800 text-[11px] font-bold text-stone-400 uppercase">
+                                    <tr>
+                                        <th class="p-3">Order</th>
+                                        <th class="p-3">Customer</th>
+                                        <th class="p-3">Payment Status</th>
+                                        <th class="p-3 text-right">Total</th>
+                                        <th class="p-3 text-right">Paid</th>
+                                        <th class="p-3 text-right">Balance Due</th>
+                                        <th class="p-3 text-right">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-stone-800/60">
+                                    @foreach ($balanceDueOrders as $balOrder)
+                                        <tr wire:key="balance-order-{{ $balOrder->id }}">
+                                            <td class="p-3 font-mono font-bold text-white">
+                                                {{ $balOrder->order_number }}
+                                                @if ($balOrder->tracking_code)
+                                                    <span class="block text-[10px] text-amber-400">{{ $balOrder->tracking_code }}</span>
+                                                @endif
+                                            </td>
+                                            <td class="p-3">{{ $balOrder->customer?->name ?? 'Customer' }}</td>
+                                            <td class="p-3">
+                                                <span class="px-2 py-0.5 rounded text-[10px] font-bold border {{ $balOrder->paymentStatusBadgeColor() }}">
+                                                    {{ $balOrder->paymentStatusLabel() }}
+                                                </span>
+                                            </td>
+                                            <td class="p-3 text-right font-mono">₱{{ number_format((float) $balOrder->total_amount, 2) }}</td>
+                                            <td class="p-3 text-right font-mono text-emerald-400">₱{{ number_format((float) $balOrder->amount_paid, 2) }}</td>
+                                            <td class="p-3 text-right font-mono font-black text-amber-300">₱{{ number_format((float) $balOrder->balance_due, 2) }}</td>
+                                            <td class="p-3 text-right space-x-1.5 whitespace-nowrap">
+                                                <button type="button" wire:click="openCounterSettlementModal({{ $balOrder->id }})" class="px-2.5 py-1 rounded-lg bg-amber-500 hover:bg-amber-400 text-stone-950 text-[11px] font-black cursor-pointer">
+                                                    Record Counter Pay
+                                                </button>
+                                                <a href="{{ route('orders.receipt', $balOrder) }}" target="_blank" class="px-2.5 py-1 rounded-lg bg-stone-800 hover:bg-stone-700 text-stone-200 text-[11px] font-bold">
+                                                    Receipt
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
+                        </div>
+                    @endif
+                </div>
+            </div>
+        @endif
     </main>
+
+    <!-- Reject Payment Modal -->
+    @if ($rejecting_payment_id)
+        <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-stone-950/80 backdrop-blur-md">
+            <div class="w-full max-w-md rounded-3xl border border-stone-800 bg-stone-900 p-6 space-y-4 shadow-2xl">
+                <h3 class="text-base font-black text-white">Reject Payment Proof</h3>
+                <p class="text-xs text-stone-400">Provide a clear reason so the customer can submit an accurate payment reference.</p>
+                <div>
+                    <textarea wire:model="rejection_reason" rows="3" placeholder="e.g. Reference number does not match shop GCash history..." class="w-full rounded-xl bg-stone-950 border border-stone-800 px-3 py-2 text-xs text-white"></textarea>
+                    @error('rejection_reason') <p class="text-[11px] text-red-400 mt-1">{{ $message }}</p> @enderror
+                </div>
+                <div class="flex justify-end gap-2">
+                    <button type="button" wire:click="closeRejectModal" class="px-4 py-2 rounded-xl bg-stone-800 text-xs font-bold text-stone-300 cursor-pointer">Cancel</button>
+                    <button type="button" wire:click="confirmRejectPayment" class="px-4 py-2 rounded-xl bg-red-500 hover:bg-red-400 text-xs font-black text-white cursor-pointer">Confirm Reject</button>
+                </div>
+            </div>
+        </div>
+    @endif
+
+    <!-- Counter Settlement Modal -->
+    @if ($settlingOrder)
+        <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-stone-950/80 backdrop-blur-md">
+            <div class="w-full max-w-md rounded-3xl border border-stone-800 bg-stone-900 p-6 space-y-4 shadow-2xl">
+                <div>
+                    <span class="text-[10px] font-bold text-amber-400 uppercase">Record Counter / Offline Payment</span>
+                    <h3 class="text-base font-black text-white font-mono">{{ $settlingOrder->order_number }}</h3>
+                    <p class="text-xs text-stone-400 mt-1">Remaining balance: ₱{{ number_format((float) $settlingOrder->balance_due, 2) }}</p>
+                </div>
+                <div class="space-y-3 text-xs">
+                    <div>
+                        <label class="block font-bold text-stone-300 mb-1">Amount Collected (PHP)</label>
+                        <input type="number" step="0.01" wire:model="counter_amount" class="w-full rounded-xl bg-stone-950 border border-stone-800 px-3 py-2 text-xs text-white" />
+                        @error('counter_amount') <p class="text-[11px] text-red-400 mt-1">{{ $message }}</p> @enderror
+                    </div>
+                    <div>
+                        <label class="block font-bold text-stone-300 mb-1">Method</label>
+                        <select wire:model="counter_method" class="w-full rounded-xl bg-stone-950 border border-stone-800 px-3 py-2 text-xs text-white">
+                            <option value="cash_counter">Cash at Counter</option>
+                            <option value="gcash">Counter GCash</option>
+                            <option value="maya">Counter Maya</option>
+                            <option value="bank_transfer">Bank Transfer</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block font-bold text-stone-300 mb-1">Reference / OR Note (Optional)</label>
+                        <input type="text" wire:model="counter_reference_no" placeholder="Optional counter receipt ref..." class="w-full rounded-xl bg-stone-950 border border-stone-800 px-3 py-2 text-xs text-white font-mono" />
+                    </div>
+                </div>
+                <div class="flex justify-end gap-2">
+                    <button type="button" wire:click="closeCounterSettlementModal" class="px-4 py-2 rounded-xl bg-stone-800 text-xs font-bold text-stone-300 cursor-pointer">Cancel</button>
+                    <button type="button" wire:click="recordCounterSettlement" class="px-4 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-xs font-black text-stone-950 cursor-pointer">Record Payment</button>
+                </div>
+            </div>
+        </div>
+    @endif
 
     <!-- Footer Bar -->
     <footer class="w-full bg-stone-900/60 border-t border-stone-800/80 px-4 sm:px-8 py-3 flex flex-col sm:flex-row items-center justify-between text-xs text-stone-500 gap-2">
-        <span>&copy; {{ date('Y') }} {{ $shop ? $shop->name : 'Printify' }} &bull; Sales & Financial Analytics Hub</span>
+        <span>&copy; {{ date('Y') }} {{ $shop ? $shop->name : 'PressQueue' }} &bull; Sales & Financial Analytics Hub</span>
         <span class="text-stone-500 font-medium">
             Financial Ledger & Bullseye BOM Net Profit Calculation
         </span>

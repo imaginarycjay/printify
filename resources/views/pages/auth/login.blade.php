@@ -1,64 +1,44 @@
-<x-layouts::auth :title="__('Sign In')">
-    <div class="flex flex-col gap-6">
-        <!-- Auth Header & Navigation Pills -->
-        <div class="space-y-4">
-            <div class="flex items-center justify-between border-b border-stone-200 dark:border-stone-800 pb-3">
-                <div class="flex items-center gap-2">
-                    <span class="flex size-7 items-center justify-center rounded-lg bg-amber-500/10 text-amber-600 dark:text-amber-400">
-                        <flux:icon name="arrow-right-end-on-rectangle" class="size-4" />
-                    </span>
-                    <span class="text-sm font-bold text-stone-900 dark:text-stone-100 uppercase tracking-wide">Portal Sign In</span>
-                </div>
-                <div class="flex items-center gap-1 rounded-lg bg-stone-100 p-1 dark:bg-stone-800/60">
-                    <a href="{{ route('login') }}" class="rounded-md bg-white px-3 py-1 text-xs font-semibold text-stone-900 shadow-xs dark:bg-stone-950 dark:text-white" wire:navigate>
-                        {{ __('Login') }}
-                    </a>
-                    <a href="{{ route('register') }}" class="rounded-md px-3 py-1 text-xs font-medium text-stone-600 hover:text-stone-900 dark:text-stone-400 dark:hover:text-white" wire:navigate>
-                        {{ __('Register') }}
-                    </a>
-                </div>
-            </div>
+<x-layouts::auth :title="__('Sign in')">
+    <div class="flex flex-col gap-4">
+        <x-auth-header
+            :title="__('Sign in to PressQueue')"
+            :description="__('One sign-in for customers, print shop owners, and production staff — we’ll route you to your workspace.')"
+        />
 
-            <div>
-                <h1 class="text-xl font-extrabold tracking-tight text-stone-900 dark:text-stone-100">
-                    {{ __('Welcome Back') }}
-                </h1>
-                <p class="text-xs text-stone-500 dark:text-stone-400">
-                    {{ __('Enter your credentials to access your printing account dashboard') }}
-                </p>
-            </div>
-        </div>
+        <x-auth-feedback />
 
-        <!-- Session Status -->
-        <x-auth-session-status class="text-center" :status="session('status')" />
-
-        <x-passkey-verify />
-
-        <form method="POST" action="{{ route('login.store') }}" class="flex flex-col gap-5">
+        <form
+            method="POST"
+            action="{{ route('login.store') }}"
+            class="flex flex-col gap-3.5"
+            x-data="{ submitting: false }"
+            @submit="submitting = true"
+            @pageshow.window="submitting = false"
+        >
             @csrf
 
-            <!-- Email Address -->
             <flux:field>
-                <flux:label>{{ __('Email Address') }}</flux:label>
+                <flux:label>{{ __('Email address') }}</flux:label>
                 <flux:input
                     name="email"
                     :value="old('email')"
                     type="email"
-                    icon="envelope"
                     required
                     autofocus
                     autocomplete="email"
-                    placeholder="name@company.com"
+                    placeholder="you@example.com"
                 />
-                <flux:error name="email" />
             </flux:field>
 
-            <!-- Password -->
             <flux:field>
-                <div class="flex items-center justify-between">
+                <div class="flex items-center justify-between gap-2">
                     <flux:label>{{ __('Password') }}</flux:label>
                     @if (Route::has('password.request'))
-                        <flux:link class="text-xs text-amber-600 hover:text-amber-500 dark:text-amber-400" :href="route('password.request')" wire:navigate>
+                        <flux:link
+                            data-theme-keep
+                            class="text-xs font-semibold !text-amber-700 hover:!text-amber-800 dark:!text-amber-400 dark:hover:!text-amber-300"
+                            :href="route('password.request')"
+                        >
                             {{ __('Forgot password?') }}
                         </flux:link>
                     @endif
@@ -66,35 +46,119 @@
                 <flux:input
                     name="password"
                     type="password"
-                    icon="key"
                     required
                     autocomplete="current-password"
-                    placeholder="••••••••"
+                    :placeholder="__('Enter your password')"
                     viewable
                 />
                 <flux:error name="password" />
             </flux:field>
 
-            <!-- Remember Me -->
-            <div class="flex items-center justify-between">
-                <flux:checkbox name="remember" :label="__('Keep me signed in')" :checked="old('remember')" />
-            </div>
+            <flux:checkbox name="remember" :label="__('Keep me signed in')" :checked="old('remember')" />
 
-            <!-- Submit Button -->
-            <flux:button variant="primary" type="submit" class="w-full bg-amber-500 hover:bg-amber-600 text-stone-950 font-semibold shadow-md shadow-amber-500/20" data-test="login-button">
-                {{ __('Sign In to Dashboard') }}
+            <flux:button
+                variant="primary"
+                type="submit"
+                data-theme-keep
+                class="mt-1 w-full !bg-amber-500 !text-stone-950 font-semibold hover:!bg-amber-400"
+                data-test="login-button"
+                x-bind:disabled="submitting"
+            >
+                {{ __('Sign in') }}
             </flux:button>
         </form>
 
-        <!-- Footer link -->
-        <div class="text-xs text-center text-stone-500 dark:text-stone-400 border-t border-stone-100 dark:border-stone-800/60 pt-4">
-            <span>{{ __('Don\'t have a customer account yet?') }}</span>
-            <flux:link class="font-semibold text-amber-600 hover:text-amber-500 dark:text-amber-400 ms-1" :href="route('register')" wire:navigate>
-                {{ __('Create account') }}
-            </flux:link>
+        <div class="relative my-0.5">
+            <div class="absolute inset-0 flex items-center" aria-hidden="true">
+                <div class="w-full border-t border-[var(--auth-border)]"></div>
+            </div>
+            <div class="relative flex justify-center text-xs font-medium uppercase tracking-wider">
+                <span data-theme-keep class="bg-[var(--auth-card)] px-3 text-stone-500 dark:text-stone-400">
+                    {{ __('Or') }}
+                </span>
+            </div>
         </div>
 
-        <!-- Dev Role Switcher for 1-Click Role Logins -->
-        <x-dev-role-switcher />
+        <div
+            x-data="{
+                googleNotice: false,
+                notifyGoogle() {
+                    this.googleNotice = true;
+                    this.$dispatch('toast-show', {
+                        duration: 4500,
+                        slots: {
+                            heading: @js(__('Coming soon')),
+                            text: @js(__('Google sign-in is not enabled yet. Please sign in with your email and password.')),
+                        },
+                        dataset: {
+                            variant: 'info',
+                        },
+                    });
+                },
+            }"
+            class="space-y-2"
+        >
+            <button
+                type="button"
+                @click="notifyGoogle()"
+                data-theme-keep
+                data-test="google-login-button"
+                class="flex h-10 w-full cursor-pointer items-center justify-center gap-2.5 rounded-lg border border-stone-300 bg-white px-4 text-sm font-semibold text-stone-800 transition-colors hover:bg-stone-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber-500 dark:border-stone-600 dark:bg-stone-800 dark:text-stone-100 dark:hover:bg-stone-700/80"
+            >
+                <svg class="size-4 shrink-0" viewBox="0 0 24 24" aria-hidden="true">
+                    <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
+                    <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
+                    <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" />
+                    <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" />
+                </svg>
+                <span>{{ __('Continue with Google') }}</span>
+            </button>
+
+            <p x-show="googleNotice" x-cloak role="status" aria-live="polite" data-theme-keep class="text-center text-xs text-stone-600 dark:text-stone-400">
+                {{ __('Google sign-in is coming soon. Please sign in with your email and password above for now.') }}
+            </p>
+        </div>
     </div>
+
+    <x-slot:footer>
+        <p data-theme-keep class="mb-2.5 text-xs font-semibold text-stone-700 dark:text-stone-300">
+            {{ __('New to PressQueue? Create an account') }}
+        </p>
+
+        <div class="grid grid-cols-1 gap-2 sm:grid-cols-2">
+            <a
+                href="{{ route('register') }}"
+                data-theme-keep
+                class="group flex items-center justify-between gap-2.5 rounded-xl border border-stone-300/90 bg-white px-3 py-2.5 transition-colors hover:border-stone-400 hover:bg-stone-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber-500 dark:border-stone-700 dark:bg-[#23201d] dark:hover:border-stone-500 dark:hover:bg-[#2b2723]"
+            >
+                <span class="flex min-w-0 items-center gap-2.5">
+                    <flux:icon name="user" class="size-4 shrink-0 text-stone-600 dark:text-stone-300" />
+                    <span class="min-w-0">
+                        <span data-theme-keep class="block text-xs font-semibold text-stone-900 dark:text-white">{{ __('Customer account') }}</span>
+                        <span data-theme-keep class="block truncate text-[11px] text-stone-500 dark:text-stone-400">{{ __('Order printing') }}</span>
+                    </span>
+                </span>
+                <flux:icon name="arrow-right" class="size-3.5 shrink-0 text-stone-400 transition-transform group-hover:translate-x-0.5 group-hover:text-stone-700 dark:group-hover:text-stone-200" />
+            </a>
+
+            <a
+                href="{{ route('owner.register') }}"
+                data-theme-keep
+                class="group flex items-center justify-between gap-2.5 rounded-xl border border-amber-500/40 bg-amber-500/[0.07] px-3 py-2.5 transition-colors hover:border-amber-500/80 hover:bg-amber-500/12 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber-500 dark:border-amber-500/45 dark:bg-amber-500/10 dark:hover:border-amber-400 dark:hover:bg-amber-500/15"
+            >
+                <span class="flex min-w-0 items-center gap-2.5">
+                    <flux:icon name="building-storefront" class="size-4 shrink-0 text-amber-700 dark:text-amber-400" />
+                    <span class="min-w-0">
+                        <span data-theme-keep class="block text-xs font-semibold text-amber-800 dark:text-amber-300">{{ __('Print shop owner') }}</span>
+                        <span data-theme-keep class="block truncate text-[11px] text-stone-500 dark:text-stone-400">{{ __('Register your shop') }}</span>
+                    </span>
+                </span>
+                <flux:icon name="arrow-right" class="size-3.5 shrink-0 text-amber-700 transition-transform group-hover:translate-x-0.5 dark:text-amber-400" />
+            </a>
+        </div>
+
+        <p data-theme-keep class="mt-2.5 text-xs text-stone-600 dark:text-stone-400">
+            {{ __('Production staff join using an invitation link sent by their shop owner.') }}
+        </p>
+    </x-slot:footer>
 </x-layouts::auth>

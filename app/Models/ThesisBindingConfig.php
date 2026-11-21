@@ -22,6 +22,7 @@ use Illuminate\Support\Carbon;
  * @property array<int, string>|null $paper_sizes
  * @property bool $auto_deduct_inventory
  * @property int $daily_production_quota
+ * @property int $max_binding_sheets
  * @property int $standard_lead_time_days
  * @property int $rush_lead_time_days
  * @property bool $require_pdf_upload
@@ -46,6 +47,7 @@ use Illuminate\Support\Carbon;
     'paper_sizes',
     'auto_deduct_inventory',
     'daily_production_quota',
+    'max_binding_sheets',
     'standard_lead_time_days',
     'rush_lead_time_days',
     'require_pdf_upload',
@@ -74,6 +76,7 @@ class ThesisBindingConfig extends Model
             'paper_sizes' => 'array',
             'auto_deduct_inventory' => 'boolean',
             'daily_production_quota' => 'integer',
+            'max_binding_sheets' => 'integer',
             'standard_lead_time_days' => 'integer',
             'rush_lead_time_days' => 'integer',
             'require_pdf_upload' => 'boolean',

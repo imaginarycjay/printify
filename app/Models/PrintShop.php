@@ -15,12 +15,42 @@ use Illuminate\Support\Carbon;
  * @property int $user_id
  * @property string $name
  * @property bool $is_setup_completed
+ * @property string $approval_status
+ * @property string|null $rejection_reason
+ * @property string|null $address
+ * @property string|null $contact
+ * @property string|null $description
+ * @property int|null $file_retention_days
+ * @property int $busy_threshold
+ * @property int $at_capacity_threshold
+ * @property string|null $operating_hours
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
  */
-#[Fillable(['user_id', 'name', 'is_setup_completed', 'approval_status', 'rejection_reason', 'address', 'contact', 'description'])]
+#[Fillable([
+    'user_id',
+    'name',
+    'is_setup_completed',
+    'approval_status',
+    'rejection_reason',
+    'address',
+    'contact',
+    'description',
+    'file_retention_days',
+    'busy_threshold',
+    'at_capacity_threshold',
+    'operating_hours',
+])]
 class PrintShop extends Model
 {
+    public const STATUS_PENDING = 'pending';
+
+    public const STATUS_APPROVED = 'approved';
+
+    public const STATUS_REJECTED = 'rejected';
+
+    public const STATUS_SUSPENDED = 'suspended';
+
     /**
      * Get the attributes that should be cast.
      *
@@ -30,6 +60,9 @@ class PrintShop extends Model
     {
         return [
             'is_setup_completed' => 'boolean',
+            'file_retention_days' => 'integer',
+            'busy_threshold' => 'integer',
+            'at_capacity_threshold' => 'integer',
         ];
     }
 
@@ -91,6 +124,43 @@ class PrintShop extends Model
     public function orders(): HasMany
     {
         return $this->hasMany(Order::class)->latest();
+    }
+
+    /**
+     * Check whether the shop is suspended by platform governance.
+     */
+    public function isSuspended(): bool
+    {
+        return $this->getAttribute('approval_status') === self::STATUS_SUSPENDED;
+    }
+
+    /**
+     * Check whether the shop is approved for public directory listing.
+     */
+    public function isApproved(): bool
+    {
+        return $this->getAttribute('approval_status') === self::STATUS_APPROVED;
+    }
+
+    /**
+     * Resolve the effective file retention window in days, clamped to platform bounds.
+     */
+    public function effectiveFileRetentionDays(?PlatformSetting $settings = null): int
+    {
+        $settings ??= PlatformSetting::current();
+        $days = $this->file_retention_days ?? $settings->default_retention_days;
+
+        return max($settings->min_retention_days, min($settings->max_retention_days, $days));
+    }
+
+    /**
+     * Audit log entries associated with this print shop.
+     *
+     * @return HasMany<AuditLog, $this>
+     */
+    public function auditLogs(): HasMany
+    {
+        return $this->hasMany(AuditLog::class)->latest();
     }
 
     /**

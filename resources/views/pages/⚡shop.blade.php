@@ -40,7 +40,15 @@ new class extends Component {
             </div>
         </section>
         <section wire:poll.30s.visible class="space-y-5">
-            <div><h2 class="text-xl font-extrabold">What would you like to print?</h2><p class="mt-1 text-sm text-stone-500 dark:text-stone-400">Prices and availability below belong to {{ $shop->name }}.</p></div>
+            <div class="flex flex-wrap items-center justify-between gap-4">
+                <div><h2 class="text-xl font-extrabold">What would you like to print?</h2><p class="mt-1 text-sm text-stone-500 dark:text-stone-400">Prices and availability below belong to {{ $shop->name }}.</p></div>
+                @if ((! auth()->check() || auth()->user()->isCustomer()) && $shop->services->where('is_active', true)->whereIn('service_key', ['thesis_binding', 'document_printing'])->isNotEmpty())
+                    <a href="{{ route('customer.shop.checkout', $shop->id) }}" data-theme-keep class="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl bg-stone-900 px-4 text-sm font-bold text-white shadow-sm transition-colors hover:bg-stone-800 dark:bg-amber-500 dark:text-stone-950 dark:hover:bg-amber-400">
+                        <flux:icon name="shopping-cart" class="size-4" />
+                        Multi-Item Cart &amp; Checkout
+                    </a>
+                @endif
+            </div>
             <div class="grid gap-5 md:grid-cols-2">
                 @forelse ($shop->services->where('is_active', true)->whereIn('service_key', ['thesis_binding', 'document_printing']) as $offering)
                     @php
@@ -75,7 +83,7 @@ new class extends Component {
                     <p class="rounded-3xl border border-dashed border-stone-300 p-8 text-sm text-stone-500 md:col-span-2 dark:border-stone-700">This shop is still preparing its online services. Contact the shop for assistance.</p>
                 @endforelse
             </div>
-            <p class="text-xs leading-relaxed text-stone-500 dark:text-stone-400">Final prices depend on your specifications. Workload reflects active jobs recorded in Printify, not an estimated completion time. Busy and at-capacity services may still accept orders unless paused.</p>
+            <p class="text-xs leading-relaxed text-stone-500 dark:text-stone-400">Final prices depend on your specifications. Workload reflects active jobs recorded in PressQueue, not an estimated completion time. Busy and at-capacity services may still accept orders unless paused.</p>
         </section>
     </main>
 </div>

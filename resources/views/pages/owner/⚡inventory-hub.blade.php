@@ -629,10 +629,6 @@ new class extends Component {
                     <flux:icon name="book-open" class="size-3.5 text-amber-500" />
                     <span>Thesis Binding BOM</span>
                 </a>
-                <a href="{{ route('owner.web-builder') }}" wire:navigate class="flex items-center gap-2.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-stone-400 hover:text-violet-300 hover:bg-stone-800/50 transition-all">
-                    <flux:icon name="globe-alt" class="size-3.5 text-violet-400" />
-                    <span>Storefront Builder</span>
-                </a>
             </div>
         </div>
 
@@ -965,6 +961,12 @@ new class extends Component {
                                             <div class="font-extrabold text-white text-sm">
                                                 {{ number_format($item->stock_qty, $item->stock_qty == (int)$item->stock_qty ? 0 : 2) }} <span class="text-stone-400 text-xs">{{ $item->unit }}</span>
                                             </div>
+                                            <div class="text-[10px] text-emerald-400 font-semibold">
+                                                Available: {{ number_format($item->availableQty(), $item->availableQty() == (int) $item->availableQty() ? 0 : 2) }} {{ $item->unit }}
+                                                @if ((float) $item->reserved_qty > 0)
+                                                    <span class="text-amber-400 ml-1">&bull; Reserved: {{ number_format((float) $item->reserved_qty, (float) $item->reserved_qty == (int) $item->reserved_qty ? 0 : 2) }}</span>
+                                                @endif
+                                            </div>
                                             <div class="text-[10px] text-stone-500">
                                                 Safety Level: {{ $item->reorder_level }} {{ $item->unit }}
                                             </div>
@@ -1136,7 +1138,7 @@ new class extends Component {
                         $poText .= "- {$dItem->name} (SKU: {$dItem->sku}): Qty {$recommendedQty} {$dItem->unit} (Current: {$dItem->stock_qty}) | Supplier: {$dItem->supplier_name}\n";
                     }
                     $poText .= "----------------------------------------\n";
-                    $poText .= "Generated via Printify Dynamic Inventory Engine";
+                    $poText .= "Generated via PressQueue Dynamic Inventory Engine";
                 @endphp
 
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -1259,6 +1261,7 @@ new class extends Component {
                                 <option value="Paper">Paper Stock</option>
                                 <option value="Adhesive">Adhesive & Glue</option>
                                 <option value="Foil">Stamping Foil</option>
+                                <option value="Ink / Toner">Ink &amp; Toner</option>
                                 <option value="Add-on">Retail Add-on</option>
                                 <option value="Packaging">Packaging</option>
                                 <option value="Raw Material">General Raw Material</option>

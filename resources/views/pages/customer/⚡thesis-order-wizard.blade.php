@@ -3,10 +3,14 @@
 use App\Models\InventoryItem;
 use App\Models\Order;
 use App\Models\OrderItem;
+use App\Models\Payment;
+use App\Models\PlatformSetting;
 use App\Models\PrintShop;
 use App\Models\ThesisBindingConfig;
+use App\Services\OrderCheckoutService;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\ValidationException;
 use Livewire\Attributes\Layout;
 use Livewire\Component;
 use Livewire\WithFileUploads;
@@ -208,6 +212,8 @@ new class extends Component {
 
     public function proceedToCheckout(): void
     {
+        $maxUploadKb = PlatformSetting::current()->max_upload_mb * 1024;
+
         if ($this->fulfillment_type === 'cover_only') {
             $this->binding_type = 'hardbound';
             $rules = [
@@ -216,7 +222,7 @@ new class extends Component {
                 'paper_size' => 'required|string',
                 'cover_color' => 'required|string',
                 'foil_color' => 'required|string',
-                'manuscript_file' => 'nullable|file|mimes:pdf|max:51200',
+                'manuscript_file' => 'nullable|file|mimes:pdf|max:'.$maxUploadKb,
             ];
 
             foreach ($this->required_custom_fields as $field) {
@@ -250,7 +256,9 @@ new class extends Component {
             }
 
             if ($this->require_pdf_upload) {
-                $rules['manuscript_file'] = 'required|file|mimes:pdf|max:51200'; // 50MB max
+                $rules['manuscript_file'] = 'required|file|mimes:pdf|max:'.$maxUploadKb;
+            } else {
+                $rules['manuscript_file'] = 'nullable|file|mimes:pdf|max:'.$maxUploadKb;
             }
 
             $this->validate($rules, [
@@ -261,6 +269,16 @@ new class extends Component {
                 'foil_color.required' => 'Please select a foil stamping color.',
             ]);
         }
+
+        $shop = $this->selectedShop();
+        app(OrderCheckoutService::class)->validateBindingLimits($shop, [
+            'service_key' => 'thesis_binding',
+            'fulfillment_type' => $this->fulfillment_type,
+            'bw_pages' => $this->bw_pages,
+            'color_pages' => $this->color_pages,
+            'preprinted_total_pages' => $this->preprinted_total_pages,
+            'print_sides' => (string) ($this->custom_fields_data['print_sides'] ?? 'simplex'),
+        ]);
 
         $this->step = 2;
     }
@@ -282,11 +300,23 @@ new class extends Component {
             return;
         }
 
+        $normalizedRef = strtoupper(trim($this->payment_reference_no));
+        $duplicateRef = Payment::query()
+            ->where('print_shop_id', $shop->id)
+            ->where('reference_no', $normalizedRef)
+            ->exists();
+
+        if ($duplicateRef) {
+            throw ValidationException::withMessages([
+                'payment_reference_no' => 'This payment reference number has already been submitted for this print shop.',
+            ]);
+        }
+
         $pricing = $this->calculatePricing();
         $isCoverOnly = ($this->fulfillment_type === 'cover_only');
         $totalPages = $isCoverOnly ? $this->preprinted_total_pages : ($this->bw_pages + $this->color_pages);
 
-        DB::transaction(function () use ($user, $shop, $pricing, $isCoverOnly, $totalPages) {
+        DB::transaction(function () use ($user, $shop, $pricing, $isCoverOnly, $totalPages, $normalizedRef) {
             // Store manuscript PDF
             $manuscriptPath = null;
             $manuscriptName = null;
@@ -303,22 +333,29 @@ new class extends Component {
 
             $order = Order::create([
                 'order_number' => Order::generateOrderNumber(),
+                'tracking_code' => Order::generateTrackingCode(),
                 'print_shop_id' => $shop->id,
                 'customer_id' => $user->id,
                 'service_key' => 'thesis_binding',
                 'order_status' => Order::STATUS_PENDING_PAYMENT,
                 'payment_status' => Order::PAYMENT_PENDING_VERIFICATION,
+                'payment_option' => Order::PAYMENT_OPTION_FULL_100,
                 'subtotal_amount' => $pricing['subtotal'] + $pricing['addons_total'],
                 'rush_fee_amount' => $pricing['rush_total'],
                 'total_amount' => $pricing['grand_total'],
+                'amount_paid' => 0.0,
+                'balance_due' => $pricing['grand_total'],
+                'refund_due' => 0.0,
+                'refund_status' => Order::REFUND_NONE,
                 'is_rush' => $this->is_rush,
                 'target_completion_date' => $pricing['target_completion_date'],
                 'payment_proof_path' => $paymentProofPath,
-                'payment_reference_no' => trim($this->payment_reference_no),
+                'payment_reference_no' => $normalizedRef,
             ]);
 
             OrderItem::create([
                 'order_id' => $order->id,
+                'service_key' => 'thesis_binding',
                 'binding_type' => $this->binding_type,
                 'fulfillment_type' => $this->fulfillment_type,
                 'is_paper_received' => false,
@@ -336,6 +373,19 @@ new class extends Component {
                 'document_original_name' => $manuscriptName,
                 'unit_price' => $pricing['unit_price'],
                 'total_price' => $pricing['subtotal'] + $pricing['addons_total'],
+            ]);
+
+            Payment::create([
+                'order_id' => $order->id,
+                'print_shop_id' => $shop->id,
+                'submitted_by' => $user->id,
+                'payment_type' => Payment::TYPE_FULL_100,
+                'payment_method' => 'gcash',
+                'amount' => $pricing['grand_total'],
+                'reference_no' => $normalizedRef,
+                'proof_path' => $paymentProofPath,
+                'status' => Payment::STATUS_PENDING,
+                'submitted_at' => now(),
             ]);
 
             $this->created_order_id = $order->id;
@@ -367,7 +417,7 @@ new class extends Component {
                 <flux:icon name="book-open" class="size-5 text-stone-950" />
             </span>
             <div>
-                <h1 class="text-sm font-extrabold text-white tracking-tight leading-tight">{{ $shop ? $shop->name : 'Printify' }}</h1>
+                <h1 class="text-sm font-extrabold text-white tracking-tight leading-tight">{{ $shop ? $shop->name : 'PressQueue' }}</h1>
                 <span class="text-[10px] text-amber-400 font-bold">Thesis Binding Order Portal</span>
             </div>
         </a>

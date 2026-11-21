@@ -73,7 +73,7 @@ select:focus[data-flux-control] {
 
 /* ==========================================================================
    Global Light Mode Theme System
-   Retains Printify's brand design, warm stone palette, and amber hierarchy
+   Retains PressQueue's brand design, warm stone palette, and amber hierarchy
    while delivering a clean, accessible, high-contrast light mode.
    ========================================================================== */
 
@@ -197,7 +197,7 @@ html:not(.dark) .shadow-stone-950 {
 }
 
 /* Public landing page: isolated from the legacy dashboard theme overrides. */
-body.printify-landing {
+body.pressqueue-landing {
     --landing-canvas: var(--color-stone-100);
     --landing-surface: var(--color-white);
     --landing-ink: var(--color-stone-900);
@@ -209,7 +209,7 @@ body.printify-landing {
     background: var(--landing-canvas);
 }
 
-.dark body.printify-landing {
+.dark body.pressqueue-landing {
     --landing-canvas: var(--color-stone-950);
     --landing-surface: var(--color-stone-900);
     --landing-ink: var(--color-stone-100);
@@ -219,7 +219,7 @@ body.printify-landing {
     --landing-good: var(--color-emerald-400);
 }
 
-.printify-landing > header {
+.pressqueue-landing > header {
     position: sticky;
     top: 0;
     z-index: 40;
@@ -231,14 +231,14 @@ body.printify-landing {
 }
 
 @supports (backdrop-filter: blur(10px)) or (-webkit-backdrop-filter: blur(10px)) {
-    .printify-landing > header {
+    .pressqueue-landing > header {
         background: color-mix(in oklab, var(--landing-canvas) 86%, transparent);
         -webkit-backdrop-filter: blur(10px);
         backdrop-filter: blur(10px);
     }
 }
 
-.printify-landing .landing-container {
+.pressqueue-landing .landing-container {
     width: min(100% - clamp(2.5rem, 8vw, 6rem), 80rem);
     margin-inline: auto;
 }
@@ -965,3 +965,65 @@ body.printify-landing {
         opacity: 0;
     }
 }
+
+/* Authentication pages: isolated surface palette for crisp figure-ground contrast on all displays */
+html:not(.dark) body.pressqueue-auth {
+    --auth-canvas: #eae7e3;
+    --auth-bar: #f7f5f2;
+    --auth-card: #ffffff;
+    --auth-card-footer: #f5f3ef;
+    --auth-border: #d6d3d1;
+    --auth-border-subtle: #e7e5e4;
+    --auth-input-bg: #ffffff;
+    --auth-input-border: #c7c2bc;
+    --auth-ink: #1c1917;
+    --auth-muted: #57534e;
+    color-scheme: light;
+    background-color: var(--auth-canvas);
+    background-image: radial-gradient(ellipse 75% 42% at 50% 0%, color-mix(in oklab, var(--color-amber-500) 8%, transparent), transparent 70%);
+    color: var(--auth-ink);
+}
+
+html.dark body.pressqueue-auth {
+    --auth-canvas: #0d0c0b;
+    --auth-bar: #141210;
+    --auth-card: #211e1b;
+    --auth-card-footer: #181614;
+    --auth-border: #44403c;
+    --auth-border-subtle: #332f2c;
+    --auth-input-bg: #12100f;
+    --auth-input-border: #57534e;
+    --auth-ink: #fafaf9;
+    --auth-muted: #b5b0aa;
+    color-scheme: dark;
+    background-color: var(--auth-canvas);
+    background-image: radial-gradient(ellipse 75% 42% at 50% 0%, color-mix(in oklab, var(--color-amber-500) 7%, transparent), transparent 70%);
+    color: var(--auth-ink);
+}
+
+.pressqueue-auth input[data-flux-control] {
+    background-color: var(--auth-input-bg);
+    color: var(--auth-ink);
+}
+
+.pressqueue-auth input[data-flux-control]:not([data-invalid]) {
+    border-color: var(--auth-input-border);
+}
+
+.pressqueue-auth input[data-flux-control]::placeholder {
+    color: var(--auth-muted);
+    opacity: 0.75;
+}
+
+.pressqueue-auth input[data-flux-control]:focus {
+    border-color: var(--color-amber-500);
+    box-shadow: 0 0 0 3px color-mix(in oklab, var(--color-amber-500) 24%, transparent);
+    outline: none;
+    --tw-ring-shadow: 0 0 #0000;
+}
+
+.pressqueue-auth [data-flux-label] {
+    color: var(--auth-ink);
+    font-weight: 600;
+}
+

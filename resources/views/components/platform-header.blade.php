@@ -1,4 +1,4 @@
-@props(['title' => config('app.name', 'Printify'), 'subtitle' => 'Find a shop. Make it print.', 'backUrl' => null])
+@props(['title' => config('app.name', 'PressQueue'), 'subtitle' => 'Find a shop. Make it print.', 'backUrl' => null])
 
 <header {{ $attributes->class(['relative z-20 mx-auto flex w-full max-w-6xl flex-col gap-4 border-b border-stone-200 px-4 py-4 sm:px-6 lg:flex-row lg:items-center lg:justify-between dark:border-stone-800']) }}>
     <div class="flex min-w-0 items-center gap-3">
@@ -7,7 +7,7 @@
                 <flux:icon name="arrow-left" class="size-5" />
             </a>
         @else
-            <a href="{{ route('home') }}" data-theme-keep aria-label="Printify home" class="flex size-11 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-amber-400 to-amber-600 text-stone-950 shadow-md shadow-amber-500/20 focus-visible:outline-2 focus-visible:outline-amber-500">
+            <a href="{{ route('home') }}" data-theme-keep aria-label="PressQueue home" class="flex size-11 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-amber-400 to-amber-600 text-stone-950 shadow-md shadow-amber-500/20 focus-visible:outline-2 focus-visible:outline-amber-500">
                 <x-app-logo-icon class="size-6 fill-current" />
             </a>
         @endif
@@ -33,7 +33,7 @@
                 <button type="submit" aria-label="Log out" class="flex size-11 cursor-pointer items-center justify-center rounded-xl text-stone-500 hover:bg-red-500/10 hover:text-red-600 dark:text-stone-400"><flux:icon name="arrow-right-start-on-rectangle" class="size-5" /></button>
             </form>
         @else
-            <a href="{{ route('owner.register') }}" data-theme-keep class="inline-flex min-h-11 items-center rounded-xl px-3 text-sm font-semibold text-stone-600 hover:text-amber-700 dark:text-stone-400 dark:hover:text-amber-400">For shop owners</a>
+            <a href="{{ route('owner.register') }}" data-theme-keep class="inline-flex min-h-11 items-center rounded-xl px-3 text-sm font-semibold text-stone-600 hover:text-amber-700 dark:text-stone-400 dark:hover:text-amber-400">Register a shop</a>
             <a href="{{ route('login') }}" data-theme-keep class="inline-flex min-h-11 items-center rounded-xl bg-amber-500 px-4 text-sm font-bold text-stone-950 hover:bg-amber-400">Sign in</a>
         @endauth
         <x-theme-toggle class="size-11" />

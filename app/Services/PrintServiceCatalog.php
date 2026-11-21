@@ -39,15 +39,6 @@ class PrintServiceCatalog
                 'badge_color' => 'bg-amber-500/20 text-amber-300 border-amber-500/30',
                 'is_preinstalled' => true,
             ],
-            'web_builder' => [
-                'key' => 'web_builder',
-                'name' => 'Web Builder',
-                'description' => 'Storefront visual editor to customize layout, themes, banners, and customer experience',
-                'icon' => 'globe-alt',
-                'gradient' => 'from-violet-500 via-purple-600 to-indigo-700',
-                'badge_color' => 'bg-violet-500/20 text-violet-300 border-violet-500/30',
-                'is_preinstalled' => true,
-            ],
             'thesis_binding' => [
                 'key' => 'thesis_binding',
                 'name' => 'Hardbound / Softbound Thesis Binding',
@@ -122,7 +113,7 @@ class PrintServiceCatalog
      */
     public static function preinstalledKeys(): array
     {
-        return ['analytics_hub', 'inventory_hub', 'production_hub', 'web_builder'];
+        return ['analytics_hub', 'inventory_hub', 'production_hub'];
     }
 
     /**

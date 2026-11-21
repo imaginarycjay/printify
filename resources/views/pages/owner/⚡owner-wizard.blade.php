@@ -120,7 +120,7 @@ new class extends Component {
                 <x-app-logo-icon class="size-6 fill-current" />
             </span>
             <div>
-                <h1 class="text-lg font-bold text-white tracking-tight">{{ config('app.name', 'Printify') }}</h1>
+                <h1 class="text-lg font-bold text-white tracking-tight">{{ config('app.name', 'PressQueue') }}</h1>
                 <p class="text-xs text-amber-400 font-semibold uppercase tracking-wider">Business Owner Setup Wizard</p>
             </div>
         </div>
@@ -260,6 +260,6 @@ new class extends Component {
 
     <!-- Footer -->
     <footer class="w-full max-w-4xl mx-auto text-center text-xs text-stone-600 py-4 relative z-20">
-        &copy; {{ date('Y') }} {{ config('app.name', 'Printify') }}. All rights reserved.
+        &copy; {{ date('Y') }} {{ config('app.name', 'PressQueue') }}. All rights reserved.
     </footer>
 </div>

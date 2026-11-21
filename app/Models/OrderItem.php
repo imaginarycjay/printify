@@ -2,18 +2,22 @@
 
 namespace App\Models;
 
+use Carbon\CarbonInterface;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Support\Carbon;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 /**
  * @property int $id
  * @property int $order_id
+ * @property string|null $service_key
+ * @property int|null $assigned_staff_id
  * @property string $binding_type
  * @property int $bw_pages_count
  * @property int $color_pages_count
  * @property int $total_pages_count
+ * @property array<string, mixed>|null $specifications
  * @property string|null $cover_color
  * @property string|null $foil_color
  * @property string $paper_size
@@ -27,11 +31,21 @@ use Illuminate\Support\Carbon;
  * @property string $fulfillment_type
  * @property bool $is_paper_received
  * @property float $estimated_spine_thickness_mm
- * @property Carbon|null $created_at
- * @property Carbon|null $updated_at
+ * @property string $production_stage
+ * @property string $prepress_status
+ * @property string|null $prepress_rejection_reason
+ * @property bool $is_spec_locked
+ * @property string|null $shelf_bin_code
+ * @property CarbonInterface|null $ready_at
+ * @property CarbonInterface|null $claimed_at
+ * @property CarbonInterface|null $file_purged_at
+ * @property CarbonInterface|null $created_at
+ * @property CarbonInterface|null $updated_at
  */
 #[Fillable([
     'order_id',
+    'service_key',
+    'assigned_staff_id',
     'binding_type',
     'fulfillment_type',
     'is_paper_received',
@@ -50,12 +64,26 @@ use Illuminate\Support\Carbon;
     'document_original_name',
     'unit_price',
     'total_price',
+    'production_stage',
+    'prepress_status',
+    'prepress_rejection_reason',
+    'is_spec_locked',
+    'shelf_bin_code',
+    'ready_at',
+    'claimed_at',
+    'file_purged_at',
 ])]
 class OrderItem extends Model
 {
     public const FULFILLMENT_FULL_PACKAGE = 'full_package';
 
     public const FULFILLMENT_COVER_ONLY = 'cover_only';
+
+    public const PREPRESS_PENDING = 'pending';
+
+    public const PREPRESS_APPROVED = 'approved';
+
+    public const PREPRESS_REJECTED = 'rejected';
 
     /**
      * Get the attributes that should be cast.
@@ -65,6 +93,7 @@ class OrderItem extends Model
     protected function casts(): array
     {
         return [
+            'assigned_staff_id' => 'integer',
             'is_paper_received' => 'boolean',
             'estimated_spine_thickness_mm' => 'float',
             'bw_pages_count' => 'integer',
@@ -76,6 +105,10 @@ class OrderItem extends Model
             'selected_addons' => 'array',
             'unit_price' => 'float',
             'total_price' => 'float',
+            'is_spec_locked' => 'boolean',
+            'ready_at' => 'datetime',
+            'claimed_at' => 'datetime',
+            'file_purged_at' => 'datetime',
         ];
     }
 
@@ -100,10 +133,54 @@ class OrderItem extends Model
      */
     public function isDocumentPrinting(): bool
     {
-        return ($this->order && $this->order->service_key === 'document_printing') ||
-            (isset($this->custom_fields_data['service_key']) && $this->custom_fields_data['service_key'] === 'document_printing') ||
-            isset($this->custom_fields_data['print_sides']) ||
-            isset($this->custom_fields_data['finishing_type']);
+        return $this->resolvedServiceKey() === 'document_printing';
+    }
+
+    /**
+     * Check if this item belongs to thesis binding service.
+     */
+    public function isThesisBinding(): bool
+    {
+        return $this->resolvedServiceKey() === 'thesis_binding';
+    }
+
+    /**
+     * Resolve the authoritative service key for this line item.
+     */
+    public function resolvedServiceKey(): string
+    {
+        if (is_string($this->service_key) && $this->service_key !== '') {
+            return $this->service_key;
+        }
+
+        $customService = $this->custom_fields_data['service_key'] ?? null;
+        if (is_string($customService) && $customService !== '') {
+            return $customService;
+        }
+
+        if ($this->order && is_string($this->order->service_key) && $this->order->service_key !== '') {
+            return $this->order->service_key;
+        }
+
+        if (isset($this->custom_fields_data['finishing_type']) || isset($this->custom_fields_data['print_sides'])) {
+            return 'document_printing';
+        }
+
+        return 'thesis_binding';
+    }
+
+    /**
+     * Physical sheet count per bound copy (accounts for duplex printing).
+     */
+    public function getSheetsPerCopyForBinding(): int
+    {
+        $totalPages = max(1, (int) $this->total_pages_count);
+
+        if ($this->isDuplex()) {
+            return (int) ceil($totalPages / 2);
+        }
+
+        return $totalPages;
     }
 
     /**
@@ -172,5 +249,25 @@ class OrderItem extends Model
     public function order(): BelongsTo
     {
         return $this->belongsTo(Order::class);
+    }
+
+    /**
+     * Production staff member assigned to this line item.
+     *
+     * @return BelongsTo<User, $this>
+     */
+    public function assignedStaff(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'assigned_staff_id');
+    }
+
+    /**
+     * Stock movements (reservations, deductions, rework) linked to this item.
+     *
+     * @return HasMany<StockMovement, $this>
+     */
+    public function stockMovements(): HasMany
+    {
+        return $this->hasMany(StockMovement::class)->latest();
     }
 }

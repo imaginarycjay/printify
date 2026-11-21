@@ -4,11 +4,14 @@ namespace App\Providers;
 
 use App\Actions\Fortify\CreateNewUser;
 use App\Actions\Fortify\ResetUserPassword;
+use App\Models\User;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Str;
+use Illuminate\Validation\ValidationException;
 use Laravel\Fortify\Fortify;
 
 class FortifyServiceProvider extends ServiceProvider
@@ -38,6 +41,33 @@ class FortifyServiceProvider extends ServiceProvider
     {
         Fortify::resetUserPasswordsUsing(ResetUserPassword::class);
         Fortify::createUsersUsing(CreateNewUser::class);
+
+        Fortify::authenticateUsing(function (Request $request): ?User {
+            $usernameField = Fortify::username();
+            $username = $request->string($usernameField)->toString();
+            $user = User::where($usernameField, $username)->first();
+            if (! $user instanceof User && config('fortify.lowercase_usernames', true)) {
+                $user = User::where($usernameField, Str::lower($username))->first();
+            }
+
+            if (! $user instanceof User || ! Hash::check($request->string('password')->toString(), $user->password)) {
+                return null;
+            }
+
+            $suspendedShop = $user->suspendedShop();
+            if ($suspendedShop !== null) {
+                $reason = $suspendedShop->rejection_reason;
+                $message = $reason
+                    ? "Your print shop account is currently suspended: {$reason}"
+                    : 'Your print shop account is currently suspended. Contact the platform administrator.';
+
+                throw ValidationException::withMessages([
+                    $usernameField => [$message],
+                ]);
+            }
+
+            return $user;
+        });
     }
 
     /**

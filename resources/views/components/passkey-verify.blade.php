@@ -3,7 +3,8 @@
     'submitRoute' => 'passkey.login',
     'label' => __('Sign in with a passkey'),
     'loadingLabel' => __('Authenticating...'),
-    'separator' => __('Or continue with email'),
+    'separator' => __('Or'),
+    'position' => 'below',
 ])
 
 @assets
@@ -11,6 +12,7 @@
 @endassets
 
 <div
+    class="contents"
     x-data="{
         supported: false,
         loading: false,
@@ -45,31 +47,31 @@
     }"
 >
     <template x-if="supported">
-        <div>
-            <div class="grid gap-2">
+        <div class="flex flex-col gap-5">
+            <div class="relative {{ $position === 'above' ? 'order-2' : 'order-1' }}">
+                <div class="absolute inset-0 flex items-center" aria-hidden="true">
+                    <div data-theme-keep class="w-full border-t border-[var(--auth-border)]"></div>
+                </div>
+                <div class="relative flex justify-center text-xs uppercase tracking-wider">
+                    <span data-theme-keep class="bg-[var(--auth-card)] px-2.5 text-stone-500 dark:text-stone-400">
+                        {{ $separator }}
+                    </span>
+                </div>
+            </div>
+
+            <div class="grid gap-2 {{ $position === 'above' ? 'order-1' : 'order-2' }}">
                 <flux:button
                     variant="outline"
                     icon="finger-print"
-                    class="w-full"
+                    data-theme-keep
+                    class="w-full !border-stone-300 !bg-white !text-stone-800 hover:!bg-stone-50 dark:!border-stone-700 dark:!bg-stone-800/70 dark:!text-stone-100 dark:hover:!bg-stone-800"
                     x-on:click="verify()"
                     x-bind:disabled="loading"
                 >
                     <span x-show="!loading">{{ $label }}</span>
                     <span x-show="loading" x-cloak>{{ $loadingLabel }}</span>
                 </flux:button>
-                <p x-show="error" x-text="error" x-cloak
-                   class="text-sm text-center text-red-600 dark:text-red-400"></p>
-            </div>
-
-            <div class="relative my-6">
-                <div class="absolute inset-0 flex items-center">
-                    <div class="w-full border-t border-zinc-200 dark:border-zinc-700"></div>
-                </div>
-                <div class="relative flex justify-center text-xs uppercase">
-                    <span class="px-2 text-zinc-500 dark:text-zinc-400 bg-white dark:bg-zinc-900">
-                        {{ $separator }}
-                    </span>
-                </div>
+                <p x-show="error" x-text="error" x-cloak class="text-center text-xs text-red-600 dark:text-red-400"></p>
             </div>
         </div>
     </template>

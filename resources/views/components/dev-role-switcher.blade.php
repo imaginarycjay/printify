@@ -1,51 +1,35 @@
 @if (app()->isLocal())
-    <div class="mt-6 border-t border-amber-500/20 pt-4 dark:border-amber-500/30">
-        <div class="rounded-xl bg-amber-500/10 p-3.5 backdrop-blur-md border border-amber-500/20">
-            <div class="flex items-center justify-between mb-2">
-                <span class="inline-flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-amber-600 dark:text-amber-400">
-                    <flux:icon name="command-line" class="size-3.5" />
-                    Dev Role Switcher
-                </span>
-                <span class="text-[10px] text-amber-700/70 dark:text-amber-300/70">1-Click Test Login</span>
-            </div>
+    <details data-theme-keep class="group rounded-xl border border-stone-200 bg-white dark:border-stone-800 dark:bg-stone-900">
+        <summary data-theme-keep class="flex cursor-pointer list-none items-center justify-between gap-2 px-4 py-2.5 text-xs font-semibold text-stone-600 transition-colors hover:text-stone-900 dark:text-stone-400 dark:hover:text-stone-200 [&::-webkit-details-marker]:hidden">
+            <span class="inline-flex items-center gap-2">
+                <flux:icon name="command-line" class="size-3.5 text-amber-600 dark:text-amber-400" />
+                <span>{{ __('Dev quick login') }}</span>
+            </span>
+            <span class="inline-flex items-center gap-2">
+                <span data-theme-keep class="rounded-md bg-stone-100 px-1.5 py-0.5 text-[10px] font-medium text-stone-500 dark:bg-stone-800 dark:text-stone-400">{{ __('Local only') }}</span>
+                <flux:icon name="chevron-down" class="size-3.5 transition-transform duration-150 group-open:rotate-180" />
+            </span>
+        </summary>
 
+        <div data-theme-keep class="border-t border-stone-200 p-3 dark:border-stone-800">
             <div class="grid grid-cols-3 gap-2">
-                <!-- Business Owner -->
-                <form method="POST" action="{{ route('dev.login', 'business_owner') }}">
-                    @csrf
-                    <button type="submit" class="w-full text-left rounded-lg bg-amber-500/10 hover:bg-amber-500/20 p-2 transition-all border border-amber-500/20 group cursor-pointer">
-                        <div class="flex items-center gap-1.5 mb-0.5">
-                            <flux:icon name="building-storefront" class="size-3.5 text-amber-600 dark:text-amber-400 group-hover:scale-110 transition-transform" />
-                            <span class="text-xs font-medium text-stone-900 dark:text-stone-100 truncate">Owner</span>
-                        </div>
-                        <p class="text-[10px] text-stone-500 dark:text-stone-400 truncate">owner@capstone.test</p>
-                    </button>
-                </form>
-
-                <!-- Production Staff -->
-                <form method="POST" action="{{ route('dev.login', 'production_staff') }}">
-                    @csrf
-                    <button type="submit" class="w-full text-left rounded-lg bg-amber-500/10 hover:bg-amber-500/20 p-2 transition-all border border-amber-500/20 group cursor-pointer">
-                        <div class="flex items-center gap-1.5 mb-0.5">
-                            <flux:icon name="wrench-screwdriver" class="size-3.5 text-amber-600 dark:text-amber-400 group-hover:scale-110 transition-transform" />
-                            <span class="text-xs font-medium text-stone-900 dark:text-stone-100 truncate">Staff</span>
-                        </div>
-                        <p class="text-[10px] text-stone-500 dark:text-stone-400 truncate">staff@capstone.test</p>
-                    </button>
-                </form>
-
-                <!-- Customer -->
-                <form method="POST" action="{{ route('dev.login', 'customer') }}">
-                    @csrf
-                    <button type="submit" class="w-full text-left rounded-lg bg-amber-500/10 hover:bg-amber-500/20 p-2 transition-all border border-amber-500/20 group cursor-pointer">
-                        <div class="flex items-center gap-1.5 mb-0.5">
-                            <flux:icon name="user" class="size-3.5 text-amber-600 dark:text-amber-400 group-hover:scale-110 transition-transform" />
-                            <span class="text-xs font-medium text-stone-900 dark:text-stone-100 truncate">Customer</span>
-                        </div>
-                        <p class="text-[10px] text-stone-500 dark:text-stone-400 truncate">customer@capstone.test</p>
-                    </button>
-                </form>
+                @foreach ([
+                    ['role' => 'business_owner', 'label' => 'Owner', 'email' => 'owner@capstone.test', 'icon' => 'building-storefront'],
+                    ['role' => 'production_staff', 'label' => 'Staff', 'email' => 'staff@capstone.test', 'icon' => 'wrench-screwdriver'],
+                    ['role' => 'customer', 'label' => 'Customer', 'email' => 'customer@capstone.test', 'icon' => 'user'],
+                ] as $account)
+                    <form method="POST" action="{{ route('dev.login', $account['role']) }}">
+                        @csrf
+                        <button type="submit" data-theme-keep class="group/btn w-full cursor-pointer rounded-lg border border-stone-200 bg-stone-50 px-2.5 py-2 text-left transition-colors hover:border-amber-500/60 hover:bg-amber-500/10 dark:border-stone-800 dark:bg-stone-950/70 dark:hover:border-amber-500/50">
+                            <div class="flex items-center gap-1.5">
+                                <flux:icon :name="$account['icon']" class="size-3.5 shrink-0 text-amber-700 dark:text-amber-400" />
+                                <span data-theme-keep class="truncate text-xs font-semibold text-stone-900 dark:text-stone-100">{{ $account['label'] }}</span>
+                            </div>
+                            <p data-theme-keep class="mt-0.5 truncate text-[10px] text-stone-500 dark:text-stone-400">{{ $account['email'] }}</p>
+                        </button>
+                    </form>
+                @endforeach
             </div>
         </div>
-    </div>
+    </details>
 @endif

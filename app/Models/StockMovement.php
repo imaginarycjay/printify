@@ -10,6 +10,7 @@ use Illuminate\Support\Carbon;
 /**
  * @property int $id
  * @property int $inventory_item_id
+ * @property int|null $order_item_id
  * @property string $movement_type
  * @property float $quantity
  * @property float $previous_stock
@@ -21,6 +22,7 @@ use Illuminate\Support\Carbon;
  */
 #[Fillable([
     'inventory_item_id',
+    'order_item_id',
     'movement_type',
     'quantity',
     'previous_stock',
@@ -38,6 +40,12 @@ class StockMovement extends Model
 
     public const TYPE_MANUAL_ADJUSTMENT = 'manual_adjustment';
 
+    public const TYPE_RESERVATION = 'stock_reservation';
+
+    public const TYPE_RESERVATION_RELEASE = 'stock_reservation_release';
+
+    public const TYPE_REWORK_SPOILAGE = 'rework_spoilage';
+
     /**
      * Get the attributes that should be cast.
      *
@@ -46,6 +54,7 @@ class StockMovement extends Model
     protected function casts(): array
     {
         return [
+            'order_item_id' => 'integer',
             'quantity' => 'float',
             'previous_stock' => 'float',
             'resulting_stock' => 'float',
@@ -60,6 +69,16 @@ class StockMovement extends Model
     public function inventoryItem(): BelongsTo
     {
         return $this->belongsTo(InventoryItem::class);
+    }
+
+    /**
+     * Get the order line item linked to this stock movement.
+     *
+     * @return BelongsTo<OrderItem, $this>
+     */
+    public function orderItem(): BelongsTo
+    {
+        return $this->belongsTo(OrderItem::class);
     }
 
     /**

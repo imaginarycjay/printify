@@ -14,6 +14,7 @@ Route::post('staff-invitations/{token}', [PlatformController::class, 'accept'])-
 Route::middleware(['auth', 'role:platform_admin'])->group(function (): void {
     Route::livewire('admin/shops', 'pages::admin-shops')->name('admin.shops');
     Route::post('admin/shops/{shop}', [PlatformController::class, 'review'])->name('admin.shops.review');
+    Route::post('admin/settings', [PlatformController::class, 'updateSettings'])->name('admin.settings.update');
 });
 Route::middleware(['auth', 'role:business_owner'])->group(function (): void {
     Route::livewire('owner/platform', 'pages::owner-platform')->name('owner.platform');
@@ -23,6 +24,7 @@ Route::middleware(['auth', 'role:business_owner'])->group(function (): void {
     Route::delete('owner/staff/{staff}', [PlatformController::class, 'revoke'])->name('owner.staff.revoke');
 });
 Route::get('orders/{order}/files/{kind}/{item?}', [PlatformController::class, 'file'])->middleware('auth')->name('orders.file');
+Route::get('orders/{order}/receipt', [PlatformController::class, 'receipt'])->middleware('auth')->name('orders.receipt');
 
 Route::middleware(['auth', 'verified'])->group(function () {
     // Smart Single Sign-On (SSO) Role Redirector
@@ -33,7 +35,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::livewire('dashboard', 'pages::owner.⚡owner-dashboard')->name('dashboard');
         Route::livewire('setup', 'pages::owner.⚡owner-wizard')->name('wizard');
         Route::livewire('analytics', 'pages::owner.⚡analytics-hub')->name('analytics-hub');
-        Route::livewire('web-builder', 'pages::owner.⚡web-builder')->name('web-builder');
         Route::livewire('inventory', 'pages::owner.⚡inventory-hub')->name('inventory-hub');
         Route::livewire('thesis-binding', 'pages::owner.⚡thesis-binding')->name('thesis-binding');
         Route::livewire('document-printing', 'pages::owner.⚡document-printing')->name('document-printing');
@@ -48,6 +49,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // Customer Routes (Strictly Restricted to Customer)
     Route::prefix('customer')->name('customer.')->middleware('role:customer')->group(function () {
         Route::livewire('dashboard', 'pages::customer.⚡customer-dashboard')->name('dashboard');
+        Route::livewire('shops/{shop}/checkout', 'pages::customer.⚡shop-cart')->whereNumber('shop')->name('shop.checkout');
         Route::livewire('shops/{shop}/order/thesis', 'pages::customer.⚡thesis-order-wizard')->whereNumber('shop')->name('shop.order-thesis');
         Route::get('order/thesis-binding', fn () => redirect()->route('shops.index', ['service' => 'thesis_binding']))->name('order-thesis');
         Route::livewire('shops/{shop}/order/document', 'pages::customer.⚡document-order-wizard')->whereNumber('shop')->name('shop.order-document');

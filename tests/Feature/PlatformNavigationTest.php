@@ -176,13 +176,11 @@ test('signed in visitors can return to their dashboard from the landing page', f
         ->assertDontSee('Register your print shop');
 });
 
-test('service configuration and the builder lead back to shop management', function () {
+test('service configuration pages lead back to shop management', function () {
     $this->actingAs($this->owner)->get(route('owner.document-printing'))
         ->assertOk()->assertSee(route('owner.platform').'#availability', false);
     $this->get(route('owner.thesis-binding'))
         ->assertOk()->assertSee(route('owner.platform').'#availability', false);
-    $this->get(route('owner.web-builder'))
-        ->assertOk()->assertSee(route('shops.show', $this->shop), false);
 });
 
 test('invalid availability changes preserve input only for the submitted service', function () {
@@ -215,4 +213,40 @@ test('public navigation uses direct links between the landing page and shop dire
             ->and($xpath->evaluate('count(//header//a[@href="'.route('home').'"])'))->toBe(1.0)
             ->and($xpath->evaluate('count(//header//a[@href="'.route('shops.index').'"])'))->toBe(1.0);
     }
+});
+
+test('registration screens share a bidirectional customer and shop owner switcher', function () {
+    foreach (['register', 'owner.register'] as $routeName) {
+        $response = $this->get(route($routeName))
+            ->assertOk()
+            ->assertSee(route('register'), false)
+            ->assertSee(route('owner.register'), false)
+            ->assertSee(route('login'), false)
+            ->assertSee('data-test="theme-toggle"', false)
+            ->assertDontSee('Dev quick login');
+
+        $document = new DOMDocument;
+        @$document->loadHTML($response->getContent());
+        $xpath = new DOMXPath($document);
+
+        expect($xpath->evaluate('count(//a[@*[name()="wire:navigate"]])'))->toBe(0.0);
+    }
+});
+
+test('auth header links directly to home and shop directory while guest header labels shop registration', function () {
+    $loginResponse = $this->get(route('login'))->assertOk();
+    $loginDocument = new DOMDocument;
+    @$loginDocument->loadHTML($loginResponse->getContent());
+    $loginXpath = new DOMXPath($loginDocument);
+
+    expect($loginXpath->evaluate('count(//header//a[@*[name()="wire:navigate"]])'))->toBe(0.0)
+        ->and($loginXpath->evaluate('count(//header//a[@href="'.route('home').'"])'))->toBe(1.0)
+        ->and($loginXpath->evaluate('count(//header//a[@href="'.route('shops.index').'"])'))->toBe(1.0);
+
+    $homeResponse = $this->get(route('home'))->assertOk();
+    $homeDocument = new DOMDocument;
+    @$homeDocument->loadHTML($homeResponse->getContent());
+    $homeXpath = new DOMXPath($homeDocument);
+
+    expect(trim($homeXpath->evaluate('string(//header//a[@href="'.route('owner.register').'"])')))->toBe('Register a shop');
 });

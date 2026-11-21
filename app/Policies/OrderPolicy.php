@@ -14,6 +14,10 @@ class OrderPolicy
 
     public function update(User $user, Order $order): bool
     {
+        if ($user->belongsToSuspendedShop()) {
+            return false;
+        }
+
         return $user->operationalShop()?->id === $order->print_shop_id;
     }
 }

@@ -44,9 +44,14 @@ class ShopService extends Model
 
     public function workload(): string
     {
-        $count = Order::where('print_shop_id', $this->print_shop_id)->where('service_key', $this->service_key)
+        $count = Order::where('print_shop_id', $this->print_shop_id)
+            ->where(function ($query): void {
+                $query->where('service_key', $this->service_key)
+                    ->orWhereHas('items', fn ($itemQuery) => $itemQuery->where('service_key', $this->service_key));
+            })
             ->whereIn('order_status', [Order::STATUS_IN_QUEUE, Order::STATUS_IN_PRODUCTION, Order::STATUS_QUALITY_CHECK])
-            ->where('payment_status', '!=', Order::PAYMENT_REJECTED)->count();
+            ->where('payment_status', '!=', Order::PAYMENT_REJECTED)
+            ->count();
         $capacity = max(1, (int) $this->getAttribute('capacity'));
 
         return $count >= $capacity ? 'At capacity' : ($count >= $capacity / 2 ? 'Busy' : 'Normal');

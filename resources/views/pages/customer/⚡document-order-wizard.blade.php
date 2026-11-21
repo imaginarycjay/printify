@@ -3,9 +3,12 @@
 use App\Models\DocumentPrintingConfig;
 use App\Models\Order;
 use App\Models\OrderItem;
+use App\Models\Payment;
+use App\Models\PlatformSetting;
 use App\Models\PrintShop;
 use Flux\Flux;
 use Illuminate\Support\Carbon;
+use Illuminate\Validation\ValidationException;
 use Livewire\Attributes\Title;
 use Livewire\Component;
 use Livewire\WithFileUploads;
@@ -291,6 +294,8 @@ new #[Title('Order Document Printing')] class extends Component {
 
     public function proceedToCheckout(): void
     {
+        $maxUploadKb = PlatformSetting::current()->max_upload_mb * 1024;
+
         $this->validate([
             'total_pages' => 'required|integer|min:1|max:5000',
             'copies_count' => 'required|integer|min:1|max:500',
@@ -298,6 +303,7 @@ new #[Title('Order Document Printing')] class extends Component {
             'paper_stock' => 'required|in:70gsm,80gsm,100gsm',
             'print_sides' => 'required|in:simplex,duplex',
             'finishing_type' => 'required|in:loose,staple,folder,ring_bind,booklet',
+            'document_file' => 'nullable|file|mimes:pdf,doc,docx|max:'.$maxUploadKb,
         ]);
 
         $this->step = 2;
@@ -318,6 +324,20 @@ new #[Title('Order Document Printing')] class extends Component {
             return;
         }
 
+        $normalizedRef = strtoupper(trim($this->payment_reference_no));
+        if ($this->payment_method !== 'cash_counter' && $normalizedRef !== '') {
+            $duplicateRef = Payment::query()
+                ->where('print_shop_id', $shop->id)
+                ->where('reference_no', $normalizedRef)
+                ->exists();
+
+            if ($duplicateRef) {
+                throw ValidationException::withMessages([
+                    'payment_reference_no' => 'This payment reference number has already been submitted for this print shop.',
+                ]);
+            }
+        }
+
         $user = auth()->user();
         $pricing = $this->calculatePricing();
 
@@ -334,19 +354,26 @@ new #[Title('Order Document Printing')] class extends Component {
 
         // Generate Order
         $orderNumber = 'DOC-' . date('Y') . '-' . strtoupper(substr(uniqid(), -6));
+        $isCounter = $this->payment_method === 'cash_counter';
         $order = Order::create([
             'order_number' => $orderNumber,
+            'tracking_code' => Order::generateTrackingCode(),
             'print_shop_id' => $shop->id,
             'customer_id' => $user?->id ?? 1,
             'service_key' => 'document_printing',
             'order_status' => Order::STATUS_IN_QUEUE,
-            'payment_status' => $this->payment_method === 'cash_counter' ? Order::PAYMENT_UNPAID : Order::PAYMENT_PENDING_VERIFICATION,
+            'payment_status' => $isCounter ? Order::PAYMENT_UNPAID : Order::PAYMENT_PENDING_VERIFICATION,
+            'payment_option' => $isCounter ? Order::PAYMENT_OPTION_COUNTER_OFFLINE : Order::PAYMENT_OPTION_FULL_100,
             'subtotal_amount' => $pricing['copies_subtotal'],
             'rush_fee_amount' => $pricing['rush_fee'],
             'total_amount' => $pricing['final_total'],
+            'amount_paid' => 0.0,
+            'balance_due' => $pricing['final_total'],
+            'refund_due' => 0.0,
+            'refund_status' => Order::REFUND_NONE,
             'is_rush' => $this->is_rush,
             'production_stage' => Order::STAGE_QUEUE,
-            'payment_reference_no' => $this->payment_reference_no,
+            'payment_reference_no' => $normalizedRef !== '' ? $normalizedRef : $this->payment_reference_no,
             'payment_proof_path' => $paymentProofPath,
             'target_completion_date' => $this->is_rush ? Carbon::now()->addHours(3) : Carbon::now()->addHours(24),
             'staff_notes' => $this->special_instructions,
@@ -355,6 +382,7 @@ new #[Title('Order Document Printing')] class extends Component {
         // Create OrderItem
         OrderItem::create([
             'order_id' => $order->id,
+            'service_key' => 'document_printing',
             'binding_type' => $this->finishing_type === 'ring_bind' ? 'ring_bind' : 'none',
             'fulfillment_type' => OrderItem::FULFILLMENT_FULL_PACKAGE,
             'is_paper_received' => true,
@@ -381,6 +409,21 @@ new #[Title('Order Document Printing')] class extends Component {
                 'total_physical_sheets' => $pricing['total_physical_sheets'],
             ],
         ]);
+
+        if (! $isCounter && $normalizedRef !== '') {
+            Payment::create([
+                'order_id' => $order->id,
+                'print_shop_id' => $shop->id,
+                'submitted_by' => $user?->id,
+                'payment_type' => Payment::TYPE_FULL_100,
+                'payment_method' => $this->payment_method,
+                'amount' => $pricing['final_total'],
+                'reference_no' => $normalizedRef,
+                'proof_path' => $paymentProofPath,
+                'status' => Payment::STATUS_PENDING,
+                'submitted_at' => now(),
+            ]);
+        }
 
         $this->created_order = $order;
         $this->step = 3;
@@ -417,7 +460,7 @@ new #[Title('Order Document Printing')] class extends Component {
                         Instant Quotation
                     </span>
                 </div>
-                <p class="text-[11px] text-stone-400">{{ $shop ? $shop->name : 'Printify' }} &bull; High-Speed Document Xerox, Duplex & Ring Binding</p>
+                <p class="text-[11px] text-stone-400">{{ $shop ? $shop->name : 'PressQueue' }} &bull; High-Speed Document Xerox, Duplex & Ring Binding</p>
             </div>
         </div>
 

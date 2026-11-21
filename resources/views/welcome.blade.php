@@ -11,9 +11,9 @@
             }
         </script>
         @include('partials.head', ['title' => 'Printing services for your next project'])
-        <meta name="description" content="Find a print shop, order document printing or thesis binding, and follow your pages from payment to pickup. Printify connects customers, shop owners, and production teams.">
+        <meta name="description" content="Find a print shop, order document printing or thesis binding, and follow your pages from payment to pickup. PressQueue connects customers, shop owners, and production teams.">
     </head>
-    <body class="printify-landing font-sans antialiased selection:bg-amber-500 selection:text-stone-950">
+    <body class="pressqueue-landing font-sans antialiased selection:bg-amber-500 selection:text-stone-950">
         <a href="#main-content" class="landing-skip">Skip to content</a>
         <x-platform-header>
             <a href="#pricing" class="inline-flex min-h-11 items-center rounded-xl px-3 text-sm font-semibold focus-visible:outline-2 focus-visible:outline-offset-4">Shop plans</a>
@@ -271,7 +271,7 @@
                 <div class="landing-container" data-landing-reveal>
                     <div class="landing-section-heading">
                         <h2 id="pricing-title" data-landing-heading><span class="landing-heading-word">Your</span> <span class="landing-heading-word">shop's</span> <span class="landing-heading-word">next</span> <span class="landing-heading-word">step.</span><br><span class="landing-heading-word">Free</span> <span class="landing-heading-word">for</span> <span class="landing-heading-word">the</span> <span class="landing-heading-word">capstone.</span></h2>
-                        <p>Explore Printify with your shop. All three access options are ₱0 during this capstone preview. Printing and binding orders are charged separately by each shop.</p>
+                        <p>Explore PressQueue with your shop. All three access options are ₱0 during this capstone preview. Printing and binding orders are charged separately by each shop.</p>
                     </div>
                     <div class="landing-plan-grid">
                         @foreach ([['name' => 'Monthly', 'original' => '₱499', 'period' => '/ month', 'description' => 'A proposed subscription for shops that prefer a monthly option.'], ['name' => 'Annual', 'original' => '₱3,999', 'period' => '/ year', 'description' => 'A proposed yearly option for shops planning a full year ahead.'], ['name' => 'One-time', 'original' => '₱4,999', 'period' => 'one-time payment', 'description' => 'A proposed single-payment option for access to the current system.']] as $plan)
@@ -314,7 +314,7 @@
         </main>
         <footer class="landing-footer">
             <div class="landing-container">
-                <p>&copy; {{ date('Y') }} {{ config('app.name', 'Printify') }}. Built for the next print.</p>
+                <p>&copy; {{ date('Y') }} {{ config('app.name', 'PressQueue') }}. Built for the next print.</p>
                 <nav aria-label="Footer navigation">
                     <a href="{{ route('shops.index') }}">Find a shop</a>
                     <a href="#pricing">Shop plans</a>

@@ -5,6 +5,8 @@ namespace App\Http\Middleware;
 use App\Models\User;
 use Closure;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Laravel\Fortify\Fortify;
 use Symfony\Component\HttpFoundation\Response;
 
 class EnsureUserHasRole
@@ -20,6 +22,22 @@ class EnsureUserHasRole
 
         if (! $user) {
             return redirect()->guest(route('login'));
+        }
+
+        $suspendedShop = $user->suspendedShop();
+        if ($suspendedShop !== null) {
+            $reason = $suspendedShop->rejection_reason;
+            Auth::guard('web')->logout();
+            $request->session()->invalidate();
+            $request->session()->regenerateToken();
+
+            $message = $reason
+                ? "Your print shop account is currently suspended: {$reason}"
+                : 'Your print shop account is currently suspended. Contact the platform administrator.';
+
+            return redirect()->route('login')->withErrors([
+                Fortify::username() => $message,
+            ]);
         }
 
         // Flatten any comma-separated roles passed (e.g. 'role:production_staff,business_owner')

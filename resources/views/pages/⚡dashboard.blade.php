@@ -16,6 +16,22 @@ new #[Title('Dashboard')] class extends Component {
             return redirect()->route('login');
         }
 
+        $suspendedShop = $user->suspendedShop();
+        if ($suspendedShop !== null) {
+            $reason = $suspendedShop->rejection_reason;
+            auth()->guard('web')->logout();
+            request()->session()->invalidate();
+            request()->session()->regenerateToken();
+
+            $message = $reason
+                ? "Your print shop account is currently suspended: {$reason}"
+                : 'Your print shop account is currently suspended. Contact the platform administrator.';
+
+            return redirect()->route('login')->withErrors([
+                \Laravel\Fortify\Fortify::username() => $message,
+            ]);
+        }
+
         if ($user->role === \App\Models\User::ROLE_ADMIN) { return redirect()->route('admin.shops'); }
 
         if ($user->isOwner()) {
