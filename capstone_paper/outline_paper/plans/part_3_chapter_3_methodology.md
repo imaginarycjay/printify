@@ -157,25 +157,29 @@ PressQueue follows the **5-Phase Modified Waterfall Model** (`PressQueue_Modifie
 
 ---
 
-## 8. Curated Light-Mode User Interface Screenshots (`13` Figures — Post-UI Overhaul `CR-4`)
+## 8. Curated Light-Mode User Interface Screenshots (`14` Figures — Post-UI Overhaul `CR-4`)
 
-All UI figures are captured in **native Editorial Light Mode** (`Instrument Sans`, warm stone surfaces, WCAG AA high-contrast semantic badges, zero ambient radial glow blobs, zero UI emojis, consistent universal contextual back navigation) in **4 reviewed batches** after `CR-1` and `CR-2` complete:
+All UI figures are captured in **native Pressroom Slate & Cobalt Light Mode** (`Instrument Sans`, crisp `#f1f5f9` slate canvas, white surfaces, `#2563eb` cobalt primary CTAs, geometric `PressQueue` logo mark, WCAG-AA high-contrast semantic badges, zero gradients or ambient radial glow blobs, zero UI emojis, consistent universal contextual back navigation) in **4 reviewed batches** after `CR-1` and `CR-2` complete:
 
-1. `01_auth_login.png` — Unified Sign-In and Role Entry (`FR-01`, `FR-02`)
-2. `02_super_admin_governance.png` — Super Admin Tenant Governance and Global File Retention Console (`FR-03`, `FR-17`)
-3. `03_marketplace_directory.png` — Customer Marketplace Shop Directory with Live Workload Badges and Paused Service Notice (`FR-07`)
-4. `04_customer_multi_item_checkout.png` — Customer Multi-Item Cart, Dynamic Quotation, and 50%/100% Payment Selection (`FR-08`, `FR-09`)
-5. `05_customer_order_tracking.png` — Customer Split Item-Level Order Tracker, Shelf Tag, and Proof Retry/Receipt Access (`FR-09`, `FR-12`, `FR-13`)
-6. `06_owner_app_launcher.png` — Printing Shop Owner App Launcher (`FR-05`)
-7. `07_owner_more_services_modal.png` — Printing Shop Owner More Services App Store Modal (`FR-05`)
-8. `08_owner_operations_and_fleet.png` — Shop Operations, Multi-Printer Fleet Failover, and Service Availability Controls (`FR-04`)
-9. `09_owner_inventory_bom.png` — Raw Material Inventory Hub, BOM Recipes, and Low-Stock ROP Alert (`FR-06`, `FR-15`)
-10. `10_owner_payment_audit_refunds.png` — Owner Payment Proof Audit (Aging Flags), Counter Settlement, and Manual Refund Ledger (`FR-10`, `FR-12`)
-11. `11_owner_standardized_reports.png` — Standardized Operational Report Center with Print View, PDF, and CSV Controls (`FR-16`)
-12. `12_staff_production_queue.png` — Production Staff Multi-Printer Queue, Prepress Lock, and Cover-Only Intake (`FR-11`, `FR-13`, `FR-14`)
-13. `13_staff_direct_browser_print.png` — Direct Browser Print Dispatch Preview Modal (`FR-14`)
+1. `01_landing_page.png` — Public Platform Landing Page and Illustrative Order Ticket Preview (`FR-01`, `FR-07`)
+2. `02_auth_login.png` — Unified Sign-In and Role Entry (`FR-01`, `FR-02`)
+3. `03_super_admin_governance.png` — Super Admin Tenant Governance and Global File Retention Console (`FR-03`, `FR-17`)
+4. `04_marketplace_directory.png` — Customer Marketplace Shop Directory with Live Workload Badges and Paused Service Notice (`FR-07`)
+5. `05_customer_multi_item_checkout.png` — Customer Multi-Item Cart, Dynamic Quotation, and 50%/100% Payment Selection (`FR-08`, `FR-09`)
+6. `06_customer_order_tracking.png` — Customer Split Item-Level Order Tracker, Shelf Tag, and Proof Retry/Receipt Access (`FR-09`, `FR-12`, `FR-13`)
+7. `07_owner_app_launcher.png` — Printing Shop Owner App Launcher (`FR-05`)
+8. `08_owner_more_services_modal.png` — Printing Shop Owner More Services App Store Modal (`FR-05`)
+9. `09_owner_operations_and_fleet.png` — Shop Operations, Multi-Printer Fleet Failover, and Service Availability Controls (`FR-04`)
+10. `10_owner_inventory_bom.png` — Raw Material Inventory Hub, BOM Recipes, and Low-Stock ROP Alert (`FR-06`, `FR-15`)
+11. `11_owner_payment_audit_refunds.png` — Owner Payment Proof Audit (Aging Flags), Counter Settlement, and Manual Refund Ledger (`FR-10`, `FR-12`)
+12. `12_owner_standardized_reports.png` — Standardized Operational Report Center with Print View, PDF, and CSV Controls (`FR-16`)
+13. `13_staff_production_queue.png` — Production Staff Multi-Printer Queue, Prepress Lock, and Cover-Only Intake (`FR-11`, `FR-13`, `FR-14`)
+14. `14_staff_direct_browser_print.png` — Direct Browser Print Dispatch Preview Modal (`FR-14`)
 
-### Ready-to-Insert Introductory Paragraph for `07_owner_more_services_modal.png`
+### Ready-to-Insert Introductory Paragraph for `01_landing_page.png`
+> The **PressQueue Landing Page** serves as the public entry point of the platform, introducing customers and independent printing shop owners to the multi-tenant workflow before requiring account registration. Alongside direct navigation to the live marketplace directory and shop onboarding plans, the hero section presents an illustrative order ticket detailing itemized specifications, verified payment status, and stage-by-stage production tracking. Visitors can inspect available services—including document printing and thesis binding—and proceed directly into shop discovery or role-based sign-in.
+
+### Ready-to-Insert Introductory Paragraph for `08_owner_more_services_modal.png`
 > To accommodate the varied equipment capabilities of independent local print shops without cluttering each tenant's workspace, PressQueue includes a **More Services App Store** modal accessible directly from the Printing Shop Owner App Launcher. Through this interface, shop owners can selectively install or remove optional printing modules—such as Thesis Binding, Document Printing, and additional commercial services—while retaining essential core operational hubs (Analytics, Inventory, and Production Queue) as pre-installed defaults. Activating or removing a module dynamically updates both the owner's configuration tools and the shop's public service catalog on the customer marketplace.
 
 ---

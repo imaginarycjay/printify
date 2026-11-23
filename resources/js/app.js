@@ -105,3 +105,68 @@ document.addEventListener('livewire:navigating', () => {
     cleanupLandingMotion();
 });
 document.addEventListener('livewire:navigated', initializeLandingMotion);
+
+/**
+ * Render protected inline PDF preview streams inside the Staff Direct Browser Print modal.
+ */
+window.renderPressQueuePdfPreview = async function (url, containerEl, statusEl) {
+    if (!url || !containerEl) {
+        return;
+    }
+
+    containerEl.dataset.pdfRendered = 'false';
+    containerEl.innerHTML = '';
+
+    try {
+        const [{ default: workerUrl }, pdfjsImport] = await Promise.all([
+            import('pdfjs-dist/build/pdf.worker.min.js?url'),
+            import('pdfjs-dist'),
+        ]);
+        const pdfjsLib = pdfjsImport.getDocument ? pdfjsImport : (pdfjsImport.default ?? window.pdfjsLib);
+        pdfjsLib.GlobalWorkerOptions.workerSrc = workerUrl;
+
+        const response = await fetch(url, { credentials: 'same-origin' });
+        if (!response.ok) {
+            throw new Error(`Preview stream returned HTTP ${response.status}`);
+        }
+
+        const buffer = await response.arrayBuffer();
+        const pdf = await pdfjsLib.getDocument({ data: new Uint8Array(buffer) }).promise;
+        const pageLimit = Math.min(pdf.numPages, 10);
+        const dpr = Math.min(window.devicePixelRatio || 1, 2);
+
+        for (let pageNumber = 1; pageNumber <= pageLimit; pageNumber += 1) {
+            const pdfPage = await pdf.getPage(pageNumber);
+            const viewport = pdfPage.getViewport({ scale: 1.25 });
+
+            const canvas = document.createElement('canvas');
+            canvas.width = Math.floor(viewport.width * dpr);
+            canvas.height = Math.floor(viewport.height * dpr);
+            canvas.style.width = `${Math.floor(viewport.width)}px`;
+            canvas.style.height = `${Math.floor(viewport.height)}px`;
+            canvas.className = 'bg-white shadow-md rounded border border-slate-300 max-w-full h-auto';
+
+            const ctx = canvas.getContext('2d');
+            if (ctx) {
+                ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+                await pdfPage.render({ canvasContext: ctx, viewport }).promise;
+            }
+            containerEl.appendChild(canvas);
+        }
+
+        if (statusEl) {
+            const pageLabel = pdf.numPages === 1 ? 'page' : 'pages';
+            statusEl.textContent = `${pdf.numPages} ${pageLabel} ready · Inline stream locked`;
+        }
+        containerEl.dataset.pdfRendered = 'true';
+    } catch (err) {
+        if (statusEl) {
+            statusEl.textContent = 'Preview stream unavailable';
+        }
+        const notice = document.createElement('p');
+        notice.className = 'text-xs font-semibold text-rose-700 bg-rose-50 border border-rose-200 rounded-xl px-4 py-3';
+        notice.textContent = `Unable to render inline preview (${err instanceof Error ? err.message : 'stream error'}). Use Print Now to dispatch directly.`;
+        containerEl.appendChild(notice);
+        containerEl.dataset.pdfRendered = 'error';
+    }
+};

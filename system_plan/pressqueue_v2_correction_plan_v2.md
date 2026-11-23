@@ -1,6 +1,6 @@
 # PressQueue v2 — System Correction Plan v2 (UI Overhaul, Universal Navigation, Pure Academic Diagrams & Curated Screenshots)
 
-> **Status:** `CR-1`, `CR-2`, and `CR-3` (`3A`–`3G`) Complete — Ready for `CR-4` (Batched Curated Screenshot Capture)
+> **Status:** `CR-1`, `CR-2`, `CR-3` (`3A`–`3G`), and `CR-4` (`14` Curated Light-Mode Screenshots, Pressroom Slate & Cobalt) Complete
 > **Baseline Build:** `WP-0` through `WP-5` implemented and verified (`./vendor/bin/sail composer test`: `143` Pest tests passed, `0` PHPStan Level 7 errors, Pint clean).
 > **SDLC Alignment:** Strictly follows the **5-Phase Modified Waterfall Model** documented in Chapter 3 of `capstone_paper/outline_paper/papers/outline_capstone_v2.docx` (*Phase 4 Testing and Refinement* feedback loop into *Phase 2 Design* and *Phase 3 Implementation*, followed by *Phase 5 Deployment Planning and Readiness*). **Never use Agile/Sprint terminology.**
 > **Locked Constraints:** Do NOT break existing business logic, routes, pricing math, database schema, tenant isolation (`.ai/rules/pages.md`), or the **17 locked FR titles (`FR-01`–`FR-17`)**.
@@ -14,7 +14,7 @@ Post-`WP-5` review uncovered four visual, navigation, and academic-presentation 
 1. **Dark-Mode-First Legacy UI & Light-Mode "AI Slop":** While `welcome.blade.php`, `⚡shops.blade.php`, `⚡shop.blade.php`, and `⚡admin-shops.blade.php` already follow a clean editorial Light-Mode aesthetic (`Instrument Sans`, warm stone canvas `#f5f5f4`, white surfaces, disciplined amber accent), operational pages contain **564 hardcoded dark-mode/decorative classes** (`bg-stone-950/900`, `text-rose-300/sky-300/indigo-300/emerald-300`, `blur-3xl` ambient radial glow blobs, emoji filters, promo micro-pills) patched over by a global `html:not(.dark)` CSS inversion hack in `resources/css/app.css` (`L88–L213`).
 2. **Missing Universal Back Navigation:** Business Owner sub-apps (`Analytics`, `Inventory`, `Operations`, `Document Printing`, `Thesis Binding`, `Reports`), Customer sub-flows (`Shop Profile`, `Unified Cart`, `Order Wizards`, `Receipts`), Production Staff sub-views/settings, and Fortify Account Settings lack a consistent, deterministic universal back button—leaving users with inconsistent or missing escape paths.
 3. **Slide-Deck Clutter on Generated Diagrams:** Unlike the panel-approved reference manuscript (`capstone_paper/outline_paper/scratch/outline_example_1.pdf`), the WP-5 `UC-1`–`UC-4`, `ERD`, `Class`, `AD-01`–`AD-17`, and `Gantt` PNGs include presentation headers (`PHASE 2 SYSTEM DESIGN • ...`), subtitles, pill badges, bottom meta-commentary boxes (`Adviser ERD Normalization Audit`, `1-to-1 parity with Table 6`), AI-internal milestones (`WP-1`–`WP-5`, `PressQueueDemoSeeder`, `PHPStan + 143 Tests`), and minor label collisions (e.g., `[Customer]` on `AD-01`). `PressQueue_Deployment_Diagram_v4.png` also carries a bottom-left `Scope Note / Fallback Summary` box that should be cleaned into a new `v5` version.
-4. **Rushed Single-Prompt Screenshot Capture (`17` Screenshots):** All `17` screenshots were captured in one shot before auditing Light Mode and right-sizing coverage. Screenshots must be re-captured **only after the UI overhaul**, right-sized to **13 curated, non-redundant screens** (explicitly including the **Owner More Services App Store Modal**), and visually reviewed in small batches (`3–4` screens per pass).
+4. **Rushed Single-Prompt Screenshot Capture (`17` Screenshots):** All `17` screenshots were captured in one shot before auditing Light Mode and right-sizing coverage. Screenshots must be re-captured **only after the UI overhaul**, right-sized to **14 curated, non-redundant screens** (including the **Public Platform Landing Page** and **Owner More Services App Store Modal**), and visually reviewed in small batches (`3–4` screens per pass).
 
 ---
 
@@ -25,7 +25,7 @@ flowchart LR
     CR1["CR-1: Design System, Universal Back Nav & CSS Cleanup<br/>(PRODUCT.md, DESIGN.md, Navigation helper, shared topbar)"]
     CR2["CR-2: Role-by-Role UI Overhaul<br/>(Wave 2A Owner -> Wave 2B Staff -> Wave 2C Customer -> Wave 2D Chrome/Settings)"]
     CR3["CR-3: Pure Academic Diagram Regeneration<br/>(Deployment v5, UC-1..4, ERD, Class, AD-01..17, Gantt Jul-Dec 2026)"]
-    CR4["CR-4: Batched Curated Screenshot Capture (13 Screens)<br/>(4 reviewed batches + full Sail CI verification gate)"]
+    CR4["CR-4: Batched Curated Screenshot Capture (14 Screens)<br/>(4 reviewed batches + full Sail CI verification gate)"]
     CR1 --> CR2 --> CR3 --> CR4
 ```
 
@@ -168,27 +168,31 @@ To ensure thorough visual review and prevent single-pass context bloat, `CR-3` r
 
 ---
 
-## 5. `CR-4` — Batched, Visually-Reviewed Curated Screenshot Capture (`13` Screens)
+## 5. `CR-4` — Batched, Visually-Reviewed Curated Screenshot Capture (`14` Screens)
 
-After `CR-1` and `CR-2` pass build + tests + visual inspection, clear the stale `17` PNGs in `capstone_paper/outline_paper/diagrams/ui/` and capture **exactly 13 curated Light-Mode screenshots** (`1440×900`, `2x` DPR) in **4 reviewed batches** (visually inspecting every PNG after each batch before moving on):
+After `CR-1`, `CR-2`, and the **Pressroom Slate & Cobalt** rebrand (`DESIGN.md` — `#f1f5f9` slate canvas, `#ffffff` surfaces, `#0f172a` ink, `#2563eb` cobalt primary CTAs, and the geometric two-tone `PressQueue` logo mark) pass build + tests + visual inspection, clear the stale PNGs in `capstone_paper/outline_paper/diagrams/ui/` and capture **exactly 14 curated Light-Mode screenshots** (`1440×900`, `2x` DPR) in **4 reviewed batches** (visually inspecting every PNG after each batch before moving on):
 
 | Batch | File Name (`capstone_paper/outline_paper/diagrams/ui/`) | Role / View | FR Coverage |
 | :---: | :--- | :--- | :--- |
-| **Batch 1** | `01_auth_login.png` | Unified Sign-In & Role Entry (`login`) | `FR-01`, `FR-02` |
-| **Batch 1** | `02_super_admin_governance.png` | Super Admin Tenant Governance & File Retention (`admin/shops`) | `FR-03`, `FR-17` |
-| **Batch 1** | `03_marketplace_directory.png` | Customer Marketplace Directory with Live Workload Badges & Paused Service (`shops`) | `FR-07` |
-| **Batch 2** | `04_customer_multi_item_checkout.png` | Multi-Item Cart, Dynamic Quotation & 50%/100% Payment Selection (`customer/shops/{shop}/checkout`) | `FR-08`, `FR-09` |
-| **Batch 2** | `05_customer_order_tracking.png` | Customer Split Order Tracker, Shelf Tag & Proof Retry/Receipt (`customer/dashboard`) | `FR-09`, `FR-12`, `FR-13` |
-| **Batch 2** | `06_owner_app_launcher.png` | Printing Shop Owner App Launcher (`owner/dashboard`) | `FR-05` |
-| **Batch 2** | `07_owner_more_services_modal.png` | Printing Shop Owner More Services App Store Modal (`owner/dashboard` — modal open) | `FR-05` |
-| **Batch 3** | `08_owner_operations_and_fleet.png` | Shop Operations, Multi-Printer Fleet Failover & Service Availability (`owner/platform`) | `FR-04` |
-| **Batch 3** | `09_owner_inventory_bom.png` | Raw Material Inventory Hub, BOM & Low-Stock ROP Alert (`owner/inventory`) | `FR-06`, `FR-15` |
-| **Batch 3** | `10_owner_payment_audit_refunds.png` | Payment Proof Audit (Aging Flags), Counter Settlement & Manual Refund Ledger (`owner/analytics?tab=payments`) | `FR-10`, `FR-12` |
-| **Batch 4** | `11_owner_standardized_reports.png` | Standardized Report Center with Print View / PDF / CSV Controls (`owner/analytics?tab=reports`) | `FR-16` |
-| **Batch 4** | `12_staff_production_queue.png` | Production Staff Multi-Printer Queue, Prepress Lock & Cover-Only Intake (`staff/dashboard`) | `FR-11`, `FR-13`, `FR-14` |
-| **Batch 4** | `13_staff_direct_browser_print.png` | Direct Browser Print Dispatch Preview Modal (`staff/dashboard` — print preview overlay) | `FR-14` |
+| **Batch 1** | `01_landing_page.png` | Public Platform Landing Page & Illustrative Order Ticket Preview (`/`) | `FR-01`, `FR-07` |
+| **Batch 1** | `02_auth_login.png` | Unified Sign-In & Role Entry (`login`) | `FR-01`, `FR-02` |
+| **Batch 1** | `03_super_admin_governance.png` | Super Admin Tenant Governance & File Retention (`admin/shops`) | `FR-03`, `FR-17` |
+| **Batch 1** | `04_marketplace_directory.png` | Customer Marketplace Directory with Live Workload Badges & Paused Service (`shops`) | `FR-07` |
+| **Batch 2** | `05_customer_multi_item_checkout.png` | Multi-Item Cart, Dynamic Quotation & 50%/100% Payment Selection (`customer/shops/{shop}/checkout`) | `FR-08`, `FR-09` |
+| **Batch 2** | `06_customer_order_tracking.png` | Customer Split Order Tracker, Shelf Tag & Proof Retry/Receipt (`customer/dashboard`) | `FR-09`, `FR-12`, `FR-13` |
+| **Batch 2** | `07_owner_app_launcher.png` | Printing Shop Owner App Launcher (`owner/dashboard`) | `FR-05` |
+| **Batch 2** | `08_owner_more_services_modal.png` | Printing Shop Owner More Services App Store Modal (`owner/dashboard` — modal open) | `FR-05` |
+| **Batch 3** | `09_owner_operations_and_fleet.png` | Shop Operations, Multi-Printer Fleet Failover & Service Availability (`owner/platform`) | `FR-04` |
+| **Batch 3** | `10_owner_inventory_bom.png` | Raw Material Inventory Hub, BOM & Low-Stock ROP Alert (`owner/inventory`) | `FR-06`, `FR-15` |
+| **Batch 3** | `11_owner_payment_audit_refunds.png` | Payment Proof Audit (Aging Flags), Counter Settlement & Manual Refund Ledger (`owner/analytics?tab=payments`) | `FR-10`, `FR-12` |
+| **Batch 4** | `12_owner_standardized_reports.png` | Standardized Report Center with Print View / PDF / CSV Controls (`owner/analytics?tab=reports`) | `FR-16` |
+| **Batch 4** | `13_staff_production_queue.png` | Production Staff Multi-Printer Queue, Prepress Lock & Cover-Only Intake (`staff/dashboard`) | `FR-11`, `FR-13`, `FR-14` |
+| **Batch 4** | `14_staff_direct_browser_print.png` | Direct Browser Print Dispatch Preview Modal (`staff/dashboard` — print preview overlay) | `FR-14` |
 
-### Concise Academic Introductory Paragraph for `07_owner_more_services_modal.png` (For Chapter 3 *User Interface Design*)
+### Concise Academic Introductory Paragraph for `01_landing_page.png` (For Chapter 3 *User Interface Design*)
+> The **PressQueue Landing Page** serves as the public entry point of the platform, introducing customers and independent printing shop owners to the multi-tenant workflow before requiring account registration. Alongside direct navigation to the live marketplace directory and shop onboarding plans, the hero section presents an illustrative order ticket detailing itemized specifications, verified payment status, and stage-by-stage production tracking. Visitors can inspect available services—including document printing and thesis binding—and proceed directly into shop discovery or role-based sign-in.
+
+### Concise Academic Introductory Paragraph for `08_owner_more_services_modal.png` (For Chapter 3 *User Interface Design*)
 > To accommodate the varied equipment capabilities of independent local print shops without cluttering each tenant's workspace, PressQueue includes a **More Services App Store** modal accessible directly from the Printing Shop Owner App Launcher. Through this interface, shop owners can selectively install or remove optional printing modules—such as Thesis Binding, Document Printing, and additional commercial services—while retaining essential core operational hubs (Analytics, Inventory, and Production Queue) as pre-installed defaults. Activating or removing a module dynamically updates both the owner's configuration tools and the shop's public service catalog on the customer marketplace.
 
 ---

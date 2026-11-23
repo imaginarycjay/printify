@@ -1,8 +1,8 @@
 /**
  * Batched Curated Light-Mode Screenshot Capture & DOM Audit (CR-4).
  * Usage:
- *   ./vendor/bin/sail exec laravel.test node capstone_paper/outline_paper/scratch/capture_ui_cr4.mjs --batch 1
- *   ./vendor/bin/sail exec laravel.test node capstone_paper/outline_paper/scratch/capture_ui_cr4.mjs --only 02
+ *   ./vendor/bin/sail exec -u sail laravel.test node capstone_paper/outline_paper/scratch/capture_ui_cr4.mjs --batch 1
+ *   ./vendor/bin/sail exec -u sail laravel.test node capstone_paper/outline_paper/scratch/capture_ui_cr4.mjs --only 03
  */
 
 import fs from 'node:fs';
@@ -46,6 +46,7 @@ async function createLightContext(browser) {
     viewport: { width: 1440, height: 900 },
     deviceScaleFactor: 2,
     colorScheme: 'light',
+    reducedMotion: 'reduce',
   });
 
   await context.addInitScript(() => {
@@ -121,6 +122,7 @@ async function captureScreen(page, telemetry, filename, opts = {}) {
     expectBackLink = false,
     expectedBackText = null,
     fullPage = false,
+    scrollY = 0,
   } = opts;
 
   await page.evaluate(async () => {
@@ -129,6 +131,12 @@ async function captureScreen(page, telemetry, filename, opts = {}) {
       await document.fonts.ready;
     }
   });
+
+  if (scrollY > 0) {
+    await page.evaluate((y) => window.scrollTo(0, y), scrollY);
+    await page.waitForTimeout(200);
+  }
+
   await page.waitForTimeout(450);
 
   const audit = await page.evaluate(() => {
@@ -213,16 +221,16 @@ async function captureScreen(page, telemetry, filename, opts = {}) {
 }
 
 const TASKS = [
-  // Batch 1 (01-03)
+  // Batch 1 (01-04)
   {
     id: '01',
     batch: '1',
-    filename: '01_auth_login.png',
+    filename: '01_landing_page.png',
     run: async (browser) => {
       const { context, page, telemetry } = await createLightContext(browser);
       try {
-        await page.goto(`${BASE_URL}/login`, { waitUntil: 'networkidle' });
-        return await captureScreen(page, telemetry, '01_auth_login.png', {
+        await page.goto(`${BASE_URL}/`, { waitUntil: 'networkidle' });
+        return await captureScreen(page, telemetry, '01_landing_page.png', {
           expectBackLink: false,
         });
       } finally {
@@ -233,13 +241,12 @@ const TASKS = [
   {
     id: '02',
     batch: '1',
-    filename: '02_super_admin_governance.png',
+    filename: '02_auth_login.png',
     run: async (browser) => {
       const { context, page, telemetry } = await createLightContext(browser);
       try {
-        await loginAs(page, 'admin@pressqueue.test');
-        await page.goto(`${BASE_URL}/admin/shops`, { waitUntil: 'networkidle' });
-        return await captureScreen(page, telemetry, '02_super_admin_governance.png', {
+        await page.goto(`${BASE_URL}/login`, { waitUntil: 'networkidle' });
+        return await captureScreen(page, telemetry, '02_auth_login.png', {
           expectBackLink: false,
         });
       } finally {
@@ -250,13 +257,30 @@ const TASKS = [
   {
     id: '03',
     batch: '1',
-    filename: '03_marketplace_directory.png',
+    filename: '03_super_admin_governance.png',
+    run: async (browser) => {
+      const { context, page, telemetry } = await createLightContext(browser);
+      try {
+        await loginAs(page, 'admin@pressqueue.test');
+        await page.goto(`${BASE_URL}/admin/shops`, { waitUntil: 'networkidle' });
+        return await captureScreen(page, telemetry, '03_super_admin_governance.png', {
+          expectBackLink: false,
+        });
+      } finally {
+        await context.close();
+      }
+    },
+  },
+  {
+    id: '04',
+    batch: '1',
+    filename: '04_marketplace_directory.png',
     run: async (browser) => {
       const { context, page, telemetry } = await createLightContext(browser);
       try {
         await loginAs(page, 'customer@pressqueue.test');
         await page.goto(`${BASE_URL}/shops`, { waitUntil: 'networkidle' });
-        return await captureScreen(page, telemetry, '03_marketplace_directory.png', {
+        return await captureScreen(page, telemetry, '04_marketplace_directory.png', {
           expectBackLink: true,
           expectedBackText: 'My Orders',
         });
@@ -266,11 +290,11 @@ const TASKS = [
     },
   },
 
-  // Batch 2 (04-07)
+  // Batch 2 (05-08)
   {
-    id: '04',
+    id: '05',
     batch: '2',
-    filename: '04_customer_multi_item_checkout.png',
+    filename: '05_customer_multi_item_checkout.png',
     run: async (browser) => {
       const { context, page, telemetry } = await createLightContext(browser);
       try {
@@ -297,7 +321,7 @@ const TASKS = [
         await page.locator('select[wire\\:model\\.live="payment_option"]').selectOption('downpayment_50');
         await page.waitForTimeout(300);
 
-        return await captureScreen(page, telemetry, '04_customer_multi_item_checkout.png', {
+        return await captureScreen(page, telemetry, '05_customer_multi_item_checkout.png', {
           expectBackLink: true,
           expectedBackText: 'Kabacan Academic Press',
         });
@@ -307,32 +331,27 @@ const TASKS = [
     },
   },
   {
-    id: '05',
+    id: '06',
     batch: '2',
-    filename: '05_customer_order_tracking.png',
+    filename: '06_customer_order_tracking.png',
     run: async (browser) => {
       const { context, page, telemetry } = await createLightContext(browser);
       try {
         await loginAs(page, 'customer@pressqueue.test');
         await page.goto(`${BASE_URL}/customer/dashboard`, { waitUntil: 'networkidle' });
-        return await captureScreen(page, telemetry, '05_customer_order_tracking.png', {
-          expectBackLink: false,
+        await page.getByRole('button', { name: /My Orders/i }).click();
+        const splitOrderCard = page.locator('[wire\\:key^="customer-order-"]', { hasText: 'PQ-DEMO-1001' }).first();
+        await splitOrderCard.waitFor({ state: 'visible', timeout: 8000 });
+        await page.evaluate(() => {
+          const cards = [...document.querySelectorAll('[wire\\:key^="customer-order-"]')];
+          const target = cards.find((el) => el.innerText.includes('PQ-DEMO-1001'));
+          if (target) {
+            const top = target.getBoundingClientRect().top + window.scrollY - 88;
+            window.scrollTo(0, Math.max(0, top));
+          }
         });
-      } finally {
-        await context.close();
-      }
-    },
-  },
-  {
-    id: '06',
-    batch: '2',
-    filename: '06_owner_app_launcher.png',
-    run: async (browser) => {
-      const { context, page, telemetry } = await createLightContext(browser);
-      try {
-        await loginAs(page, 'owner@pressqueue.test');
-        await page.goto(`${BASE_URL}/owner/dashboard`, { waitUntil: 'networkidle' });
-        return await captureScreen(page, telemetry, '06_owner_app_launcher.png', {
+        await page.waitForTimeout(350);
+        return await captureScreen(page, telemetry, '06_customer_order_tracking.png', {
           expectBackLink: false,
         });
       } finally {
@@ -343,7 +362,24 @@ const TASKS = [
   {
     id: '07',
     batch: '2',
-    filename: '07_owner_more_services_modal.png',
+    filename: '07_owner_app_launcher.png',
+    run: async (browser) => {
+      const { context, page, telemetry } = await createLightContext(browser);
+      try {
+        await loginAs(page, 'owner@pressqueue.test');
+        await page.goto(`${BASE_URL}/owner/dashboard`, { waitUntil: 'networkidle' });
+        return await captureScreen(page, telemetry, '07_owner_app_launcher.png', {
+          expectBackLink: false,
+        });
+      } finally {
+        await context.close();
+      }
+    },
+  },
+  {
+    id: '08',
+    batch: '2',
+    filename: '08_owner_more_services_modal.png',
     run: async (browser) => {
       const { context, page, telemetry } = await createLightContext(browser);
       try {
@@ -351,7 +387,7 @@ const TASKS = [
         await page.goto(`${BASE_URL}/owner/dashboard`, { waitUntil: 'networkidle' });
         await page.locator('button[wire\\:click="openMoreServicesModal"]').click();
         await page.getByRole('heading', { name: 'More Services App Store' }).waitFor({ state: 'visible', timeout: 8000 });
-        return await captureScreen(page, telemetry, '07_owner_more_services_modal.png', {
+        return await captureScreen(page, telemetry, '08_owner_more_services_modal.png', {
           expectBackLink: false,
         });
       } finally {
@@ -360,35 +396,26 @@ const TASKS = [
     },
   },
 
-  // Batch 3 (08-10)
+  // Batch 3 (09-11)
   {
-    id: '08',
+    id: '09',
     batch: '3',
-    filename: '08_owner_operations_and_fleet.png',
+    filename: '09_owner_operations_and_fleet.png',
     run: async (browser) => {
       const { context, page, telemetry } = await createLightContext(browser);
       try {
         await loginAs(page, 'owner@pressqueue.test');
         await page.goto(`${BASE_URL}/owner/platform`, { waitUntil: 'networkidle' });
-        return await captureScreen(page, telemetry, '08_owner_operations_and_fleet.png', {
-          expectBackLink: true,
-          expectedBackText: 'App Launcher',
+        await page.locator('#printers').waitFor({ state: 'visible', timeout: 8000 });
+        await page.evaluate(() => {
+          const el = document.querySelector('#printers');
+          if (el) {
+            const top = el.getBoundingClientRect().top + window.scrollY - 20;
+            window.scrollTo(0, Math.max(0, top));
+          }
         });
-      } finally {
-        await context.close();
-      }
-    },
-  },
-  {
-    id: '09',
-    batch: '3',
-    filename: '09_owner_inventory_bom.png',
-    run: async (browser) => {
-      const { context, page, telemetry } = await createLightContext(browser);
-      try {
-        await loginAs(page, 'owner@pressqueue.test');
-        await page.goto(`${BASE_URL}/owner/inventory`, { waitUntil: 'networkidle' });
-        return await captureScreen(page, telemetry, '09_owner_inventory_bom.png', {
+        await page.waitForTimeout(300);
+        return await captureScreen(page, telemetry, '09_owner_operations_and_fleet.png', {
           expectBackLink: true,
           expectedBackText: 'App Launcher',
         });
@@ -400,13 +427,31 @@ const TASKS = [
   {
     id: '10',
     batch: '3',
-    filename: '10_owner_payment_audit_refunds.png',
+    filename: '10_owner_inventory_bom.png',
+    run: async (browser) => {
+      const { context, page, telemetry } = await createLightContext(browser);
+      try {
+        await loginAs(page, 'owner@pressqueue.test');
+        await page.goto(`${BASE_URL}/owner/inventory`, { waitUntil: 'networkidle' });
+        return await captureScreen(page, telemetry, '10_owner_inventory_bom.png', {
+          expectBackLink: true,
+          expectedBackText: 'App Launcher',
+        });
+      } finally {
+        await context.close();
+      }
+    },
+  },
+  {
+    id: '11',
+    batch: '3',
+    filename: '11_owner_payment_audit_refunds.png',
     run: async (browser) => {
       const { context, page, telemetry } = await createLightContext(browser);
       try {
         await loginAs(page, 'owner@pressqueue.test');
         await page.goto(`${BASE_URL}/owner/analytics?tab=payments`, { waitUntil: 'networkidle' });
-        return await captureScreen(page, telemetry, '10_owner_payment_audit_refunds.png', {
+        return await captureScreen(page, telemetry, '11_owner_payment_audit_refunds.png', {
           expectBackLink: true,
           expectedBackText: 'App Launcher',
         });
@@ -416,17 +461,17 @@ const TASKS = [
     },
   },
 
-  // Batch 4 (11-13)
+  // Batch 4 (12-14)
   {
-    id: '11',
+    id: '12',
     batch: '4',
-    filename: '11_owner_standardized_reports.png',
+    filename: '12_owner_standardized_reports.png',
     run: async (browser) => {
       const { context, page, telemetry } = await createLightContext(browser);
       try {
         await loginAs(page, 'owner@pressqueue.test');
         await page.goto(`${BASE_URL}/owner/analytics?tab=reports`, { waitUntil: 'networkidle' });
-        return await captureScreen(page, telemetry, '11_owner_standardized_reports.png', {
+        return await captureScreen(page, telemetry, '12_owner_standardized_reports.png', {
           expectBackLink: true,
           expectedBackText: 'App Launcher',
         });
@@ -436,15 +481,15 @@ const TASKS = [
     },
   },
   {
-    id: '12',
+    id: '13',
     batch: '4',
-    filename: '12_staff_production_queue.png',
+    filename: '13_staff_production_queue.png',
     run: async (browser) => {
       const { context, page, telemetry } = await createLightContext(browser);
       try {
         await loginAs(page, 'staff@pressqueue.test');
         await page.goto(`${BASE_URL}/staff/dashboard`, { waitUntil: 'networkidle' });
-        return await captureScreen(page, telemetry, '12_staff_production_queue.png', {
+        return await captureScreen(page, telemetry, '13_staff_production_queue.png', {
           expectBackLink: false,
         });
       } finally {
@@ -453,9 +498,9 @@ const TASKS = [
     },
   },
   {
-    id: '13',
+    id: '14',
     batch: '4',
-    filename: '13_staff_direct_browser_print.png',
+    filename: '14_staff_direct_browser_print.png',
     run: async (browser) => {
       const { context, page, telemetry } = await createLightContext(browser);
       try {
@@ -463,8 +508,9 @@ const TASKS = [
         await page.goto(`${BASE_URL}/staff/dashboard`, { waitUntil: 'networkidle' });
         await page.locator('button[wire\\:click^="openPrintPreview("]').first().click();
         await page.getByRole('heading', { name: /Direct Print Dispatch/i }).waitFor({ state: 'visible', timeout: 8000 });
-        await page.waitForTimeout(500);
-        return await captureScreen(page, telemetry, '13_staff_direct_browser_print.png', {
+        await page.locator('[data-test="pdf-preview-stage"][data-pdf-rendered="true"] canvas').first().waitFor({ state: 'visible', timeout: 10000 });
+        await page.waitForTimeout(300);
+        return await captureScreen(page, telemetry, '14_staff_direct_browser_print.png', {
           expectBackLink: false,
         });
       } finally {
@@ -491,7 +537,7 @@ async function main() {
       process.exit(1);
     }
   } else {
-    console.error('Specify --batch <1|2|3|4> or --only <01..13>');
+    console.error('Specify --batch <1|2|3|4> or --only <01..14>');
     process.exit(1);
   }
 

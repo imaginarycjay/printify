@@ -748,16 +748,43 @@ class PressQueueDemoSeeder extends Seeder
     private function minimalPdfBytes(string $title): string
     {
         $safeTitle = str_replace(['(', ')', '\\'], '', $title);
-        $stream = "BT /F1 18 Tf 72 720 Td ({$safeTitle}) Tj ET\n";
-        $stream .= 'BT /F1 12 Tf 72 690 Td (PressQueue Multi-Tenant Academic Printing & Bindery System) Tj ET';
+        $lines = [
+            '0.15 0.39 0.92 RG 2 w 56 736 m 556 736 l S',
+            '0.06 0.09 0.16 rg',
+            'BT /F2 9 Tf 56 746 Td (UNIVERSITY OF SOUTHERN MINDANAO  |  COLLEGE OF ENGINEERING & INFORMATION TECHNOLOGY) Tj ET',
+            "BT /F2 16 Tf 56 704 Td ({$safeTitle}) Tj ET",
+            'BT /F2 13 Tf 56 684 Td (Multi-Tenant Print Shop Operations, Job Scheduling & BOM Inventory System) Tj ET',
+            '0.35 0.41 0.50 rg',
+            'BT /F1 10 Tf 56 660 Td (Author: Alyssa Marie Cruz  |  Program: BS Information Systems  |  Manuscript Edition: 2026) Tj ET',
+            '0.88 0.91 0.94 RG 0.97 0.98 0.99 rg 56 588 500 54 re B',
+            '0.06 0.09 0.16 rg',
+            'BT /F2 9 Tf 70 624 Td (PREPRESS & BINDING SPECIFICATION SHEET) Tj ET',
+            'BT /F1 9.5 Tf 70 606 Td (Trim Size: ISO A4 (210 x 297 mm)  |  Binding: Hardbound Navy Blue + Gold Foil Stamping) Tj ET',
+            'BT /F1 9.5 Tf 70 594 Td (Page Breakdown: 60 B&W + 4 Full-Color  |  Queue Lock: Active  |  Stream: Protected Inline Print) Tj ET',
+            'BT /F2 12 Tf 56 546 Td (CHAPTER 1  -  INTRODUCTION AND ARCHITECTURAL OVERVIEW) Tj ET',
+            'BT /F1 10.5 Tf 56 520 Td (Commercial and campus-adjacent printing shops routinely manage concurrent document) Tj ET',
+            'BT /F1 10.5 Tf 56 504 Td (printing and thesis binding orders across shared printers, finishing stations, and) Tj ET',
+            'BT /F1 10.5 Tf 56 488 Td (consumable raw materials. Without deterministic row-level inventory locking and) Tj ET',
+            'BT /F1 10.5 Tf 56 472 Td (per-item machine scheduling, concurrent walk-in and online requests frequently cause) Tj ET',
+            'BT /F1 10.5 Tf 56 456 Td (stock discrepancies, lost cover specifications, and delayed customer pickup handoffs.) Tj ET',
+            'BT /F1 10.5 Tf 56 426 Td (PressQueue addresses these operational bottlenecks through strict multi-tenant) Tj ET',
+            'BT /F1 10.5 Tf 56 410 Td (workspace isolation, upfront 50%/100% billing verification, prepress specification) Tj ET',
+            'BT /F1 10.5 Tf 56 394 Td (locks, atomic Bill of Materials (BOM) stock reservations, and direct browser print) Tj ET',
+            'BT /F1 10.5 Tf 56 378 Td (dispatch streams that preserve customer document confidentiality on the shop floor.) Tj ET',
+            '0.82 0.85 0.90 RG 0.8 w 56 84 m 556 84 l S',
+            '0.40 0.45 0.55 rg',
+            'BT /F1 8.5 Tf 56 68 Td (Page 1 of 64  |  PressQueue Protected Print Stream (No Local Download Permitted)) Tj ET',
+        ];
+        $stream = implode("\n", $lines);
         $len = strlen($stream);
 
         $objects = [
             "1 0 obj\n<< /Type /Catalog /Pages 2 0 R >>\nendobj\n",
             "2 0 obj\n<< /Type /Pages /Kids [3 0 R] /Count 1 >>\nendobj\n",
-            "3 0 obj\n<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Contents 4 0 R /Resources << /Font << /F1 5 0 R >> >> >>\nendobj\n",
+            "3 0 obj\n<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Contents 4 0 R /Resources << /Font << /F1 5 0 R /F2 6 0 R >> >> >>\nendobj\n",
             "4 0 obj\n<< /Length {$len} >>\nstream\n{$stream}\nendstream\nendobj\n",
             "5 0 obj\n<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>\nendobj\n",
+            "6 0 obj\n<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold >>\nendobj\n",
         ];
 
         $pdf = "%PDF-1.4\n";
