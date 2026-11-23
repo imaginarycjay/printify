@@ -69,7 +69,7 @@ class DocumentPrintingServiceTest extends TestCase
         $response->assertSee('Document Printing');
 
         Livewire::actingAs($this->owner)
-            ->test('pages::owner.⚡document-printing')
+            ->test('pages::owner.document-printing')
             ->set('page_price_bw_a4', 2.00)
             ->set('page_price_color_a4', 6.00)
             ->set('duplex_discount_percent', 15)
@@ -103,7 +103,7 @@ class DocumentPrintingServiceTest extends TestCase
 
         // Total 20 pages: 15 B&W, 5 Color, A4 80gsm, Duplex (10 physical sheets), Ring Binding (Blue)
         Livewire::actingAs($this->customer)
-            ->test('pages::customer.⚡document-order-wizard', ['shop' => $this->shop->id])
+            ->test('pages::customer.document-order-wizard', ['shop' => $this->shop->id])
             ->set('total_pages', 20)
             ->set('color_mode', 'mixed')
             ->set('custom_color_pages', '1, 5, 10, 15, 20')
@@ -186,7 +186,7 @@ class DocumentPrintingServiceTest extends TestCase
 
         // Test filtering by document_printing category
         Livewire::actingAs($this->staff)
-            ->test('pages::staff.⚡staff-dashboard')
+            ->test('pages::staff.staff-dashboard')
             ->set('selectedService', 'document_printing')
             ->assertSee('DOC-2026-TEST01')
             ->set('selectedService', 'thesis_binding')

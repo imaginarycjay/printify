@@ -159,7 +159,7 @@ class ProductionStaffQueueTest extends TestCase
 
         $this->actingAs($this->staff);
 
-        Livewire::test('pages::staff.⚡staff-dashboard')
+        Livewire::test('pages::staff.staff-dashboard')
             ->assertSee('Production Operations Hub')
             ->assertSee('ORD-2026-0001')
             ->assertSee('RUSH')
@@ -192,7 +192,7 @@ class ProductionStaffQueueTest extends TestCase
         $this->actingAs($this->staff);
 
         // Advance 1: Queue -> Printing
-        Livewire::test('pages::staff.⚡staff-dashboard')
+        Livewire::test('pages::staff.staff-dashboard')
             ->call('advanceOrder', $order->id);
 
         $order->refresh();
@@ -200,14 +200,14 @@ class ProductionStaffQueueTest extends TestCase
         $this->assertEquals(Order::STATUS_IN_PRODUCTION, $order->order_status);
 
         // Advance 2: Printing -> Binding
-        Livewire::test('pages::staff.⚡staff-dashboard')
+        Livewire::test('pages::staff.staff-dashboard')
             ->call('advanceOrder', $order->id);
 
         $order->refresh();
         $this->assertEquals(Order::STAGE_BINDING, $order->production_stage);
 
         // Advance 3: Binding -> Quality Check
-        Livewire::test('pages::staff.⚡staff-dashboard')
+        Livewire::test('pages::staff.staff-dashboard')
             ->call('advanceOrder', $order->id);
 
         $order->refresh();
@@ -244,7 +244,7 @@ class ProductionStaffQueueTest extends TestCase
 
         $this->actingAs($this->staff);
 
-        Livewire::test('pages::staff.⚡staff-dashboard')
+        Livewire::test('pages::staff.staff-dashboard')
             ->call('markPaperReceived', $order->id);
 
         $item->refresh();
@@ -280,7 +280,7 @@ class ProductionStaffQueueTest extends TestCase
         $this->actingAs($this->staff);
 
         // Advance from QC -> Ready for Pickup (Triggers BOM deduction)
-        Livewire::test('pages::staff.⚡staff-dashboard')
+        Livewire::test('pages::staff.staff-dashboard')
             ->call('advanceOrder', $order->id);
 
         $this->paperItem->refresh();
@@ -328,7 +328,7 @@ class ProductionStaffQueueTest extends TestCase
 
         $this->actingAs($this->staff);
 
-        Livewire::test('pages::staff.⚡staff-dashboard')
+        Livewire::test('pages::staff.staff-dashboard')
             ->call('advanceOrder', $order->id);
 
         $this->paperItem->refresh();
@@ -347,7 +347,7 @@ class ProductionStaffQueueTest extends TestCase
     {
         $this->actingAs($this->staff);
 
-        Livewire::test('pages::staff.⚡staff-dashboard')
+        Livewire::test('pages::staff.staff-dashboard')
             ->set('spoilageItemId', $this->paperItem->id)
             ->set('spoilageQty', 15)
             ->set('spoilageReason', 'Fuser unit paper jam on page 40')
@@ -388,7 +388,7 @@ class ProductionStaffQueueTest extends TestCase
 
         $this->actingAs($this->staff);
 
-        Livewire::test('pages::staff.⚡staff-dashboard')
+        Livewire::test('pages::staff.staff-dashboard')
             ->call('viewJobTicket', $order->id)
             ->set('assignedMachine', 'Digital Hot Foil Press Alpha')
             ->set('staffNotes', 'Extra 1mm margin added on spine')
@@ -425,7 +425,7 @@ class ProductionStaffQueueTest extends TestCase
 
         $this->actingAs($this->staff);
 
-        Livewire::test('pages::staff.⚡staff-dashboard')
+        Livewire::test('pages::staff.staff-dashboard')
             ->call('openRejectModal', $order->id)
             ->set('rejectReason', 'Crooked foil stamp on author line')
             ->call('submitQcRejection');

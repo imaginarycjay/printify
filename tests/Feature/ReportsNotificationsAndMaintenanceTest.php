@@ -387,7 +387,7 @@ class ReportsNotificationsAndMaintenanceTest extends TestCase
 
         // Analytics Hub 3rd 'reports' tab preserves default 'overview' and switches cleanly
         Livewire::actingAs($this->owner)
-            ->test('pages::owner.⚡analytics-hub')
+            ->test('pages::owner.analytics-hub')
             ->assertSet('active_tab', 'overview')
             ->set('active_tab', 'reports')
             ->assertSee('Standardized Reports')

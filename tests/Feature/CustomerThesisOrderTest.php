@@ -83,7 +83,7 @@ class CustomerThesisOrderTest extends TestCase
     public function test_price_calculation_computes_accurately(): void
     {
         Livewire::actingAs($this->customer)
-            ->test('pages::customer.⚡thesis-order-wizard', ['shop' => $this->shop->id])
+            ->test('pages::customer.thesis-order-wizard', ['shop' => $this->shop->id])
             ->set('binding_type', 'hardbound') // 350
             ->set('bw_pages', 80) // 80 * 1.50 = 120
             ->set('color_pages', 20) // 20 * 5.00 = 100
@@ -100,7 +100,7 @@ class CustomerThesisOrderTest extends TestCase
         $dummyReceipt = UploadedFile::fake()->create('gcash_receipt.png', 500, 'image/png');
 
         Livewire::actingAs($this->customer)
-            ->test('pages::customer.⚡thesis-order-wizard', ['shop' => $this->shop->id])
+            ->test('pages::customer.thesis-order-wizard', ['shop' => $this->shop->id])
             ->set('binding_type', 'hardbound')
             ->set('bw_pages', 50)
             ->set('color_pages', 10)
@@ -168,7 +168,7 @@ class CustomerThesisOrderTest extends TestCase
         ]);
 
         Livewire::actingAs($this->customer)
-            ->test('pages::customer.⚡customer-dashboard')
+            ->test('pages::customer.customer-dashboard')
             ->set('active_tab', 'orders')
             ->assertSee('ORD-2026-0001')
             ->assertSee('In production')
@@ -184,7 +184,7 @@ class CustomerThesisOrderTest extends TestCase
         $dummyPdf = UploadedFile::fake()->create('report_final.pdf', 512, 'application/pdf');
 
         Livewire::actingAs($this->customer)
-            ->test('pages::customer.⚡thesis-order-wizard', ['shop' => $this->shop->id])
+            ->test('pages::customer.thesis-order-wizard', ['shop' => $this->shop->id])
             ->set('binding_type', 'softbound')
             ->assertSee('Not Applicable')
             ->assertSee('transparent clear PVC acetate front sheet')
@@ -212,7 +212,7 @@ class CustomerThesisOrderTest extends TestCase
         $dummyRefPdf = UploadedFile::fake()->create('digital_reference.pdf', 512, 'application/pdf');
 
         Livewire::actingAs($this->customer)
-            ->test('pages::customer.⚡thesis-order-wizard', ['shop' => $this->shop->id])
+            ->test('pages::customer.thesis-order-wizard', ['shop' => $this->shop->id])
             ->set('fulfillment_type', 'cover_only')
             ->set('preprinted_total_pages', 150) // ~15.0mm spine
             ->set('paper_size', 'A4')
@@ -252,7 +252,7 @@ class CustomerThesisOrderTest extends TestCase
     public function test_owner_can_configure_cover_only_pricing_and_availability(): void
     {
         Livewire::actingAs($this->owner)
-            ->test('pages::owner.⚡thesis-binding')
+            ->test('pages::owner.thesis-binding')
             ->set('allow_customer_supplied_paper', true)
             ->set('hardbound_cover_only_price', 280.00)
             ->call('savePricing')

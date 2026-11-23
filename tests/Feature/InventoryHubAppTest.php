@@ -62,7 +62,7 @@ class InventoryHubAppTest extends TestCase
         ]);
 
         Livewire::actingAs($user)
-            ->test('pages::owner.⚡inventory-hub')
+            ->test('pages::owner.inventory-hub')
             ->assertOk();
 
         $this->assertGreaterThan(0, $shop->inventoryItems()->count());
@@ -85,7 +85,7 @@ class InventoryHubAppTest extends TestCase
         ]);
 
         Livewire::actingAs($user)
-            ->test('pages::owner.⚡inventory-hub')
+            ->test('pages::owner.inventory-hub')
             ->set('item_name', 'Matte PVC Sheet (A4)')
             ->set('item_sku', 'MAT-PVC-01')
             ->set('item_category', 'Cover')
@@ -130,7 +130,7 @@ class InventoryHubAppTest extends TestCase
         ]);
 
         Livewire::actingAs($user)
-            ->test('pages::owner.⚡inventory-hub')
+            ->test('pages::owner.inventory-hub')
             ->call('openAdjustModal', $item->id)
             ->set('adjust_type', StockMovement::TYPE_MANUAL_STOCK_IN)
             ->set('adjust_qty', 50.0)
@@ -179,7 +179,7 @@ class InventoryHubAppTest extends TestCase
         ]);
 
         Livewire::actingAs($user)
-            ->test('pages::owner.⚡thesis-binding')
+            ->test('pages::owner.thesis-binding')
             ->assertOk()
             ->assertSee('Central Inventory Hub')
             ->call('setTab', 'bom')

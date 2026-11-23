@@ -64,7 +64,7 @@
                 type="submit"
                 variant="primary"
                 data-theme-keep
-                class="mt-1 w-full !bg-amber-500 !text-stone-950 font-semibold hover:!bg-amber-400"
+                class="mt-1 w-full !bg-blue-600 !text-white font-semibold hover:!bg-blue-700 dark:hover:!bg-blue-500"
                 data-test="reset-password-button"
                 x-bind:disabled="submitting"
             >

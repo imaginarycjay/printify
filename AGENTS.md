@@ -20,7 +20,7 @@ Run a single test file: `php artisan test --filter=SecurityTest` (or `tests/Feat
 
 ## New pages: non-standard Laravel convention
 
-Pages are NOT PHP files in `app/Livewire/`. Full-page Livewire components are Blade files in `resources/views/pages/` with a `⚡` filename prefix (e.g. `⚡security.blade.php`), defining an inline `new class extends Component { ... }` at the top. They are referenced by the `pages::` view namespace and registered with `Route::livewire()`:
+Pages are NOT PHP files in `app/Livewire/`. Full-page Livewire components are single-file Blade components in `resources/views/pages/` with clean ASCII filenames (e.g. `security.blade.php`, with `make_command.emoji` set to `false` in `config/livewire.php` — never prefix filenames with `⚡`), defining an inline `new class extends Component { ... }` at the top. They are referenced by the `pages::` view namespace and registered with `Route::livewire()`:
 
 ```php
 Route::livewire('settings/profile', 'pages::settings.profile')->name('profile.edit');

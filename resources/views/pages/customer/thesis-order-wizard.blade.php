@@ -413,14 +413,14 @@ new class extends Component {
             <div class="flex items-center gap-3 min-w-0">
                 <x-app-back-link :href="route('shops.show', $this->shopId)" :label="$shop->name" :navigate="true" />
                 <div class="min-w-0">
-                    <h1 class="text-sm font-bold text-stone-900 dark:text-white tracking-tight leading-tight truncate">{{ $shop ? $shop->name : 'PressQueue' }}</h1>
-                    <span class="text-[11px] text-amber-700 dark:text-amber-400 font-semibold">Thesis Binding Order Portal</span>
+                    <h1 class="text-sm font-bold text-slate-900 dark:text-white tracking-tight leading-tight truncate">{{ $shop ? $shop->name : 'PressQueue' }}</h1>
+                    <span class="text-[11px] text-indigo-700 dark:text-indigo-400 font-semibold">Thesis Binding Order Portal</span>
                 </div>
             </div>
 
             <div class="flex items-center gap-2.5 shrink-0">
                 <x-theme-toggle />
-                <div class="size-7 rounded-full bg-amber-500 text-stone-950 text-xs font-extrabold flex items-center justify-center">
+                <div class="size-7 rounded-full bg-slate-900 text-white dark:bg-blue-600 text-xs font-extrabold flex items-center justify-center">
                     {{ $user?->initials() }}
                 </div>
             </div>
@@ -432,29 +432,29 @@ new class extends Component {
         <!-- Multi-Step Breadcrumb Progress Bar -->
         <div class="max-w-2xl mx-auto">
             <div class="flex items-center justify-between relative">
-                <div class="absolute left-0 top-1/2 -translate-y-1/2 h-0.5 w-full bg-stone-200 dark:bg-stone-800 z-0"></div>
-                <div class="absolute left-0 top-1/2 -translate-y-1/2 h-0.5 bg-amber-500 z-0 transition-all duration-300 {{ $step === 1 ? 'w-0' : ($step === 2 ? 'w-1/2' : 'w-full') }}"></div>
+                <div class="absolute left-0 top-1/2 -translate-y-1/2 h-0.5 w-full bg-slate-200 dark:bg-slate-800 z-0"></div>
+                <div class="absolute left-0 top-1/2 -translate-y-1/2 h-0.5 bg-blue-600 z-0 transition-all duration-300 {{ $step === 1 ? 'w-0' : ($step === 2 ? 'w-1/2' : 'w-full') }}"></div>
 
                 <!-- Step 1 Indicator -->
                 <div class="relative z-10 flex flex-col items-center gap-1">
-                    <span class="size-7 sm:size-8 rounded-full flex items-center justify-center text-xs font-bold tabular-nums {{ $step >= 1 ? 'bg-amber-500 text-stone-950 shadow-sm' : 'bg-stone-200 dark:bg-stone-800 text-stone-500' }}">1</span>
-                    <span class="text-[9px] sm:text-[11px] font-bold text-center {{ $step >= 1 ? 'text-stone-900 dark:text-white' : 'text-stone-500' }}">
+                    <span class="size-7 sm:size-8 rounded-full flex items-center justify-center text-xs font-bold tabular-nums {{ $step >= 1 ? 'bg-blue-600 text-white shadow-sm' : 'bg-slate-200 dark:bg-slate-800 text-slate-500' }}">1</span>
+                    <span class="text-[9px] sm:text-[11px] font-bold text-center {{ $step >= 1 ? 'text-slate-900 dark:text-white' : 'text-slate-500' }}">
                         1. <span class="hidden sm:inline">Configure &amp; </span>Upload
                     </span>
                 </div>
 
                 <!-- Step 2 Indicator -->
                 <div class="relative z-10 flex flex-col items-center gap-1">
-                    <span class="size-7 sm:size-8 rounded-full flex items-center justify-center text-xs font-bold tabular-nums {{ $step >= 2 ? 'bg-amber-500 text-stone-950 shadow-sm' : 'bg-stone-200 dark:bg-stone-800 text-stone-500' }}">2</span>
-                    <span class="text-[9px] sm:text-[11px] font-bold text-center {{ $step >= 2 ? 'text-stone-900 dark:text-white' : 'text-stone-500' }}">
+                    <span class="size-7 sm:size-8 rounded-full flex items-center justify-center text-xs font-bold tabular-nums {{ $step >= 2 ? 'bg-blue-600 text-white shadow-sm' : 'bg-slate-200 dark:bg-slate-800 text-slate-500' }}">2</span>
+                    <span class="text-[9px] sm:text-[11px] font-bold text-center {{ $step >= 2 ? 'text-slate-900 dark:text-white' : 'text-slate-500' }}">
                         2. GCash<span class="hidden sm:inline"> Checkout</span>
                     </span>
                 </div>
 
                 <!-- Step 3 Indicator -->
                 <div class="relative z-10 flex flex-col items-center gap-1">
-                    <span class="size-7 sm:size-8 rounded-full flex items-center justify-center text-xs font-bold tabular-nums {{ $step >= 3 ? 'bg-emerald-600 text-white shadow-sm' : 'bg-stone-200 dark:bg-stone-800 text-stone-500' }}">3</span>
-                    <span class="text-[9px] sm:text-[11px] font-bold text-center {{ $step >= 3 ? 'text-emerald-700 dark:text-emerald-400' : 'text-stone-500' }}">
+                    <span class="size-7 sm:size-8 rounded-full flex items-center justify-center text-xs font-bold tabular-nums {{ $step >= 3 ? 'bg-emerald-600 text-white shadow-sm' : 'bg-slate-200 dark:bg-slate-800 text-slate-500' }}">3</span>
+                    <span class="text-[9px] sm:text-[11px] font-bold text-center {{ $step >= 3 ? 'text-emerald-700 dark:text-emerald-400' : 'text-slate-500' }}">
                         3. Confirmed
                     </span>
                 </div>
@@ -470,7 +470,7 @@ new class extends Component {
                     <!-- Service Fulfillment Mode Switcher -->
                     <div class="pq-card p-6 space-y-4">
                         <div class="flex items-center justify-between">
-                            <h3 class="text-sm font-bold text-amber-700 dark:text-amber-400 uppercase tracking-wider flex items-center gap-2">
+                            <h3 class="text-sm font-bold text-blue-700 dark:text-blue-400 uppercase tracking-wider flex items-center gap-2">
                                 <flux:icon name="sparkles" class="size-4" />
                                 1. Service Fulfillment Mode
                             </h3>
@@ -483,33 +483,33 @@ new class extends Component {
                             <button
                                 type="button"
                                 wire:click="$set('fulfillment_type', 'full_package')"
-                                class="p-4 rounded-2xl border text-left transition-colors space-y-2 cursor-pointer {{ $fulfillment_type === 'full_package' ? 'bg-amber-50 dark:bg-amber-500/15 border-amber-500 text-stone-900 dark:text-white' : 'bg-stone-50 dark:bg-stone-950 border-stone-200 dark:border-stone-800 text-stone-600 dark:text-stone-400 hover:bg-stone-100 dark:hover:text-white' }}"
+                                class="p-4 rounded-2xl border text-left transition-colors space-y-2 cursor-pointer {{ $fulfillment_type === 'full_package' ? 'bg-blue-50 dark:bg-blue-500/15 border-blue-600 text-slate-900 dark:text-white' : 'bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:text-white' }}"
                             >
                                 <div class="flex items-center justify-between">
                                     <span class="text-xs font-bold inline-flex items-center gap-1.5">
-                                        <flux:icon name="document-duplicate" class="size-4 text-amber-600 dark:text-amber-400" />
+                                        <flux:icon name="document-duplicate" class="size-4 text-blue-600 dark:text-blue-400" />
                                         <span>Full Package (Print &amp; Bind)</span>
                                     </span>
-                                    <flux:icon name="{{ $fulfillment_type === 'full_package' ? 'check-circle' : 'plus-circle' }}" class="size-4 {{ $fulfillment_type === 'full_package' ? 'text-amber-600 dark:text-amber-400' : 'text-stone-400 dark:text-stone-600' }}" />
+                                    <flux:icon name="{{ $fulfillment_type === 'full_package' ? 'check-circle' : 'plus-circle' }}" class="size-4 {{ $fulfillment_type === 'full_package' ? 'text-blue-600 dark:text-blue-400' : 'text-slate-400 dark:text-slate-600' }}" />
                                 </div>
-                                <p class="text-[11px] text-stone-600 dark:text-stone-300">We print your manuscript PDF pages and assemble the complete hardbound/softbound cover.</p>
-                                <span class="inline-block px-2 py-0.5 rounded text-[9px] font-bold pq-badge-warning">Complete Printing Service</span>
+                                <p class="text-[11px] text-slate-600 dark:text-slate-300">We print your manuscript PDF pages and assemble the complete hardbound/softbound cover.</p>
+                                <span class="inline-block px-2 py-0.5 rounded text-[9px] font-bold pq-badge-brand">Complete Printing Service</span>
                             </button>
 
                             @if ($allow_customer_supplied_paper)
                                 <button
                                     type="button"
                                     wire:click="$set('fulfillment_type', 'cover_only')"
-                                    class="p-4 rounded-2xl border text-left transition-colors space-y-2 cursor-pointer {{ $fulfillment_type === 'cover_only' ? 'bg-amber-50 dark:bg-amber-500/15 border-amber-500 text-stone-900 dark:text-white' : 'bg-stone-50 dark:bg-stone-950 border-stone-200 dark:border-stone-800 text-stone-600 dark:text-stone-400 hover:bg-stone-100 dark:hover:text-white' }}"
+                                    class="p-4 rounded-2xl border text-left transition-colors space-y-2 cursor-pointer {{ $fulfillment_type === 'cover_only' ? 'bg-blue-50 dark:bg-blue-500/15 border-blue-600 text-slate-900 dark:text-white' : 'bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:text-white' }}"
                                 >
                                     <div class="flex items-center justify-between">
                                         <span class="text-xs font-bold inline-flex items-center gap-1.5">
-                                            <flux:icon name="archive-box" class="size-4 text-amber-600 dark:text-amber-400" />
+                                            <flux:icon name="archive-box" class="size-4 text-blue-600 dark:text-blue-400" />
                                             <span>Cover &amp; Binding Only (Dala ang Papel)</span>
                                         </span>
-                                        <flux:icon name="{{ $fulfillment_type === 'cover_only' ? 'check-circle' : 'plus-circle' }}" class="size-4 {{ $fulfillment_type === 'cover_only' ? 'text-amber-600 dark:text-amber-400' : 'text-stone-400 dark:text-stone-600' }}" />
+                                        <flux:icon name="{{ $fulfillment_type === 'cover_only' ? 'check-circle' : 'plus-circle' }}" class="size-4 {{ $fulfillment_type === 'cover_only' ? 'text-blue-600 dark:text-blue-400' : 'text-slate-400 dark:text-slate-600' }}" />
                                     </div>
-                                    <p class="text-[11px] text-stone-600 dark:text-stone-300">You supply your pre-printed pages; we build the custom hardbound cover, foil stamp &amp; bind.</p>
+                                    <p class="text-[11px] text-slate-600 dark:text-slate-300">You supply your pre-printed pages; we build the custom hardbound cover, foil stamp &amp; bind.</p>
                                     <span class="inline-block px-2 py-0.5 rounded text-[9px] font-bold pq-badge-success tabular-nums">₱0.00 Print Charges</span>
                                 </button>
                             @endif
@@ -527,7 +527,7 @@ new class extends Component {
 
                     <!-- Card 2: Binding Specifications & Dimensions -->
                     <div class="pq-card p-6 space-y-5">
-                        <h3 class="text-sm font-bold text-amber-700 dark:text-amber-400 uppercase tracking-wider flex items-center gap-2">
+                        <h3 class="text-sm font-bold text-blue-700 dark:text-blue-400 uppercase tracking-wider flex items-center gap-2">
                             <flux:icon name="book-open" class="size-4" />
                             2. {{ $fulfillment_type === 'cover_only' ? 'Hardbound Sizing & Dimensions' : 'Binding Type & Paper Standards' }}
                         </h3>
@@ -538,48 +538,48 @@ new class extends Component {
                                 <button
                                     type="button"
                                     wire:click="$set('binding_type', 'hardbound')"
-                                    class="p-4 rounded-2xl border text-left transition-colors space-y-1 cursor-pointer {{ $binding_type === 'hardbound' ? 'bg-amber-50 dark:bg-amber-500/15 border-amber-500 text-stone-900 dark:text-white' : 'bg-stone-50 dark:bg-stone-950 border-stone-200 dark:border-stone-800 text-stone-600 dark:text-stone-400 hover:bg-stone-100 dark:hover:text-white' }}"
+                                    class="p-4 rounded-2xl border text-left transition-colors space-y-1 cursor-pointer {{ $binding_type === 'hardbound' ? 'bg-blue-50 dark:bg-blue-500/15 border-blue-600 text-slate-900 dark:text-white' : 'bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:text-white' }}"
                                 >
                                     <div class="flex items-center justify-between">
                                         <span class="text-xs font-bold">Hardbound Compilation</span>
-                                        <flux:icon name="{{ $binding_type === 'hardbound' ? 'check-circle' : 'plus-circle' }}" class="size-4 {{ $binding_type === 'hardbound' ? 'text-amber-600 dark:text-amber-400' : 'text-stone-400 dark:text-stone-600' }}" />
+                                        <flux:icon name="{{ $binding_type === 'hardbound' ? 'check-circle' : 'plus-circle' }}" class="size-4 {{ $binding_type === 'hardbound' ? 'text-blue-600 dark:text-blue-400' : 'text-slate-400 dark:text-slate-600' }}" />
                                     </div>
-                                    <div class="text-lg font-black text-stone-900 dark:text-white tabular-nums">₱{{ number_format($hardbound_base_price, 2) }} <span class="text-[10px] font-normal text-stone-500 dark:text-stone-400">base</span></div>
-                                    <p class="text-[10px] text-stone-500 dark:text-stone-400">Heavy duty chipboard, leatherette wrap &amp; hot foil stamping</p>
+                                    <div class="text-lg font-black text-slate-900 dark:text-white tabular-nums">₱{{ number_format($hardbound_base_price, 2) }} <span class="text-[10px] font-normal text-slate-500 dark:text-slate-400">base</span></div>
+                                    <p class="text-[10px] text-slate-500 dark:text-slate-400">Heavy duty chipboard, leatherette wrap &amp; hot foil stamping</p>
                                 </button>
 
                                 <button
                                     type="button"
                                     wire:click="$set('binding_type', 'softbound')"
-                                    class="p-4 rounded-2xl border text-left transition-colors space-y-1 cursor-pointer {{ $binding_type === 'softbound' ? 'bg-amber-50 dark:bg-amber-500/15 border-amber-500 text-stone-900 dark:text-white' : 'bg-stone-50 dark:bg-stone-950 border-stone-200 dark:border-stone-800 text-stone-600 dark:text-stone-400 hover:bg-stone-100 dark:hover:text-white' }}"
+                                    class="p-4 rounded-2xl border text-left transition-colors space-y-1 cursor-pointer {{ $binding_type === 'softbound' ? 'bg-blue-50 dark:bg-blue-500/15 border-blue-600 text-slate-900 dark:text-white' : 'bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:text-white' }}"
                                 >
                                     <div class="flex items-center justify-between">
                                         <span class="text-xs font-bold">Softbound / Bookbinding</span>
-                                        <flux:icon name="{{ $binding_type === 'softbound' ? 'check-circle' : 'plus-circle' }}" class="size-4 {{ $binding_type === 'softbound' ? 'text-amber-600 dark:text-amber-400' : 'text-stone-400 dark:text-stone-600' }}" />
+                                        <flux:icon name="{{ $binding_type === 'softbound' ? 'check-circle' : 'plus-circle' }}" class="size-4 {{ $binding_type === 'softbound' ? 'text-blue-600 dark:text-blue-400' : 'text-slate-400 dark:text-slate-600' }}" />
                                     </div>
-                                    <div class="text-lg font-black text-stone-900 dark:text-white tabular-nums">₱{{ number_format($softbound_base_price, 2) }} <span class="text-[10px] font-normal text-stone-500 dark:text-stone-400">base</span></div>
-                                    <p class="text-[10px] text-stone-500 dark:text-stone-400">Flexible coated cardstock cover with thermal binding spine</p>
+                                    <div class="text-lg font-black text-slate-900 dark:text-white tabular-nums">₱{{ number_format($softbound_base_price, 2) }} <span class="text-[10px] font-normal text-slate-500 dark:text-slate-400">base</span></div>
+                                    <p class="text-[10px] text-slate-500 dark:text-slate-400">Flexible coated cardstock cover with thermal binding spine</p>
                                 </button>
                             </div>
                         @else
                             <div class="pq-well p-3.5 flex items-center justify-between">
                                 <div>
-                                    <span class="text-xs font-bold text-stone-900 dark:text-white block">Hardbound Leatherette Cover + Hot Foil Stamping</span>
-                                    <span class="text-[10px] text-stone-600 dark:text-stone-400">Chipboard hard cover custom tailored to your paper thickness</span>
+                                    <span class="text-xs font-bold text-slate-900 dark:text-white block">Hardbound Leatherette Cover + Hot Foil Stamping</span>
+                                    <span class="text-[10px] text-slate-600 dark:text-slate-400">Chipboard hard cover custom tailored to your paper thickness</span>
                                 </div>
-                                <span class="text-sm font-bold text-amber-700 dark:text-amber-400 font-mono tabular-nums">₱{{ number_format($hardbound_cover_only_price, 2) }} <span class="text-[10px] font-normal text-stone-500">/ book</span></span>
+                                <span class="text-sm font-bold text-blue-700 dark:text-blue-400 font-mono tabular-nums">₱{{ number_format($hardbound_cover_only_price, 2) }} <span class="text-[10px] font-normal text-slate-500">/ book</span></span>
                             </div>
                         @endif
 
                         <!-- Paper Sizes Grid -->
                         <div class="space-y-1.5 pt-2">
-                            <label class="text-xs font-bold text-stone-700 dark:text-stone-300">Paper Dimension Standard</label>
+                            <label class="text-xs font-bold text-slate-700 dark:text-slate-300">Paper Dimension Standard</label>
                             <div class="grid grid-cols-3 gap-2">
                                 @foreach ($available_paper_sizes as $size)
                                     <button
                                         type="button"
                                         wire:click="$set('paper_size', '{{ $size }}')"
-                                        class="py-2.5 px-3 rounded-xl border text-xs font-bold transition-colors text-center cursor-pointer {{ $paper_size === $size ? 'bg-amber-500 text-stone-950 border-amber-500 shadow-sm font-black' : 'bg-stone-50 dark:bg-stone-950 border-stone-200 dark:border-stone-800 text-stone-700 dark:text-stone-300 hover:bg-stone-100 dark:hover:text-white' }}"
+                                        class="py-2.5 px-3 rounded-xl border text-xs font-bold transition-colors text-center cursor-pointer {{ $paper_size === $size ? 'bg-blue-600 text-white border-blue-600 shadow-sm font-black' : 'bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:text-white' }}"
                                     >
                                         {{ $size }}
                                     </button>
@@ -590,7 +590,7 @@ new class extends Component {
 
                     <!-- Card 3: Page Counts & Volume -->
                     <div class="pq-card p-6 space-y-5">
-                        <h3 class="text-sm font-bold text-amber-700 dark:text-amber-400 uppercase tracking-wider flex items-center gap-2">
+                        <h3 class="text-sm font-bold text-blue-700 dark:text-blue-400 uppercase tracking-wider flex items-center gap-2">
                             <flux:icon name="document-text" class="size-4" />
                             3. {{ $fulfillment_type === 'cover_only' ? 'Pre-Printed Page Volume & Spine Sizing' : 'Manuscript Page Counts & Copies' }}
                         </h3>
@@ -600,24 +600,24 @@ new class extends Component {
                                 <!-- B&W Pages Input -->
                                 <div class="pq-well p-4 space-y-2">
                                     <div class="flex justify-between items-center text-xs">
-                                        <span class="font-bold text-stone-700 dark:text-stone-300">Black &amp; White Pages</span>
-                                        <span class="text-stone-500 dark:text-stone-400 font-mono tabular-nums">₱{{ number_format($page_price_bw, 2) }}/page</span>
+                                        <span class="font-bold text-slate-700 dark:text-slate-300">Black &amp; White Pages</span>
+                                        <span class="text-slate-500 dark:text-slate-400 font-mono tabular-nums">₱{{ number_format($page_price_bw, 2) }}/page</span>
                                     </div>
                                     <div class="flex items-center gap-3">
-                                        <input wire:model.live="bw_pages" type="number" min="0" max="1000" class="w-24 px-3 py-2 rounded-xl bg-white dark:bg-stone-900 border border-stone-300 dark:border-stone-700 text-sm font-bold text-stone-900 dark:text-white focus:outline-none focus:border-amber-500 tabular-nums" />
-                                        <input wire:model.live="bw_pages" type="range" min="0" max="300" class="w-full accent-amber-500" />
+                                        <input wire:model.live="bw_pages" type="number" min="0" max="1000" class="w-24 px-3 py-2 rounded-xl bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 text-sm font-bold text-slate-900 dark:text-white focus:outline-none focus:border-blue-600 dark:focus:border-blue-400 tabular-nums" />
+                                        <input wire:model.live="bw_pages" type="range" min="0" max="300" class="w-full accent-blue-600" />
                                     </div>
                                 </div>
 
                                 <!-- Color Pages Input -->
                                 <div class="pq-well p-4 space-y-2">
                                     <div class="flex justify-between items-center text-xs">
-                                        <span class="font-bold text-stone-700 dark:text-stone-300">Full-Color Pages</span>
-                                        <span class="text-amber-700 dark:text-amber-400 font-mono tabular-nums">₱{{ number_format($page_price_color, 2) }}/page</span>
+                                        <span class="font-bold text-slate-700 dark:text-slate-300">Full-Color Pages</span>
+                                        <span class="text-blue-700 dark:text-blue-400 font-mono tabular-nums">₱{{ number_format($page_price_color, 2) }}/page</span>
                                     </div>
                                     <div class="flex items-center gap-3">
-                                        <input wire:model.live="color_pages" type="number" min="0" max="500" class="w-24 px-3 py-2 rounded-xl bg-white dark:bg-stone-900 border border-stone-300 dark:border-stone-700 text-sm font-bold text-stone-900 dark:text-white focus:outline-none focus:border-amber-500 tabular-nums" />
-                                        <input wire:model.live="color_pages" type="range" min="0" max="150" class="w-full accent-amber-500" />
+                                        <input wire:model.live="color_pages" type="number" min="0" max="500" class="w-24 px-3 py-2 rounded-xl bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 text-sm font-bold text-slate-900 dark:text-white focus:outline-none focus:border-blue-600 dark:focus:border-blue-400 tabular-nums" />
+                                        <input wire:model.live="color_pages" type="range" min="0" max="150" class="w-full accent-blue-600" />
                                     </div>
                                 </div>
                             </div>
@@ -626,16 +626,16 @@ new class extends Component {
                             <div class="pq-well p-4 space-y-3">
                                 <div class="flex justify-between items-center text-xs">
                                     <div>
-                                        <span class="font-bold text-stone-700 dark:text-stone-300 block">Total Pre-Printed Pages Supplied</span>
-                                        <span class="text-[10px] text-stone-500 dark:text-stone-400">Needed to measure exact spine thickness for the cover</span>
+                                        <span class="font-bold text-slate-700 dark:text-slate-300 block">Total Pre-Printed Pages Supplied</span>
+                                        <span class="text-[10px] text-slate-500 dark:text-slate-400">Needed to measure exact spine thickness for the cover</span>
                                     </div>
                                     <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-indigo-50 text-indigo-700 border border-indigo-200 dark:bg-indigo-500/20 dark:text-indigo-300 dark:border-indigo-500/30 tabular-nums">
                                         Spine: ~{{ $pricing['estimated_spine_mm'] }} mm
                                     </span>
                                 </div>
                                 <div class="flex items-center gap-3">
-                                    <input wire:model.live="preprinted_total_pages" type="number" min="10" max="1000" class="w-28 px-3 py-2 rounded-xl bg-white dark:bg-stone-900 border border-stone-300 dark:border-stone-700 text-sm font-bold text-stone-900 dark:text-white focus:outline-none focus:border-amber-500 tabular-nums" />
-                                    <input wire:model.live="preprinted_total_pages" type="range" min="20" max="400" class="w-full accent-amber-500" />
+                                    <input wire:model.live="preprinted_total_pages" type="number" min="10" max="1000" class="w-28 px-3 py-2 rounded-xl bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 text-sm font-bold text-slate-900 dark:text-white focus:outline-none focus:border-blue-600 dark:focus:border-blue-400 tabular-nums" />
+                                    <input wire:model.live="preprinted_total_pages" type="range" min="20" max="400" class="w-full accent-blue-600" />
                                 </div>
                             </div>
                         @endif
@@ -643,13 +643,13 @@ new class extends Component {
                         <!-- Copies Multiplier -->
                         <div class="pq-well flex items-center justify-between p-4">
                             <div>
-                                <span class="text-xs font-bold text-stone-900 dark:text-white block">Number of Book Copies</span>
-                                <span class="text-[10px] text-stone-500 dark:text-stone-400">Duplicate physical bound books</span>
+                                <span class="text-xs font-bold text-slate-900 dark:text-white block">Number of Book Copies</span>
+                                <span class="text-[10px] text-slate-500 dark:text-slate-400">Duplicate physical bound books</span>
                             </div>
                             <div class="flex items-center gap-2">
-                                <button type="button" wire:click="$set('copies_count', {{ max(1, $copies_count - 1) }})" class="size-8 rounded-lg bg-white dark:bg-stone-800 border border-stone-300 dark:border-stone-700 text-stone-700 dark:text-stone-300 hover:bg-stone-100 dark:hover:text-white font-bold cursor-pointer">-</button>
-                                <span class="w-8 text-center text-sm font-bold text-stone-900 dark:text-white tabular-nums">{{ $copies_count }}</span>
-                                <button type="button" wire:click="$set('copies_count', {{ min(50, $copies_count + 1) }})" class="size-8 rounded-lg bg-white dark:bg-stone-800 border border-stone-300 dark:border-stone-700 text-stone-700 dark:text-stone-300 hover:bg-stone-100 dark:hover:text-white font-bold cursor-pointer">+</button>
+                                <button type="button" wire:click="$set('copies_count', {{ max(1, $copies_count - 1) }})" class="size-8 rounded-lg bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:text-white font-bold cursor-pointer">-</button>
+                                <span class="w-8 text-center text-sm font-bold text-slate-900 dark:text-white tabular-nums">{{ $copies_count }}</span>
+                                <button type="button" wire:click="$set('copies_count', {{ min(50, $copies_count + 1) }})" class="size-8 rounded-lg bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:text-white font-bold cursor-pointer">+</button>
                             </div>
                         </div>
                     </div>
@@ -658,18 +658,18 @@ new class extends Component {
                     @if ($binding_type === 'hardbound')
                         <div class="pq-card p-6 space-y-5">
                             <div class="flex items-center justify-between">
-                                <h3 class="text-sm font-bold text-amber-700 dark:text-amber-400 uppercase tracking-wider flex items-center gap-2">
+                                <h3 class="text-sm font-bold text-blue-700 dark:text-blue-400 uppercase tracking-wider flex items-center gap-2">
                                     <flux:icon name="swatch" class="size-4" />
                                     4. Cover Colors &amp; Hot Foil Stamping
                                 </h3>
-                                <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold pq-badge-warning">
+                                <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold pq-badge-brand">
                                     Hardbound
                                 </span>
                             </div>
 
                             <!-- Cover Colors with Inventory Stock Check -->
                             <div class="space-y-2">
-                                <label class="text-xs font-bold text-stone-700 dark:text-stone-300">Cover Leatherette Color</label>
+                                <label class="text-xs font-bold text-slate-700 dark:text-slate-300">Cover Leatherette Color</label>
                                 <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
                                     @foreach ($available_cover_colors as $color)
                                         @php
@@ -682,7 +682,7 @@ new class extends Component {
                                             type="button"
                                             wire:click="$set('cover_color', '{{ $color }}')"
                                             @disabled($isOutOfStock)
-                                            class="p-3 rounded-2xl border text-left transition-colors relative cursor-pointer {{ $cover_color === $color ? 'bg-amber-50 dark:bg-amber-500/20 border-amber-500 text-stone-900 dark:text-white' : ($isOutOfStock ? 'opacity-40 bg-stone-100 dark:bg-stone-950 border-stone-200 dark:border-stone-800 text-stone-500 cursor-not-allowed' : 'bg-stone-50 dark:bg-stone-950 border-stone-200 dark:border-stone-800 text-stone-700 dark:text-stone-300 hover:bg-stone-100 dark:hover:text-white') }}"
+                                            class="p-3 rounded-2xl border text-left transition-colors relative cursor-pointer {{ $cover_color === $color ? 'bg-blue-50 dark:bg-blue-500/20 border-blue-600 text-slate-900 dark:text-white' : ($isOutOfStock ? 'opacity-40 bg-slate-100 dark:bg-slate-950 border-slate-200 dark:border-slate-800 text-slate-500 cursor-not-allowed' : 'bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:text-white') }}"
                                         >
                                             <div class="text-xs font-bold">{{ $color }}</div>
                                             @if ($isOutOfStock)
@@ -696,14 +696,14 @@ new class extends Component {
                             </div>
 
                             <!-- Foil Color Stamping -->
-                            <div class="space-y-2 pt-2 border-t border-stone-200 dark:border-stone-800">
-                                <label class="text-xs font-bold text-stone-700 dark:text-stone-300">Foil Stamping Text Color</label>
+                            <div class="space-y-2 pt-2 border-t border-slate-200 dark:border-slate-800">
+                                <label class="text-xs font-bold text-slate-700 dark:text-slate-300">Foil Stamping Text Color</label>
                                 <div class="flex flex-wrap gap-2">
                                     @foreach ($available_foil_colors as $fColor)
                                         <button
                                             type="button"
                                             wire:click="$set('foil_color', '{{ $fColor }}')"
-                                            class="px-4 py-2 rounded-xl text-xs font-bold border transition-colors cursor-pointer inline-flex items-center gap-1.5 {{ $foil_color === $fColor ? 'bg-amber-500 text-stone-950 border-amber-500 shadow-sm font-black' : 'bg-stone-50 dark:bg-stone-950 border-stone-200 dark:border-stone-800 text-stone-700 dark:text-stone-300 hover:bg-stone-100 dark:hover:text-white' }}"
+                                            class="px-4 py-2 rounded-xl text-xs font-bold border transition-colors cursor-pointer inline-flex items-center gap-1.5 {{ $foil_color === $fColor ? 'bg-blue-600 text-white border-blue-600 shadow-sm font-black' : 'bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:text-white' }}"
                                         >
                                             <flux:icon name="sparkles" class="size-3.5" />
                                             <span>{{ $fColor }} Foil</span>
@@ -716,15 +716,15 @@ new class extends Component {
                         <!-- Greyed Out Card 3 for Softbound -->
                         <div class="pq-card border-dashed p-6 space-y-3 opacity-75">
                             <div class="flex items-center justify-between">
-                                <h3 class="text-sm font-bold text-stone-600 dark:text-stone-400 uppercase tracking-wider flex items-center gap-2">
-                                    <flux:icon name="swatch" class="size-4 text-stone-500" />
+                                <h3 class="text-sm font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider flex items-center gap-2">
+                                    <flux:icon name="swatch" class="size-4 text-slate-500" />
                                     4. Cover Colors &amp; Hot Foil Stamping
                                 </h3>
                                 <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold pq-badge-neutral">
                                     Not Applicable
                                 </span>
                             </div>
-                            <p class="text-xs text-stone-600 dark:text-stone-400 leading-relaxed">
+                            <p class="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
                                 Softbound utilizes a <strong>transparent clear PVC acetate front sheet</strong> with standard cardstock backing. Leatherette colors and hot foil stamping dies are exclusive to <strong>Hardbound Compilations</strong>.
                             </p>
                         </div>
@@ -732,7 +732,7 @@ new class extends Component {
 
                     <!-- Card 5: Cover Fields (Hardbound) & PDF Manuscript Upload -->
                     <div class="pq-card p-6 space-y-5">
-                        <h3 class="text-sm font-bold text-amber-700 dark:text-amber-400 uppercase tracking-wider flex items-center gap-2">
+                        <h3 class="text-sm font-bold text-blue-700 dark:text-blue-400 uppercase tracking-wider flex items-center gap-2">
                             <flux:icon name="pencil-square" class="size-4" />
                             5. {{ $binding_type === 'hardbound' ? 'Hardbound Cover Foil Text & Reference PDF' : 'Manuscript PDF Document' }}
                         </h3>
@@ -742,12 +742,12 @@ new class extends Component {
                             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                 @foreach ($required_custom_fields as $field)
                                     <div class="space-y-1 {{ str_contains(strtolower($field), 'title') ? 'sm:col-span-2' : '' }}">
-                                        <label class="text-xs font-bold text-stone-700 dark:text-stone-300">{{ $field }} *</label>
+                                        <label class="text-xs font-bold text-slate-700 dark:text-slate-300">{{ $field }} *</label>
                                         <input
                                             wire:model="custom_fields_data.{{ $field }}"
                                             type="text"
                                             placeholder="Enter {{ strtolower($field) }}..."
-                                            class="w-full px-3.5 py-2.5 rounded-xl bg-white dark:bg-stone-950 border border-stone-300 dark:border-stone-800 text-xs text-stone-900 dark:text-stone-100 placeholder-stone-400 dark:placeholder-stone-600 focus:border-amber-500 focus:outline-none"
+                                            class="w-full px-3.5 py-2.5 rounded-xl bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-800 text-xs text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-600 focus:border-blue-600 dark:focus:border-blue-400 focus:outline-none"
                                             required
                                         />
                                         @error("custom_fields_data.{$field}")
@@ -759,22 +759,22 @@ new class extends Component {
                         @endif
 
                         <!-- PDF Manuscript File Uploader -->
-                        <div class="space-y-2 pt-2 border-t border-stone-200 dark:border-stone-800">
-                            <label class="text-xs font-bold text-stone-700 dark:text-stone-300 flex items-center justify-between">
+                        <div class="space-y-2 pt-2 border-t border-slate-200 dark:border-slate-800">
+                            <label class="text-xs font-bold text-slate-700 dark:text-slate-300 flex items-center justify-between">
                                 <span>{{ $fulfillment_type === 'cover_only' ? 'Upload Digital PDF Copy (for double checking & spine sizing)' : 'Upload Manuscript PDF Document *' }}</span>
-                                <span class="text-[10px] text-stone-500 dark:text-stone-400">PDF only, up to 50MB</span>
+                                <span class="text-[10px] text-slate-500 dark:text-slate-400">PDF only, up to 50MB</span>
                             </label>
 
-                            <div class="p-5 rounded-2xl bg-stone-50 dark:bg-stone-950 border-2 border-dashed border-stone-300 dark:border-stone-800 hover:border-amber-500/60 transition-colors text-center space-y-2">
-                                <flux:icon name="arrow-up-tray" class="size-8 mx-auto text-amber-600 dark:text-amber-400" />
-                                <div class="text-xs text-stone-700 dark:text-stone-300 font-bold">
+                            <div class="p-5 rounded-2xl bg-slate-50 dark:bg-slate-950 border-2 border-dashed border-slate-300 dark:border-slate-800 hover:border-blue-500/60 transition-colors text-center space-y-2">
+                                <flux:icon name="arrow-up-tray" class="size-8 mx-auto text-blue-600 dark:text-blue-400" />
+                                <div class="text-xs text-slate-700 dark:text-slate-300 font-bold">
                                     @if ($manuscript_file)
                                         <span class="text-emerald-700 dark:text-emerald-400 font-bold">{{ $manuscript_file->getClientOriginalName() }}</span>
                                     @else
                                         <span>Click to browse or drag &amp; drop your thesis PDF</span>
                                     @endif
                                 </div>
-                                <input wire:model="manuscript_file" type="file" accept=".pdf" class="text-xs text-stone-500 dark:text-stone-400 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-stone-200 dark:file:bg-stone-800 file:text-stone-800 dark:file:text-amber-400 hover:file:bg-stone-300 dark:hover:file:bg-stone-700 cursor-pointer" />
+                                <input wire:model="manuscript_file" type="file" accept=".pdf" class="text-xs text-slate-500 dark:text-slate-400 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-slate-200 dark:file:bg-slate-800 file:text-slate-800 dark:file:text-blue-400 hover:file:bg-slate-300 dark:hover:file:bg-slate-700 cursor-pointer" />
                             </div>
                             @error('manuscript_file') <span class="text-red-600 dark:text-red-400 text-[10px] font-bold">{{ $message }}</span> @enderror
                         </div>
@@ -783,7 +783,7 @@ new class extends Component {
                     <!-- Card 6: Retail Add-ons Selection -->
                     @if ($addonsList->isNotEmpty())
                         <div class="pq-card p-6 space-y-4">
-                            <h3 class="text-sm font-bold text-amber-700 dark:text-amber-400 uppercase tracking-wider flex items-center gap-2">
+                            <h3 class="text-sm font-bold text-blue-700 dark:text-blue-400 uppercase tracking-wider flex items-center gap-2">
                                 <flux:icon name="tag" class="size-4" />
                                 6. Optional Accessories &amp; Add-ons
                             </h3>
@@ -794,18 +794,18 @@ new class extends Component {
                                         $isAddonOut = $addon->isOutOfStock();
                                         $isChecked = in_array($addon->id, $selected_addon_ids);
                                     @endphp
-                                    <label class="p-3.5 rounded-2xl border transition-colors flex items-center justify-between cursor-pointer {{ $isChecked ? 'bg-amber-50 dark:bg-amber-500/15 border-amber-500' : ($isAddonOut ? 'opacity-40 bg-stone-100 dark:bg-stone-950 border-stone-200 dark:border-stone-800 cursor-not-allowed' : 'bg-stone-50 dark:bg-stone-950 border-stone-200 dark:border-stone-800 hover:border-stone-300 dark:hover:border-stone-700') }}">
+                                    <label class="p-3.5 rounded-2xl border transition-colors flex items-center justify-between cursor-pointer {{ $isChecked ? 'bg-blue-50 dark:bg-blue-500/15 border-blue-600' : ($isAddonOut ? 'opacity-40 bg-slate-100 dark:bg-slate-950 border-slate-200 dark:border-slate-800 cursor-not-allowed' : 'bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700') }}">
                                         <div class="flex items-center gap-3">
                                             <input
                                                 type="checkbox"
                                                 wire:model.live="selected_addon_ids"
                                                 value="{{ $addon->id }}"
                                                 @disabled($isAddonOut)
-                                                class="rounded accent-amber-500 size-4 bg-white dark:bg-stone-900 border-stone-300 dark:border-stone-700"
+                                                class="rounded accent-blue-600 size-4 bg-white dark:bg-slate-900 border-slate-300 dark:border-slate-700"
                                             />
                                             <div>
-                                                <div class="text-xs font-bold text-stone-900 dark:text-white">{{ $addon->name }}</div>
-                                                <div class="text-[10px] text-stone-500 dark:text-stone-400 tabular-nums">₱{{ number_format($addon->selling_price ?? 0, 2) }} / pc</div>
+                                                <div class="text-xs font-bold text-slate-900 dark:text-white">{{ $addon->name }}</div>
+                                                <div class="text-[10px] text-slate-500 dark:text-slate-400 tabular-nums">₱{{ number_format($addon->selling_price ?? 0, 2) }} / pc</div>
                                             </div>
                                         </div>
                                         @if ($isAddonOut)
@@ -820,43 +820,43 @@ new class extends Component {
 
                 <!-- Right 1 Col: Live Price Breakdown & Sticky Action Button -->
                 <div class="space-y-6">
-                    <div class="sticky top-20 pq-card !border-amber-300 dark:!border-amber-500/40 p-6 space-y-6">
+                    <div class="sticky top-20 pq-card !border-blue-200 dark:!border-blue-800 p-6 space-y-6">
                         <div>
-                            <span class="px-2.5 py-0.5 rounded-full pq-badge-warning text-[10px] font-bold uppercase">Live Quotation</span>
-                            <h3 class="text-lg font-bold text-stone-900 dark:text-white mt-1.5">Order Summary</h3>
-                            <p class="text-[11px] text-stone-600 dark:text-stone-400">
+                            <span class="px-2.5 py-0.5 rounded-full pq-badge-brand text-[10px] font-bold uppercase">Live Quotation</span>
+                            <h3 class="text-lg font-bold text-slate-900 dark:text-white mt-1.5">Order Summary</h3>
+                            <p class="text-[11px] text-slate-600 dark:text-slate-400">
                                 {{ $fulfillment_type === 'cover_only' ? 'Cover & Binding Only (Customer Pages)' : 'Full Print & Binding Package' }}
                             </p>
                         </div>
 
                         <!-- Price Breakdown Rows -->
-                        <div class="divide-y divide-stone-200 dark:divide-stone-800 text-xs space-y-2.5 tabular-nums">
+                        <div class="divide-y divide-slate-200 dark:divide-slate-800 text-xs space-y-2.5 tabular-nums">
                             <div class="flex justify-between pt-2">
-                                <span class="text-stone-600 dark:text-stone-400">Base {{ $fulfillment_type === 'cover_only' ? 'Hardbound Cover' : ucfirst($binding_type) }}:</span>
-                                <span class="font-bold text-stone-900 dark:text-white">₱{{ number_format($pricing['base_price'], 2) }}</span>
+                                <span class="text-slate-600 dark:text-slate-400">Base {{ $fulfillment_type === 'cover_only' ? 'Hardbound Cover' : ucfirst($binding_type) }}:</span>
+                                <span class="font-bold text-slate-900 dark:text-white">₱{{ number_format($pricing['base_price'], 2) }}</span>
                             </div>
                             @if ($fulfillment_type === 'full_package')
                                 <div class="flex justify-between pt-2">
-                                    <span class="text-stone-600 dark:text-stone-400">B&amp;W Pages ({{ $bw_pages }} &times; ₱{{ number_format($page_price_bw, 2) }}):</span>
-                                    <span class="font-bold text-stone-900 dark:text-white">₱{{ number_format($pricing['bw_total'], 2) }}</span>
+                                    <span class="text-slate-600 dark:text-slate-400">B&amp;W Pages ({{ $bw_pages }} &times; ₱{{ number_format($page_price_bw, 2) }}):</span>
+                                    <span class="font-bold text-slate-900 dark:text-white">₱{{ number_format($pricing['bw_total'], 2) }}</span>
                                 </div>
                                 <div class="flex justify-between pt-2">
-                                    <span class="text-stone-600 dark:text-stone-400">Color Pages ({{ $color_pages }} &times; ₱{{ number_format($page_price_color, 2) }}):</span>
-                                    <span class="font-bold text-stone-900 dark:text-white">₱{{ number_format($pricing['color_total'], 2) }}</span>
+                                    <span class="text-slate-600 dark:text-slate-400">Color Pages ({{ $color_pages }} &times; ₱{{ number_format($page_price_color, 2) }}):</span>
+                                    <span class="font-bold text-slate-900 dark:text-white">₱{{ number_format($pricing['color_total'], 2) }}</span>
                                 </div>
                             @else
                                 <div class="flex justify-between pt-2 text-emerald-700 dark:text-emerald-400 font-semibold">
                                     <span>Printed Pages ({{ $preprinted_total_pages }} pages):</span>
                                     <span>₱0.00 (Supplied)</span>
                                 </div>
-                                <div class="flex justify-between pt-2 text-stone-600 dark:text-stone-400">
+                                <div class="flex justify-between pt-2 text-slate-600 dark:text-slate-400">
                                     <span>Est. Spine Width:</span>
-                                    <span class="font-mono font-bold text-stone-800 dark:text-stone-200">~{{ $pricing['estimated_spine_mm'] }} mm</span>
+                                    <span class="font-mono font-bold text-slate-800 dark:text-slate-200">~{{ $pricing['estimated_spine_mm'] }} mm</span>
                                 </div>
                             @endif
                             <div class="flex justify-between pt-2">
-                                <span class="text-stone-600 dark:text-stone-400">Book Copies:</span>
-                                <span class="font-bold text-amber-700 dark:text-amber-400">&times; {{ $copies_count }}</span>
+                                <span class="text-slate-600 dark:text-slate-400">Book Copies:</span>
+                                <span class="font-bold text-blue-700 dark:text-blue-400">&times; {{ $copies_count }}</span>
                             </div>
                             @if ($pricing['addons_total'] > 0)
                                 <div class="flex justify-between pt-2 text-sky-700 dark:text-sky-300 font-semibold">
@@ -874,17 +874,17 @@ new class extends Component {
 
                         <!-- Grand Total -->
                         <div class="pq-well p-4 flex items-center justify-between">
-                            <span class="text-xs font-bold text-stone-700 dark:text-stone-300">Total Payable:</span>
-                            <span class="text-2xl font-black text-amber-700 dark:text-amber-400 tabular-nums">₱{{ number_format($pricing['grand_total'], 2) }}</span>
+                            <span class="text-xs font-bold text-slate-700 dark:text-slate-300">Total Payable:</span>
+                            <span class="text-2xl font-black text-blue-700 dark:text-blue-400 tabular-nums">₱{{ number_format($pricing['grand_total'], 2) }}</span>
                         </div>
 
                         <!-- Rush Checkbox -->
                         <div class="pq-well p-3.5 space-y-1">
                             <label class="flex items-center gap-2 cursor-pointer">
-                                <input wire:model.live="is_rush" type="checkbox" class="rounded accent-amber-500 size-4" />
-                                <span class="text-xs font-bold text-stone-900 dark:text-white tabular-nums">Expedited Rush Order (+₱{{ number_format($rush_fee, 2) }})</span>
+                                <input wire:model.live="is_rush" type="checkbox" class="rounded accent-blue-600 size-4" />
+                                <span class="text-xs font-bold text-slate-900 dark:text-white tabular-nums">Expedited Rush Order (+₱{{ number_format($rush_fee, 2) }})</span>
                             </label>
-                            <p class="text-[10px] text-stone-600 dark:text-stone-400 pl-6">
+                            <p class="text-[10px] text-slate-600 dark:text-slate-400 pl-6">
                                 Expected Ready: <strong class="text-emerald-700 dark:text-emerald-400">{{ $pricing['target_completion_date']->format('M d, Y (D)') }}</strong>
                             </p>
                         </div>
@@ -893,7 +893,7 @@ new class extends Component {
                         <button
                             type="button"
                             wire:click="proceedToCheckout"
-                            class="w-full py-3.5 rounded-xl bg-amber-500 hover:bg-amber-600 text-stone-950 text-xs font-bold uppercase tracking-wider shadow-sm transition-colors cursor-pointer"
+                            class="w-full py-3.5 rounded-xl bg-blue-600 hover:bg-blue-700 dark:hover:bg-blue-500 text-white text-xs font-bold uppercase tracking-wider shadow-sm transition-colors cursor-pointer"
                         >
                             Proceed to GCash Checkout &rarr;
                         </button>
@@ -906,19 +906,19 @@ new class extends Component {
         @if ($step === 2)
             <div class="max-w-2xl mx-auto space-y-6">
                 <div class="pq-card p-8 space-y-6">
-                    <div class="flex items-center justify-between border-b border-stone-200 dark:border-stone-800 pb-4">
+                    <div class="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-4">
                         <div class="flex items-center gap-3">
                             <span class="flex size-10 items-center justify-center rounded-xl bg-blue-600 text-white font-black shadow-sm">
                                 ₱
                             </span>
                             <div>
-                                <h3 class="text-lg font-bold text-stone-900 dark:text-white">GCash Payment Verification</h3>
-                                <p class="text-xs text-stone-600 dark:text-stone-400">Send exact amount to the print shop and submit reference number</p>
+                                <h3 class="text-lg font-bold text-slate-900 dark:text-white">GCash Payment Verification</h3>
+                                <p class="text-xs text-slate-600 dark:text-slate-400">Send exact amount to the print shop and submit reference number</p>
                             </div>
                         </div>
                         <div class="text-right">
-                            <span class="text-[10px] text-stone-500 dark:text-stone-400 block">Total Due</span>
-                            <span class="text-xl font-black text-amber-700 dark:text-amber-400 tabular-nums">₱{{ number_format($pricing['grand_total'], 2) }}</span>
+                            <span class="text-[10px] text-slate-500 dark:text-slate-400 block">Total Due</span>
+                            <span class="text-xl font-black text-blue-700 dark:text-blue-400 tabular-nums">₱{{ number_format($pricing['grand_total'], 2) }}</span>
                         </div>
                     </div>
 
@@ -930,18 +930,18 @@ new class extends Component {
                         </div>
                         <div class="grid grid-cols-2 gap-2 text-xs">
                             <div>
-                                <span class="text-stone-500 dark:text-stone-400 text-[10px] block">Account Name:</span>
-                                <strong class="text-stone-900 dark:text-white">{{ $shop ? $shop->name : 'Apex Print Hub' }}</strong>
+                                <span class="text-slate-500 dark:text-slate-400 text-[10px] block">Account Name:</span>
+                                <strong class="text-slate-900 dark:text-white">{{ $shop ? $shop->name : 'Apex Print Hub' }}</strong>
                             </div>
                             <div>
-                                <span class="text-stone-500 dark:text-stone-400 text-[10px] block">GCash Number:</span>
-                                <strong class="text-stone-900 dark:text-white font-mono">0917 888 4321</strong>
+                                <span class="text-slate-500 dark:text-slate-400 text-[10px] block">GCash Number:</span>
+                                <strong class="text-slate-900 dark:text-white font-mono">0917 888 4321</strong>
                             </div>
                         </div>
                         <button
                             type="button"
                             @click="navigator.clipboard.writeText('09178884321'); copied = true; setTimeout(() => copied = false, 2000)"
-                            class="w-full py-2 rounded-xl bg-white dark:bg-stone-900 hover:bg-stone-100 dark:hover:bg-stone-800 border border-stone-300 dark:border-stone-700 text-stone-800 dark:text-stone-300 text-xs font-bold flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
+                            class="w-full py-2 rounded-xl bg-white dark:bg-slate-900 hover:bg-slate-100 dark:hover:bg-slate-800 border border-slate-300 dark:border-slate-700 text-slate-800 dark:text-slate-300 text-xs font-bold flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
                         >
                             <flux:icon name="clipboard-document" class="size-3.5" />
                             <span x-text="copied ? 'Copied 09178884321!' : 'Copy GCash Number (09178884321)'"></span>
@@ -952,12 +952,12 @@ new class extends Component {
                     <form wire:submit.prevent="submitOrder" class="space-y-4">
                         <!-- Reference Number -->
                         <div class="space-y-1">
-                            <label class="text-xs font-bold text-stone-700 dark:text-stone-300">GCash 13-Digit Reference Number *</label>
+                            <label class="text-xs font-bold text-slate-700 dark:text-slate-300">GCash 13-Digit Reference Number *</label>
                             <input
                                 wire:model="payment_reference_no"
                                 type="text"
                                 placeholder="e.g. 1002 9481 0293 8"
-                                class="w-full px-4 py-3 rounded-xl bg-white dark:bg-stone-950 border border-stone-300 dark:border-stone-800 font-mono text-sm text-stone-900 dark:text-stone-100 placeholder-stone-400 dark:placeholder-stone-600 focus:border-amber-500 focus:outline-none"
+                                class="w-full px-4 py-3 rounded-xl bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-800 font-mono text-sm text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-600 focus:border-blue-600 dark:focus:border-blue-400 focus:outline-none"
                                 required
                             />
                             @error('payment_reference_no') <span class="text-red-600 dark:text-red-400 text-[10px] font-bold">{{ $message }}</span> @enderror
@@ -965,13 +965,13 @@ new class extends Component {
 
                         <!-- Proof Screenshot -->
                         <div class="space-y-1">
-                            <label class="text-xs font-bold text-stone-700 dark:text-stone-300">Upload GCash Receipt Screenshot <span class="text-stone-500 dark:text-stone-400 font-normal">(Optional)</span></label>
-                            <input wire:model="payment_proof_file" type="file" accept="image/*" class="w-full text-xs text-stone-600 dark:text-stone-400 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-stone-200 dark:file:bg-stone-800 file:text-stone-800 dark:file:text-white hover:file:bg-stone-300 dark:hover:file:bg-stone-700 cursor-pointer" />
+                            <label class="text-xs font-bold text-slate-700 dark:text-slate-300">Upload GCash Receipt Screenshot <span class="text-slate-500 dark:text-slate-400 font-normal">(Optional)</span></label>
+                            <input wire:model="payment_proof_file" type="file" accept="image/*" class="w-full text-xs text-slate-600 dark:text-slate-400 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-slate-200 dark:file:bg-slate-800 file:text-slate-800 dark:file:text-white hover:file:bg-slate-300 dark:hover:file:bg-slate-700 cursor-pointer" />
                             @error('payment_proof_file') <span class="text-red-600 dark:text-red-400 text-[10px] font-bold">{{ $message }}</span> @enderror
                         </div>
 
-                        <div class="flex items-center justify-between pt-4 border-t border-stone-200 dark:border-stone-800">
-                            <button type="button" wire:click="$set('step', 1)" class="px-5 py-2.5 rounded-xl border border-stone-300 dark:border-stone-800 text-stone-700 dark:text-stone-300 hover:bg-stone-100 dark:hover:text-white text-xs font-bold cursor-pointer">
+                        <div class="flex items-center justify-between pt-4 border-t border-slate-200 dark:border-slate-800">
+                            <button type="button" wire:click="$set('step', 1)" class="px-5 py-2.5 rounded-xl border border-slate-300 dark:border-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:text-white text-xs font-bold cursor-pointer">
                                 &larr; Back to Edit Details
                             </button>
                             <button type="submit" class="px-6 py-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold shadow-sm transition-colors cursor-pointer">
@@ -993,22 +993,22 @@ new class extends Component {
 
                     <div class="space-y-1">
                         <span class="px-3 py-1 rounded-full pq-badge-success text-[10px] font-bold uppercase">Order Submitted</span>
-                        <h2 class="text-2xl font-bold text-stone-900 dark:text-white">Thank You! Order Placed</h2>
-                        <p class="text-xs text-stone-600 dark:text-stone-400">Your thesis binding order has been logged and queued for payment verification</p>
+                        <h2 class="text-2xl font-bold text-slate-900 dark:text-white">Thank You! Order Placed</h2>
+                        <p class="text-xs text-slate-600 dark:text-slate-400">Your thesis binding order has been logged and queued for payment verification</p>
                     </div>
 
                     <div class="pq-well p-4 text-left space-y-2">
                         <div class="flex justify-between items-center text-xs">
-                            <span class="text-stone-600 dark:text-stone-400">Order Tracking Code:</span>
-                            <span class="font-mono font-bold text-amber-700 dark:text-amber-400 text-sm">{{ $created_order_number }}</span>
+                            <span class="text-slate-600 dark:text-slate-400">Order Tracking Code:</span>
+                            <span class="font-mono font-bold text-blue-700 dark:text-blue-400 text-sm">{{ $created_order_number }}</span>
                         </div>
                         <div class="flex justify-between items-center text-xs">
-                            <span class="text-stone-600 dark:text-stone-400">Package Type:</span>
-                            <span class="font-bold text-stone-900 dark:text-white">{{ $fulfillment_type === 'cover_only' ? 'Cover & Binding Only (Dala ang Papel)' : 'Full Print & Hardbound Package' }}</span>
+                            <span class="text-slate-600 dark:text-slate-400">Package Type:</span>
+                            <span class="font-bold text-slate-900 dark:text-white">{{ $fulfillment_type === 'cover_only' ? 'Cover & Binding Only (Dala ang Papel)' : 'Full Print & Hardbound Package' }}</span>
                         </div>
                         <div class="flex justify-between items-center text-xs">
-                            <span class="text-stone-600 dark:text-stone-400">Committed Pickup Date:</span>
-                            <span class="font-bold text-stone-900 dark:text-white">{{ $pricing['target_completion_date']->format('F d, Y') }}</span>
+                            <span class="text-slate-600 dark:text-slate-400">Committed Pickup Date:</span>
+                            <span class="font-bold text-slate-900 dark:text-white">{{ $pricing['target_completion_date']->format('F d, Y') }}</span>
                         </div>
                     </div>
 
@@ -1018,14 +1018,14 @@ new class extends Component {
                                 <flux:icon name="archive-box-arrow-down" class="size-4" />
                                 Next Step: Drop off your physical paper
                             </div>
-                            <p class="text-[11px] text-stone-700 dark:text-stone-300 leading-relaxed">
+                            <p class="text-[11px] text-slate-700 dark:text-slate-300 leading-relaxed">
                                 Please bring your {{ $preprinted_total_pages }} pre-printed and arranged manuscript pages to the print shop counter. Mention Order Tracking Code <strong>{{ $created_order_number }}</strong>.
                             </p>
                         </div>
                     @endif
 
                     <div class="pt-2">
-                        <a href="{{ route('customer.dashboard') }}" wire:navigate class="w-full block py-3.5 rounded-xl bg-amber-500 hover:bg-amber-600 text-stone-950 text-xs font-bold shadow-sm transition-colors">
+                        <a href="{{ route('customer.dashboard') }}" wire:navigate class="w-full block py-3.5 rounded-xl bg-blue-600 hover:bg-blue-700 dark:hover:bg-blue-500 text-white text-xs font-bold shadow-sm transition-colors">
                             View Order in Customer Portal &rarr;
                         </a>
                     </div>

@@ -263,7 +263,7 @@ class ProductionWorkflowAndRevisionsTest extends TestCase
         // Assign order #1 item to Canon Laser Alpha
         $item1 = $order1->items()->firstOrFail();
         Livewire::actingAs($this->staff)
-            ->test('pages::staff.⚡staff-dashboard')
+            ->test('pages::staff.staff-dashboard')
             ->call('assignItemPrinter', $item1->id, $printerAlpha->id);
 
         $this->assertSame($printerAlpha->id, $item1->fresh()->printer_id);
@@ -332,7 +332,7 @@ class ProductionWorkflowAndRevisionsTest extends TestCase
 
         // Prepress rejection puts item on_hold and blocks startPrintingItem
         Livewire::actingAs($this->staff)
-            ->test('pages::staff.⚡staff-dashboard')
+            ->test('pages::staff.staff-dashboard')
             ->call('openItemPrepressRejectModal', $item->id)
             ->set('prepressRejectReason', 'Margins cut off on page 12')
             ->call('confirmPrepressRejection');
@@ -352,7 +352,7 @@ class ProductionWorkflowAndRevisionsTest extends TestCase
 
         // Customer re-uploads corrected PDF on customer dashboard
         Livewire::actingAs($this->customer)
-            ->test('pages::customer.⚡customer-dashboard')
+            ->test('pages::customer.customer-dashboard')
             ->call('openReuploadModal', $item->id)
             ->set('reupload_file', $fixedPdf)
             ->call('submitArtworkReupload')
@@ -367,7 +367,7 @@ class ProductionWorkflowAndRevisionsTest extends TestCase
 
         // Staff approves prepress -> specs locked
         Livewire::actingAs($this->staff)
-            ->test('pages::staff.⚡staff-dashboard')
+            ->test('pages::staff.staff-dashboard')
             ->call('approveItemPrepress', $item->id);
 
         $item->refresh();
@@ -393,7 +393,7 @@ class ProductionWorkflowAndRevisionsTest extends TestCase
         $reservedPaperBefore = (float) $this->paperItem->fresh()->reserved_qty;
 
         Livewire::actingAs($this->staff)
-            ->test('pages::staff.⚡staff-dashboard')
+            ->test('pages::staff.staff-dashboard')
             ->call('openShiftToShopPaperModal', $coverItem->id)
             ->set('shiftReason', 'Supplied pages damp and mismatched GSM')
             ->set('shiftBwPages', 100)
@@ -444,7 +444,7 @@ class ProductionWorkflowAndRevisionsTest extends TestCase
 
         // 1. Pre-print UPGRADE via customer dashboard (copies 1 -> 2 => 900.00)
         Livewire::actingAs($this->customer)
-            ->test('pages::customer.⚡customer-dashboard')
+            ->test('pages::customer.customer-dashboard')
             ->call('openSpecRevisionModal', $item->id)
             ->set('rev_copies_count', 2)
             ->set('rev_notes', 'Need second hardbound copy for adviser')
@@ -458,7 +458,7 @@ class ProductionWorkflowAndRevisionsTest extends TestCase
 
         // Staff approves upgrade -> BOM reservation increases from 50 -> 100 sheets & balance becomes 450.00
         Livewire::actingAs($this->staff)
-            ->test('pages::staff.⚡staff-dashboard')
+            ->test('pages::staff.staff-dashboard')
             ->call('approveItemRevision', $upgradeRev->id);
 
         $order->refresh();
@@ -484,7 +484,7 @@ class ProductionWorkflowAndRevisionsTest extends TestCase
 
         // Owner settles manual refund from Analytics Hub
         Livewire::actingAs($this->owner)
-            ->test('pages::owner.⚡analytics-hub')
+            ->test('pages::owner.analytics-hub')
             ->set('active_tab', 'payments')
             ->assertSee('Pending Manual Refunds')
             ->call('settleManualRefund', $order->id);
@@ -559,7 +559,7 @@ class ProductionWorkflowAndRevisionsTest extends TestCase
         $queueService->advanceItemStage($thesisItem->fresh(), $this->staff);
 
         Livewire::actingAs($this->staff)
-            ->test('pages::staff.⚡staff-dashboard')
+            ->test('pages::staff.staff-dashboard')
             ->call('openItemQaPassModal', $thesisItem->id)
             ->set('qaPassShelfBin', 'BIN-A3')
             ->call('confirmItemQaPass');
@@ -572,14 +572,14 @@ class ProductionWorkflowAndRevisionsTest extends TestCase
 
         // Customer portal shows Partially Ready and Shelf/Bin tag
         Livewire::actingAs($this->customer)
-            ->test('pages::customer.⚡customer-dashboard')
+            ->test('pages::customer.customer-dashboard')
             ->set('active_tab', 'orders')
             ->assertSee('Partially ready')
             ->assertSee('BIN-A3');
 
         // Early split pickup of Item 1 allowed while Item 2 is still unfinished
         Livewire::actingAs($this->staff)
-            ->test('pages::staff.⚡staff-dashboard')
+            ->test('pages::staff.staff-dashboard')
             ->call('claimOrderItem', $thesisItem->id);
 
         $this->assertTrue($thesisItem->fresh()->isClaimed());
@@ -592,7 +592,7 @@ class ProductionWorkflowAndRevisionsTest extends TestCase
 
         // Claiming FINAL item blocked while balance_due > 0
         Livewire::actingAs($this->staff)
-            ->test('pages::staff.⚡staff-dashboard')
+            ->test('pages::staff.staff-dashboard')
             ->call('claimOrderItem', $docItem->id);
 
         $docItem->refresh();
@@ -603,7 +603,7 @@ class ProductionWorkflowAndRevisionsTest extends TestCase
         // Settle remaining 50% balance, then claim Item 2 -> completes parent order with completed_at
         $paymentService->recordOfflineCounterPayment($order, $this->owner, (float) $order->balance_due);
         Livewire::actingAs($this->staff)
-            ->test('pages::staff.⚡staff-dashboard')
+            ->test('pages::staff.staff-dashboard')
             ->call('claimOrderItem', $docItem->id);
 
         $docItem->refresh();
@@ -662,7 +662,7 @@ class ProductionWorkflowAndRevisionsTest extends TestCase
         $queueService->assignItem($item, $this->staff, $standardPrinter->id, $this->staff->id);
 
         Livewire::actingAs($this->staff)
-            ->test('pages::staff.⚡staff-dashboard')
+            ->test('pages::staff.staff-dashboard')
             ->call('viewJobTicket', $order->id)
             ->assertSee('Direct Print Preview')
             ->assertDontSee('RIP Export');
@@ -687,7 +687,7 @@ class ProductionWorkflowAndRevisionsTest extends TestCase
         $queueService->assignItem($item->fresh(), $this->staff, $widePrinter->id, $this->staff->id);
 
         Livewire::actingAs($this->staff)
-            ->test('pages::staff.⚡staff-dashboard')
+            ->test('pages::staff.staff-dashboard')
             ->call('viewJobTicket', $order->id)
             ->assertSee('RIP Export');
 
@@ -697,7 +697,7 @@ class ProductionWorkflowAndRevisionsTest extends TestCase
         $queueService->advanceItemStage($item->fresh(), $this->staff);
 
         Livewire::actingAs($this->staff)
-            ->test('pages::staff.⚡staff-dashboard')
+            ->test('pages::staff.staff-dashboard')
             ->call('openItemQaFailModal', $item->id)
             ->set('qaFailReason', 'Fuser smudge across chapter 2')
             ->set('qaFailSpoiledSheets', 12.0)

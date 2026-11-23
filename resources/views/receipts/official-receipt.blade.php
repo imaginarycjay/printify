@@ -10,8 +10,8 @@
         }
         body {
             font-family: 'DejaVu Sans', sans-serif;
-            color: #1c1917;
-            background-color: {{ ($isPdf ?? false) ? '#ffffff' : '#f5f5f4' }};
+            color: #0f172a;
+            background-color: {{ ($isPdf ?? false) ? '#ffffff' : '#f1f5f9' }};
             margin: 0;
             padding: {{ ($isPdf ?? false) ? '16px' : '24px 16px' }};
             font-size: 12px;
@@ -33,27 +33,27 @@
             font-weight: 700;
             text-decoration: none;
             cursor: pointer;
-            border: 1px solid #d6d3d1;
+            border: 1px solid #cbd5e1;
             background: #ffffff;
-            color: #1c1917;
+            color: #0f172a;
         }
         .btn-primary {
-            background: #d97706;
-            border-color: #d97706;
+            background: #2563eb;
+            border-color: #2563eb;
             color: #ffffff;
         }
         .receipt-sheet {
             max-width: 820px;
             margin: 0 auto;
             background: #ffffff;
-            border: 1px solid #e7e5e4;
+            border: 1px solid #e2e8f0;
             border-radius: {{ ($isPdf ?? false) ? '0' : '12px' }};
             padding: 28px;
         }
         .header-table {
             width: 100%;
             border-collapse: collapse;
-            border-bottom: 2px solid #1c1917;
+            border-bottom: 2px solid #0f172a;
             padding-bottom: 14px;
             margin-bottom: 18px;
         }
@@ -64,11 +64,11 @@
         .shop-title {
             font-size: 20px;
             font-weight: 700;
-            color: #1c1917;
+            color: #0f172a;
             margin: 0 0 4px 0;
         }
         .muted {
-            color: #57534e;
+            color: #475569;
             font-size: 11px;
         }
         .receipt-badge {
@@ -76,9 +76,9 @@
         }
         .receipt-tag {
             display: inline-block;
-            background: #fef3c7;
-            color: #92400e;
-            border: 1px solid #fde68a;
+            background: #eff6ff;
+            color: #1d4ed8;
+            border: 1px solid #bfdbfe;
             padding: 3px 10px;
             font-size: 10px;
             font-weight: 700;
@@ -89,21 +89,21 @@
         .or-number {
             font-size: 16px;
             font-weight: 700;
-            color: #1c1917;
+            color: #0f172a;
             margin: 2px 0;
         }
         .meta-table {
             width: 100%;
             border-collapse: collapse;
             margin-bottom: 18px;
-            background: #fafaf9;
-            border: 1px solid #e7e5e4;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
         }
         .meta-table td {
             width: 50%;
             padding: 10px 12px;
             vertical-align: top;
-            border-right: 1px solid #e7e5e4;
+            border-right: 1px solid #e2e8f0;
         }
         .meta-table td:last-child {
             border-right: none;
@@ -113,7 +113,7 @@
             font-weight: 700;
             text-transform: uppercase;
             letter-spacing: 0.06em;
-            color: #57534e;
+            color: #475569;
             margin: 16px 0 8px 0;
         }
         .items-table {
@@ -122,7 +122,7 @@
             margin-bottom: 16px;
         }
         .items-table th {
-            background: #1c1917;
+            background: #0f172a;
             color: #ffffff;
             font-size: 10px;
             font-weight: 700;
@@ -133,7 +133,7 @@
         }
         .items-table td {
             padding: 9px 10px;
-            border-bottom: 1px solid #e7e5e4;
+            border-bottom: 1px solid #e2e8f0;
             vertical-align: top;
         }
         .text-right {
@@ -155,14 +155,14 @@
         .totals-table {
             width: 100%;
             border-collapse: collapse;
-            border: 1px solid #e7e5e4;
+            border: 1px solid #e2e8f0;
         }
         .totals-table td {
             padding: 7px 10px;
-            border-bottom: 1px solid #e7e5e4;
+            border-bottom: 1px solid #e2e8f0;
         }
         .totals-table tr.grand td {
-            background: #fafaf9;
+            background: #f8fafc;
             font-weight: 700;
             font-size: 13px;
         }
@@ -175,16 +175,16 @@
             padding: 2px 7px;
             font-size: 10px;
             font-weight: 700;
-            border: 1px solid #d6d3d1;
-            background: #f5f5f4;
-            color: #44403c;
+            border: 1px solid #cbd5e1;
+            background: #f1f5f9;
+            color: #334155;
         }
         .footer-note {
             margin-top: 22px;
             padding-top: 12px;
-            border-top: 1px dashed #d6d3d1;
+            border-top: 1px dashed #cbd5e1;
             font-size: 10px;
-            color: #78716c;
+            color: #64748b;
             text-align: center;
         }
         @media print {
@@ -226,13 +226,21 @@
             \App\Models\Order::PAYMENT_OPTION_COUNTER_OFFLINE => 'Pay at Shop Counter',
             default => '100% Full Upfront Payment',
         };
+        $pressQueueLogoSrc = is_file(public_path('pressqueue-logo-v1.svg'))
+            ? 'data:image/svg+xml;base64,'.base64_encode((string) file_get_contents(public_path('pressqueue-logo-v1.svg')))
+            : null;
     @endphp
 
     <div class="receipt-sheet">
         <table class="header-table">
             <tr>
                 <td style="width: 58%;">
-                    <p class="shop-title">{{ $order->printShop?->name ?? 'PressQueue Partner Shop' }}</p>
+                    <p class="shop-title">
+                        @if ($pressQueueLogoSrc)
+                            <img src="{{ $pressQueueLogoSrc }}" alt="PressQueue" style="width: 22px; height: 22px; vertical-align: -4px; margin-right: 6px;" />
+                        @endif
+                        {{ $order->printShop?->name ?? 'PressQueue Partner Shop' }}
+                    </p>
                     <div class="muted">
                         {{ $order->printShop?->getAttribute('address') ?: 'Address on file' }}<br>
                         @if ($order->printShop?->getAttribute('contact'))

@@ -13,7 +13,7 @@
         @include('partials.head', ['title' => 'Printing services for your next project'])
         <meta name="description" content="Find a print shop, order document printing or thesis binding, and follow your pages from payment to pickup. PressQueue connects customers, shop owners, and production teams.">
     </head>
-    <body class="pressqueue-landing font-sans antialiased selection:bg-amber-500 selection:text-stone-950">
+    <body class="pressqueue-landing font-sans antialiased selection:bg-blue-600 selection:text-white">
         <a href="#main-content" class="landing-skip">Skip to content</a>
         <x-platform-header>
             <a href="#pricing" class="inline-flex min-h-11 items-center rounded-xl px-3 text-sm font-semibold focus-visible:outline-2 focus-visible:outline-offset-4">Shop plans</a>

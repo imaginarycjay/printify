@@ -43,7 +43,7 @@
                 variant="primary"
                 type="submit"
                 data-theme-keep
-                class="mt-1 w-full !bg-amber-500 !text-stone-950 font-semibold hover:!bg-amber-400"
+                class="mt-1 w-full !bg-blue-600 !text-white font-semibold hover:!bg-blue-700 dark:hover:!bg-blue-500"
                 data-test="confirm-password-button"
                 x-bind:disabled="submitting"
             >
@@ -66,7 +66,7 @@
             <a
                 href="{{ route('dashboard') }}"
                 data-theme-keep
-                class="inline-flex items-center gap-1.5 text-xs font-semibold text-stone-600 transition-colors hover:text-amber-700 dark:text-stone-300 dark:hover:text-amber-400"
+                class="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-600 transition-colors hover:text-blue-700 dark:text-slate-300 dark:hover:text-blue-400"
             >
                 <flux:icon name="arrow-left" class="size-3.5" />
                 <span>{{ __('Cancel and return to dashboard') }}</span>

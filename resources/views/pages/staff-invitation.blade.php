@@ -31,7 +31,7 @@ new class extends Component {
             {{ __('New staff can create an account below. If you already have a staff account, sign in with the invited email, then reopen this invitation.') }}
         </flux:callout>
     @else
-        <p data-theme-keep class="rounded-xl border border-[var(--auth-border)] bg-[var(--auth-input-bg)] p-3.5 text-sm text-stone-700 dark:text-stone-300">
+        <p data-theme-keep class="rounded-xl border border-[var(--auth-border)] bg-[var(--auth-input-bg)] p-3.5 text-sm text-slate-700 dark:text-slate-300">
             {{ __('Signed in as') }} <strong>{{ auth()->user()->email }}</strong>. {{ __('This must match the email receiving the invitation.') }}
         </p>
     @endguest
@@ -95,27 +95,27 @@ new class extends Component {
             variant="primary"
             icon-trailing="arrow-right"
             data-theme-keep
-            class="mt-1 w-full !bg-amber-500 !text-stone-950 font-semibold hover:!bg-amber-400"
+            class="mt-1 w-full !bg-blue-600 !text-white font-semibold hover:!bg-blue-700 dark:hover:!bg-blue-500"
             x-bind:disabled="submitting"
         >
             {{ __('Accept invitation') }}
         </flux:button>
     </form>
 
-    <div data-theme-keep class="-mx-6 -mb-6 mt-2 space-y-1.5 border-t border-[var(--auth-border-subtle)] bg-[var(--auth-card-footer)] px-6 py-4 text-center text-sm text-stone-600 dark:text-stone-300 sm:-mx-7 sm:-mb-7 sm:px-7">
+    <div data-theme-keep class="-mx-6 -mb-6 mt-2 space-y-1.5 border-t border-[var(--auth-border-subtle)] bg-[var(--auth-card-footer)] px-6 py-4 text-center text-sm text-slate-600 dark:text-slate-300 sm:-mx-7 sm:-mb-7 sm:px-7">
         @guest
             <p>
                 <span>{{ __('Already have a staff account?') }}</span>
                 <flux:link
                     data-theme-keep
-                    class="ms-1 font-semibold !text-amber-700 hover:!text-amber-800 dark:!text-amber-400 dark:hover:!text-amber-300"
+                    class="ms-1 font-semibold !text-blue-700 hover:!text-blue-800 dark:!text-blue-400 dark:hover:!text-blue-300"
                     :href="route('login')"
                 >
                     {{ __('Sign in') }}
                 </flux:link>
             </p>
         @endguest
-        <p data-theme-keep class="text-xs text-stone-500 dark:text-stone-400">
+        <p data-theme-keep class="text-xs text-slate-500 dark:text-slate-400">
             {{ __('Invitations expire after 48 hours and can only be accepted once.') }}
         </p>
     </div>

@@ -32,16 +32,16 @@ Route::get('orders/{order}/receipt', [PlatformController::class, 'receipt'])->mi
 
 Route::middleware(['auth', 'verified'])->group(function () {
     // Smart Single Sign-On (SSO) Role Redirector
-    Route::livewire('dashboard', 'pages::⚡dashboard')->name('dashboard');
+    Route::livewire('dashboard', 'pages::dashboard')->name('dashboard');
 
     // Business Owner Routes (Strictly Restricted to Business Owner)
     Route::prefix('owner')->name('owner.')->middleware('role:business_owner')->group(function () {
-        Route::livewire('dashboard', 'pages::owner.⚡owner-dashboard')->name('dashboard');
-        Route::livewire('setup', 'pages::owner.⚡owner-wizard')->name('wizard');
-        Route::livewire('analytics', 'pages::owner.⚡analytics-hub')->name('analytics-hub');
-        Route::livewire('inventory', 'pages::owner.⚡inventory-hub')->name('inventory-hub');
-        Route::livewire('thesis-binding', 'pages::owner.⚡thesis-binding')->name('thesis-binding');
-        Route::livewire('document-printing', 'pages::owner.⚡document-printing')->name('document-printing');
+        Route::livewire('dashboard', 'pages::owner.owner-dashboard')->name('dashboard');
+        Route::livewire('setup', 'pages::owner.owner-wizard')->name('wizard');
+        Route::livewire('analytics', 'pages::owner.analytics-hub')->name('analytics-hub');
+        Route::livewire('inventory', 'pages::owner.inventory-hub')->name('inventory-hub');
+        Route::livewire('thesis-binding', 'pages::owner.thesis-binding')->name('thesis-binding');
+        Route::livewire('document-printing', 'pages::owner.document-printing')->name('document-printing');
         Route::get('reports/{type}', [PlatformController::class, 'report'])
             ->whereIn('type', ['inventory', 'sales', 'schedule'])
             ->name('reports.show');
@@ -49,17 +49,17 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     // Production Staff Routes (Strictly Restricted to Production Staff)
     Route::prefix('staff')->name('staff.')->middleware('role:production_staff')->group(function () {
-        Route::livewire('dashboard', 'pages::staff.⚡staff-dashboard')->name('dashboard');
-        Route::livewire('production', 'pages::staff.⚡staff-dashboard')->name('production-hub');
+        Route::livewire('dashboard', 'pages::staff.staff-dashboard')->name('dashboard');
+        Route::livewire('production', 'pages::staff.staff-dashboard')->name('production-hub');
     });
 
     // Customer Routes (Strictly Restricted to Customer)
     Route::prefix('customer')->name('customer.')->middleware('role:customer')->group(function () {
-        Route::livewire('dashboard', 'pages::customer.⚡customer-dashboard')->name('dashboard');
-        Route::livewire('shops/{shop}/checkout', 'pages::customer.⚡shop-cart')->whereNumber('shop')->name('shop.checkout');
-        Route::livewire('shops/{shop}/order/thesis', 'pages::customer.⚡thesis-order-wizard')->whereNumber('shop')->name('shop.order-thesis');
+        Route::livewire('dashboard', 'pages::customer.customer-dashboard')->name('dashboard');
+        Route::livewire('shops/{shop}/checkout', 'pages::customer.shop-cart')->whereNumber('shop')->name('shop.checkout');
+        Route::livewire('shops/{shop}/order/thesis', 'pages::customer.thesis-order-wizard')->whereNumber('shop')->name('shop.order-thesis');
         Route::get('order/thesis-binding', fn () => redirect()->route('shops.index', ['service' => 'thesis_binding']))->name('order-thesis');
-        Route::livewire('shops/{shop}/order/document', 'pages::customer.⚡document-order-wizard')->whereNumber('shop')->name('shop.order-document');
+        Route::livewire('shops/{shop}/order/document', 'pages::customer.document-order-wizard')->whereNumber('shop')->name('shop.order-document');
         Route::get('order/document-printing', fn () => redirect()->route('shops.index', ['service' => 'document_printing']))->name('order-document');
     });
 

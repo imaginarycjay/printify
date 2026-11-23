@@ -20,7 +20,7 @@
                 type="submit"
                 variant="primary"
                 data-theme-keep
-                class="w-full !bg-amber-500 !text-stone-950 font-semibold hover:!bg-amber-400"
+                class="w-full !bg-blue-600 !text-white font-semibold hover:!bg-blue-700 dark:hover:!bg-blue-500"
                 x-bind:disabled="submitting"
             >
                 {{ __('Resend verification email') }}

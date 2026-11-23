@@ -96,7 +96,7 @@ class TenantPlatformTest extends TestCase
         Storage::disk('local')->put('proof.png', 'private');
         $staff = User::factory()->create(['role' => User::ROLE_PRODUCTION_STAFF]);
         $staff->forceFill(['staff_shop_id' => $a->id])->save();
-        Livewire::actingAs($staff)->test('pages::staff.⚡staff-dashboard')->call('verifyPayment', $order->id);
+        Livewire::actingAs($staff)->test('pages::staff.staff-dashboard')->call('verifyPayment', $order->id);
         $this->assertNotSame(Order::PAYMENT_VERIFIED_PAID, $order->fresh()->payment_status);
         $this->get(route('orders.file', ['order' => $order, 'kind' => 'payment']))->assertForbidden();
         $this->actingAs($order->customer)->get(route('orders.file', ['order' => $order, 'kind' => 'payment']))->assertOk();
@@ -157,7 +157,7 @@ class TenantPlatformTest extends TestCase
             $shop->thesisBindingConfig()->create(['is_active' => true, 'hardbound_base_price' => $shop->id === $second->id ? 600 : 300, 'require_pdf_upload' => false]);
         }
         $customer = User::factory()->create(['role' => User::ROLE_CUSTOMER]);
-        $component = Livewire::actingAs($customer)->test('pages::customer.⚡thesis-order-wizard', ['shop' => $second->id])
+        $component = Livewire::actingAs($customer)->test('pages::customer.thesis-order-wizard', ['shop' => $second->id])
             ->assertSet('hardbound_base_price', 600);
         $second->services()->firstOrFail()->update(['paused_until' => now()->addDay(), 'pause_reason' => 'Maintenance']);
         $component->call('selectedShop')->assertStatus(422);
@@ -423,18 +423,27 @@ class TenantPlatformTest extends TestCase
         $this->get(route('home'))
             ->assertOk()
             ->assertSee('PressQueue')
+            ->assertSee('M10 56V14L18 6H44L54 16V28L44 38H22V44L10 56Z', false)
+            ->assertSee('/favicon.svg?v=2', false)
+            ->assertSee('/favicon.ico?v=2', false)
+            ->assertSee('/apple-touch-icon.png?v=2', false)
+            ->assertDontSee('bg-amber-500', false)
             ->assertDontSee('Printify');
 
         $this->get(route('login'))
             ->assertOk()
             ->assertSee('PressQueue')
-            ->assertSee('text-stone-900 dark:text-white', false)
+            ->assertSee('text-slate-900 dark:text-white', false)
+            ->assertSee('M10 56V14L18 6H44L54 16V28L44 38H22V44L10 56Z', false)
+            ->assertSee('/favicon.svg?v=2', false)
+            ->assertDontSee('bg-amber-500', false)
             ->assertDontSee('from-white via-stone-100 to-stone-300 bg-clip-text text-transparent', false)
             ->assertDontSee('Printify');
 
         $this->get(route('shops.index'))
             ->assertOk()
             ->assertSee('PressQueue')
+            ->assertDontSee('bg-amber-500', false)
             ->assertDontSee('Printify');
     }
 }

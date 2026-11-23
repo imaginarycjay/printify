@@ -8,8 +8,8 @@
         * { box-sizing: border-box; }
         body {
             font-family: 'DejaVu Sans', sans-serif;
-            color: #1c1917;
-            background: {{ ($isPdf ?? false) ? '#ffffff' : '#f5f5f4' }};
+            color: #0f172a;
+            background: {{ ($isPdf ?? false) ? '#ffffff' : '#f1f5f9' }};
             margin: 0;
             padding: {{ ($isPdf ?? false) ? '14px' : '24px 16px' }};
             font-size: 11px;
@@ -31,26 +31,26 @@
             font-weight: 700;
             text-decoration: none;
             cursor: pointer;
-            border: 1px solid #d6d3d1;
+            border: 1px solid #cbd5e1;
             background: #ffffff;
-            color: #1c1917;
+            color: #0f172a;
         }
         .btn-primary {
-            background: #d97706;
-            border-color: #d97706;
+            background: #2563eb;
+            border-color: #2563eb;
             color: #ffffff;
         }
         .sheet {
             max-width: 980px;
             margin: 0 auto;
             background: #ffffff;
-            border: 1px solid #e7e5e4;
+            border: 1px solid #e2e8f0;
             padding: 24px;
         }
         .header-table {
             width: 100%;
             border-collapse: collapse;
-            border-bottom: 2px solid #1c1917;
+            border-bottom: 2px solid #0f172a;
             margin-bottom: 16px;
         }
         .header-table td {
@@ -63,7 +63,7 @@
             margin: 0 0 4px 0;
         }
         .muted {
-            color: #57534e;
+            color: #475569;
             font-size: 10px;
         }
         .kpi-table {
@@ -72,15 +72,15 @@
             margin-bottom: 16px;
         }
         .kpi-table td {
-            border: 1px solid #e7e5e4;
-            background: #fafaf9;
+            border: 1px solid #e2e8f0;
+            background: #f8fafc;
             padding: 8px 10px;
             vertical-align: top;
         }
         .kpi-label {
             font-size: 9px;
             text-transform: uppercase;
-            color: #78716c;
+            color: #64748b;
             font-weight: 700;
         }
         .kpi-value {
@@ -93,7 +93,7 @@
             font-weight: 700;
             text-transform: uppercase;
             letter-spacing: 0.05em;
-            color: #44403c;
+            color: #334155;
             margin: 16px 0 8px 0;
         }
         .data-table {
@@ -102,7 +102,7 @@
             margin-bottom: 14px;
         }
         .data-table th {
-            background: #1c1917;
+            background: #0f172a;
             color: #ffffff;
             padding: 6px 8px;
             text-align: left;
@@ -111,7 +111,7 @@
         }
         .data-table td {
             padding: 6px 8px;
-            border-bottom: 1px solid #e7e5e4;
+            border-bottom: 1px solid #e2e8f0;
             vertical-align: top;
         }
         .text-right { text-align: right; }
@@ -120,8 +120,8 @@
             padding: 2px 6px;
             font-size: 9px;
             font-weight: 700;
-            border: 1px solid #d6d3d1;
-            background: #f5f5f4;
+            border: 1px solid #cbd5e1;
+            background: #f1f5f9;
         }
         .pill-danger {
             background: #fee2e2;
@@ -156,11 +156,22 @@
         </div>
     @endif
 
+    @php
+        $pressQueueLogoSrc = is_file(public_path('pressqueue-logo-v1.svg'))
+            ? 'data:image/svg+xml;base64,'.base64_encode((string) file_get_contents(public_path('pressqueue-logo-v1.svg')))
+            : null;
+    @endphp
+
     <div class="sheet">
         <table class="header-table">
             <tr>
                 <td style="width: 65%;">
-                    <p class="title">{{ $report['title'] }}</p>
+                    <p class="title">
+                        @if ($pressQueueLogoSrc)
+                            <img src="{{ $pressQueueLogoSrc }}" alt="PressQueue" style="width: 20px; height: 20px; vertical-align: -3px; margin-right: 6px;" />
+                        @endif
+                        {{ $report['title'] }}
+                    </p>
                     <div class="muted">
                         <strong>{{ $shop->name }}</strong> &bull;
                         {{ $shop->getAttribute('address') ?: 'PressQueue Partner Shop' }}

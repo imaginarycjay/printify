@@ -44,7 +44,7 @@ class BusinessOwnerWizardTest extends TestCase
 
         $this->actingAs($owner);
 
-        Livewire::test('pages::owner.⚡owner-wizard')
+        Livewire::test('pages::owner.owner-wizard')
             ->set('shop_name', 'Pixel Print Studio')
             ->call('nextStep')
             ->assertSet('step', 2)
@@ -87,7 +87,7 @@ class BusinessOwnerWizardTest extends TestCase
 
         $this->actingAs($owner);
 
-        Livewire::test('pages::owner.⚡owner-dashboard')
+        Livewire::test('pages::owner.owner-dashboard')
             ->call('toggleServiceStatus', 'tarpaulin');
 
         $this->assertTrue($shop->fresh()->hasService('tarpaulin'));

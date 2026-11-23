@@ -234,7 +234,7 @@ class OrderCheckoutAndPaymentTest extends TestCase
     public function test_mixed_multi_service_cart_places_single_order_with_tracking_code_and_reserves_stock(): void
     {
         $component = Livewire::actingAs($this->customer)
-            ->test('pages::customer.⚡shop-cart', ['shop' => $this->shop->id])
+            ->test('pages::customer.shop-cart', ['shop' => $this->shop->id])
             ->set('thesis_bw_pages', 50)
             ->set('thesis_color_pages', 10)
             ->set('thesis_print_sides', 'simplex')
@@ -286,7 +286,7 @@ class OrderCheckoutAndPaymentTest extends TestCase
         $this->thesisConfig->update(['max_binding_sheets' => 150]);
 
         Livewire::actingAs($this->customer)
-            ->test('pages::customer.⚡shop-cart', ['shop' => $this->shop->id])
+            ->test('pages::customer.shop-cart', ['shop' => $this->shop->id])
             ->set('thesis_bw_pages', 200)
             ->set('thesis_color_pages', 0)
             ->set('thesis_print_sides', 'simplex')
@@ -314,7 +314,7 @@ class OrderCheckoutAndPaymentTest extends TestCase
         $valid = UploadedFile::fake()->create('manuscript.pdf', 512, 'application/pdf');
 
         Livewire::actingAs($this->customer)
-            ->test('pages::customer.⚡shop-cart', ['shop' => $this->shop->id])
+            ->test('pages::customer.shop-cart', ['shop' => $this->shop->id])
             ->set('thesis_custom_fields_data', [
                 'Thesis Title' => 'File Size Check',
                 'Author' => 'Ana Santos',
@@ -366,7 +366,7 @@ class OrderCheckoutAndPaymentTest extends TestCase
         $this->assertSame([], Storage::disk('local')->allFiles('orders/manuscripts'));
 
         Livewire::actingAs($this->customer)
-            ->test('pages::customer.⚡shop-cart', ['shop' => $this->shop->id])
+            ->test('pages::customer.shop-cart', ['shop' => $this->shop->id])
             ->set('thesis_bw_pages', 40)
             ->set('thesis_color_pages', 10)
             ->set('thesis_copies_count', 2)
@@ -470,7 +470,7 @@ class OrderCheckoutAndPaymentTest extends TestCase
 
         // Reject under-50% DP via Livewire dashboard modal
         Livewire::actingAs($this->customer)
-            ->test('pages::customer.⚡customer-dashboard')
+            ->test('pages::customer.customer-dashboard')
             ->call('openPaymentModal', $order->id)
             ->call('selectPaymentOption', Order::PAYMENT_OPTION_DOWNPAYMENT_50)
             ->set('payment_amount', max(1.0, $expectedMin - 50.0))
@@ -489,7 +489,7 @@ class OrderCheckoutAndPaymentTest extends TestCase
         // Same reference rejected for another order in the SAME shop
         $secondOrder = $checkoutService->placeOrder($this->shop, $this->customer, $cart);
         Livewire::actingAs($this->customer)
-            ->test('pages::customer.⚡customer-dashboard')
+            ->test('pages::customer.customer-dashboard')
             ->call('openPaymentModal', $secondOrder->id)
             ->set('payment_reference_no', 'GCASH-UNIQUE-01')
             ->call('submitPaymentProof')
@@ -516,7 +516,7 @@ class OrderCheckoutAndPaymentTest extends TestCase
 
         // Customer retries via dashboard
         Livewire::actingAs($this->customer)
-            ->test('pages::customer.⚡customer-dashboard')
+            ->test('pages::customer.customer-dashboard')
             ->call('openPaymentModal', $order->id)
             ->call('selectPaymentOption', Order::PAYMENT_OPTION_DOWNPAYMENT_50)
             ->set('payment_amount', $expectedMin)
@@ -566,7 +566,7 @@ class OrderCheckoutAndPaymentTest extends TestCase
         // Cross-tenant owner cannot approve another shop's payment
         try {
             Livewire::actingAs($this->otherOwner)
-                ->test('pages::owner.⚡analytics-hub')
+                ->test('pages::owner.analytics-hub')
                 ->call('approvePayment', $payment->id);
             $this->fail('Expected ModelNotFoundException for cross-tenant payment approval.');
         } catch (ModelNotFoundException) {
@@ -575,7 +575,7 @@ class OrderCheckoutAndPaymentTest extends TestCase
 
         // Owning merchant sees aging badge, verifies 50% DP, then settles remaining balance at counter
         Livewire::actingAs($this->owner)
-            ->test('pages::owner.⚡analytics-hub')
+            ->test('pages::owner.analytics-hub')
             ->set('active_tab', 'payments')
             ->assertSee('Aging (>2h)')
             ->call('approvePayment', $payment->id)
@@ -588,7 +588,7 @@ class OrderCheckoutAndPaymentTest extends TestCase
         $this->assertEqualsWithDelta($remainingAmount, (float) $order->balance_due, 0.01);
 
         Livewire::actingAs($this->owner)
-            ->test('pages::owner.⚡analytics-hub')
+            ->test('pages::owner.analytics-hub')
             ->set('active_tab', 'payments')
             ->call('openCounterSettlementModal', $order->id)
             ->set('counter_amount', $remainingAmount)

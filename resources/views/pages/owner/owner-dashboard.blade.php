@@ -82,29 +82,29 @@ new class extends Component {
     @endphp
 
     <!-- App Launcher Top Navigation Bar -->
-    <header class="w-full max-w-6xl mx-auto flex flex-wrap gap-4 items-center justify-between py-3 border-b border-stone-200 dark:border-stone-800">
+    <header class="w-full max-w-6xl mx-auto flex flex-wrap gap-4 items-center justify-between py-3 border-b border-slate-200 dark:border-slate-800">
         <div class="flex items-center gap-3">
-            <span data-theme-keep class="flex size-10 shrink-0 items-center justify-center rounded-xl bg-amber-500 text-stone-950">
-                <x-app-logo-icon class="size-6 fill-current" />
+            <span data-theme-keep class="flex size-10 shrink-0 items-center justify-center rounded-xl border border-slate-200 bg-white shadow-xs dark:border-slate-700 dark:bg-slate-800">
+                <x-app-logo-icon class="size-6" />
             </span>
             <div class="min-w-0">
                 <div class="flex items-center gap-2">
-                    <h1 class="truncate text-base font-extrabold text-stone-900 dark:text-stone-100 tracking-tight">{{ $shop ? $shop->name : config('app.name', 'PressQueue') }}</h1>
-                    <span class="pq-badge-warning">Owner</span>
+                    <h1 class="truncate text-base font-extrabold text-slate-900 dark:text-slate-100 tracking-tight">{{ $shop ? $shop->name : config('app.name', 'PressQueue') }}</h1>
+                    <span class="pq-badge-brand">Owner</span>
                 </div>
-                <p class="text-xs text-stone-600 dark:text-stone-400">Shop workspace &amp; applications</p>
+                <p class="text-xs text-slate-600 dark:text-slate-400">Shop workspace &amp; applications</p>
             </div>
         </div>
 
         <div class="flex flex-wrap items-center gap-2.5">
             @if ($shop)
-                <a href="{{ route('owner.platform') }}" wire:navigate class="inline-flex min-h-10 items-center gap-2 rounded-xl border border-stone-200 bg-white px-3 text-xs font-semibold text-stone-700 hover:border-amber-500 hover:text-stone-950 dark:border-stone-800 dark:bg-stone-900 dark:text-stone-300 dark:hover:text-white transition-colors">
+                <a href="{{ route('owner.platform') }}" wire:navigate class="inline-flex min-h-10 items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 text-xs font-semibold text-slate-700 hover:border-blue-600 hover:text-slate-950 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-300 dark:hover:border-blue-400 dark:hover:text-white transition-colors">
                     <flux:icon name="cog-6-tooth" class="size-4" />
                     Shop Settings
                 </a>
             @endif
-            <a href="{{ route('owner.wizard') }}" wire:navigate class="hidden sm:inline-flex min-h-10 items-center gap-1.5 px-3 rounded-xl border border-stone-200 bg-white text-xs font-semibold text-stone-700 hover:border-amber-500 hover:text-stone-950 dark:border-stone-800 dark:bg-stone-900 dark:text-stone-300 dark:hover:text-white transition-colors">
-                <flux:icon name="adjustments-horizontal" class="size-3.5 text-stone-500 dark:text-stone-400" />
+            <a href="{{ route('owner.wizard') }}" wire:navigate class="hidden sm:inline-flex min-h-10 items-center gap-1.5 px-3 rounded-xl border border-slate-200 bg-white text-xs font-semibold text-slate-700 hover:border-blue-600 hover:text-slate-950 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-300 dark:hover:border-blue-400 dark:hover:text-white transition-colors">
+                <flux:icon name="adjustments-horizontal" class="size-3.5 text-slate-500 dark:text-slate-400" />
                 Re-run Setup Wizard
             </a>
             <livewire:notification-bell />
@@ -114,17 +114,17 @@ new class extends Component {
             <a
                 href="{{ route('profile.edit') }}"
                 wire:navigate
-                class="group flex items-center gap-2 bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 hover:border-amber-500 rounded-full py-1 px-3 transition-colors cursor-pointer"
+                class="group flex items-center gap-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 hover:border-blue-600 dark:hover:border-blue-400 rounded-full py-1 px-3 transition-colors cursor-pointer"
             >
                 @if ($user?->avatarUrl())
-                    <img src="{{ $user->avatarUrl() }}" alt="{{ $user->name }}" class="size-6 rounded-full object-cover border border-amber-500/40" />
+                    <img src="{{ $user->avatarUrl() }}" alt="{{ $user->name }}" class="size-6 rounded-full object-cover border border-blue-600/40" />
                 @else
-                    <span data-theme-keep class="size-6 rounded-full bg-amber-500 text-stone-950 text-xs font-extrabold flex items-center justify-center">
+                    <span data-theme-keep class="size-6 rounded-full bg-slate-900 text-white dark:bg-blue-600 text-xs font-extrabold flex items-center justify-center">
                         {{ $user?->initials() }}
                     </span>
                 @endif
-                <span class="text-xs font-bold text-stone-800 dark:text-stone-200 group-hover:text-amber-700 dark:group-hover:text-amber-400 hidden sm:inline">{{ $user?->name }}</span>
-                <flux:icon name="cog-6-tooth" class="size-3.5 text-stone-400 group-hover:text-amber-600 dark:group-hover:text-amber-400" />
+                <span class="text-xs font-bold text-slate-800 dark:text-slate-200 group-hover:text-blue-700 dark:group-hover:text-blue-400 hidden sm:inline">{{ $user?->name }}</span>
+                <flux:icon name="cog-6-tooth" class="size-3.5 text-slate-400 group-hover:text-blue-600 dark:group-hover:text-blue-400" />
             </a>
 
             <!-- Log Out Button -->
@@ -133,7 +133,7 @@ new class extends Component {
                 <button
                     type="submit"
                     title="Log Out"
-                    class="inline-flex min-h-10 items-center gap-1.5 bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 hover:border-rose-300 hover:bg-rose-50 text-rose-700 dark:hover:bg-rose-950/60 dark:text-rose-300 rounded-xl px-3 transition-colors cursor-pointer"
+                    class="inline-flex min-h-10 items-center gap-1.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 hover:border-rose-300 hover:bg-rose-50 text-rose-700 dark:hover:bg-rose-950/60 dark:text-rose-300 rounded-xl px-3 transition-colors cursor-pointer"
                 >
                     <flux:icon name="arrow-right-start-on-rectangle" class="size-4" />
                     <span class="text-xs font-bold hidden sm:inline">Log Out</span>
@@ -153,8 +153,8 @@ new class extends Component {
     <main class="w-full max-w-5xl mx-auto my-auto py-8 sm:py-10 space-y-8">
         <!-- Main App Launcher Title & Stats -->
         <div class="text-center space-y-3">
-            <h2 class="text-3xl sm:text-4xl font-extrabold tracking-tight text-stone-900 dark:text-stone-100">App Launcher</h2>
-            <p class="text-xs sm:text-sm text-stone-600 dark:text-stone-400">
+            <h2 class="text-3xl sm:text-4xl font-extrabold tracking-tight text-slate-900 dark:text-slate-100">App Launcher</h2>
+            <p class="text-xs sm:text-sm text-slate-600 dark:text-slate-400">
                 {{ count($activeServiceKeys) }} active printing applications available in your shop
             </p>
 
@@ -172,16 +172,16 @@ new class extends Component {
                 <a
                     href="{{ route('owner.analytics-hub') }}"
                     wire:navigate
-                    class="inline-flex flex-wrap items-center justify-center gap-3 px-4 py-2 rounded-xl bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 hover:border-amber-500 transition-colors text-xs text-stone-700 dark:text-stone-300 shadow-xs group"
+                    class="inline-flex flex-wrap items-center justify-center gap-3 px-4 py-2 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 hover:border-blue-600 dark:hover:border-blue-400 transition-colors text-xs text-slate-700 dark:text-slate-300 shadow-xs group"
                 >
                     <span class="flex items-center gap-1.5 text-emerald-700 dark:text-emerald-400 font-bold tabular-nums">
                         <span class="size-2 rounded-full bg-emerald-600 dark:bg-emerald-400"></span>
                         Today: ₱{{ number_format($todaySales, 2) }}
                     </span>
-                    <span class="text-stone-300 dark:text-stone-700">&bull;</span>
-                    <span class="text-stone-600 dark:text-stone-400 font-medium tabular-nums">{{ $pendingOrders }} active floor {{ Str::plural('job', $pendingOrders) }}</span>
-                    <span class="text-stone-300 dark:text-stone-700">&bull;</span>
-                    <span class="text-amber-700 dark:text-amber-400 font-bold group-hover:underline flex items-center gap-1">
+                    <span class="text-slate-300 dark:text-slate-700">&bull;</span>
+                    <span class="text-slate-600 dark:text-slate-400 font-medium tabular-nums">{{ $pendingOrders }} active floor {{ Str::plural('job', $pendingOrders) }}</span>
+                    <span class="text-slate-300 dark:text-slate-700">&bull;</span>
+                    <span class="text-blue-700 dark:text-blue-400 font-bold group-hover:underline flex items-center gap-1">
                         Analytics Hub &rarr;
                     </span>
                 </a>
@@ -191,17 +191,17 @@ new class extends Component {
         <!-- Center Search Filter Input Bar -->
         <div class="max-w-md mx-auto">
             <div class="relative">
-                <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-stone-400">
+                <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
                     <flux:icon name="magnifying-glass" class="size-4" />
                 </div>
                 <input
                     wire:model.live.debounce.150ms="search"
                     type="text"
                     placeholder="Search installed printing applications..."
-                    class="w-full pl-10 pr-16 py-2.5 rounded-xl bg-white dark:bg-stone-900 border border-stone-300 dark:border-stone-700 text-stone-900 dark:text-stone-100 placeholder-stone-400 dark:placeholder-stone-500 text-sm focus:outline-none focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20"
+                    class="w-full pl-10 pr-16 py-2.5 rounded-xl bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 text-sm focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-600/20"
                 />
                 @if (!empty($search))
-                    <button wire:click="$set('search', '')" class="absolute inset-y-0 right-0 pr-3.5 flex items-center text-stone-500 hover:text-stone-900 dark:hover:text-white text-xs font-semibold">
+                    <button wire:click="$set('search', '')" class="absolute inset-y-0 right-0 pr-3.5 flex items-center text-slate-500 hover:text-slate-900 dark:hover:text-white text-xs font-semibold">
                         Clear
                     </button>
                 @endif
@@ -223,7 +223,7 @@ new class extends Component {
                     };
                 @endphp
                 @if ($route)
-                    <a href="{{ $route }}" wire:navigate class="pq-card group flex flex-col justify-between p-5 text-left transition-colors hover:border-amber-500 cursor-pointer">
+                    <a href="{{ $route }}" wire:navigate class="pq-card group flex flex-col justify-between p-5 text-left transition-colors hover:border-blue-600 dark:hover:border-blue-400 cursor-pointer">
                 @else
                     <div class="pq-card group flex flex-col justify-between p-5 text-left">
                 @endif
@@ -239,10 +239,10 @@ new class extends Component {
                     </div>
 
                     <div class="mt-4 space-y-1">
-                        <h3 class="text-sm font-extrabold text-stone-900 dark:text-stone-100 group-hover:text-amber-700 dark:group-hover:text-amber-400 transition-colors">
+                        <h3 class="text-sm font-extrabold text-slate-900 dark:text-slate-100 group-hover:text-blue-700 dark:group-hover:text-blue-400 transition-colors">
                             {{ $app['name'] }}
                         </h3>
-                        <p class="text-xs text-stone-600 dark:text-stone-400 line-clamp-2 leading-relaxed">
+                        <p class="text-xs text-slate-600 dark:text-slate-400 line-clamp-2 leading-relaxed">
                             {{ $app['description'] }}
                         </p>
                     </div>
@@ -257,20 +257,20 @@ new class extends Component {
             <button
                 type="button"
                 wire:click="openMoreServicesModal"
-                class="group flex flex-col justify-between p-5 text-left rounded-2xl border-2 border-dashed border-stone-300 dark:border-stone-700 bg-stone-50 dark:bg-stone-900/50 hover:border-amber-500 hover:bg-white dark:hover:bg-stone-900 transition-colors cursor-pointer"
+                class="group flex flex-col justify-between p-5 text-left rounded-2xl border-2 border-dashed border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/50 hover:border-blue-600 hover:bg-white dark:hover:border-blue-400 dark:hover:bg-slate-900 transition-colors cursor-pointer"
             >
                 <div class="flex items-start justify-between gap-3 w-full">
-                    <span class="flex size-11 shrink-0 items-center justify-center rounded-xl border border-amber-200 bg-amber-50 text-amber-700 dark:border-amber-800 dark:bg-amber-950/60 dark:text-amber-300">
+                    <span class="flex size-11 shrink-0 items-center justify-center rounded-xl border border-blue-200 bg-blue-50 text-blue-700 dark:border-blue-800 dark:bg-blue-950/60 dark:text-blue-300">
                         <flux:icon name="squares-plus" class="size-5" />
                     </span>
-                    <span class="pq-badge-warning">App Store</span>
+                    <span class="pq-badge-brand">App Store</span>
                 </div>
 
                 <div class="mt-4 space-y-1">
-                    <h3 class="text-sm font-extrabold text-amber-700 dark:text-amber-400">
+                    <h3 class="text-sm font-extrabold text-blue-700 dark:text-blue-400">
                         + More Services
                     </h3>
-                    <p class="text-xs text-stone-600 dark:text-stone-400 leading-relaxed">
+                    <p class="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
                         Install or remove optional printing modules for your shop.
                     </p>
                 </div>
@@ -278,14 +278,14 @@ new class extends Component {
         </div>
 
         @if ($installedApps->isEmpty() && !empty($search))
-            <div class="text-center py-8 text-stone-500 dark:text-stone-400 text-xs">
+            <div class="text-center py-8 text-slate-500 dark:text-slate-400 text-xs">
                 No installed applications found matching "{{ $search }}".
             </div>
         @endif
     </main>
 
     <!-- Footer Bar -->
-    <footer class="w-full max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between text-xs text-stone-500 dark:text-stone-400 border-t border-stone-200 dark:border-stone-800 pt-4 gap-2">
+    <footer class="w-full max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between text-xs text-slate-500 dark:text-slate-400 border-t border-slate-200 dark:border-slate-800 pt-4 gap-2">
         <span>&copy; {{ date('Y') }} {{ config('app.name', 'PressQueue') }} &bull; {{ $shop ? $shop->name : 'Print Shop' }}</span>
         <span class="font-medium tabular-nums">
             {{ count($activeServiceKeys) }} installed {{ Str::plural('app', count($activeServiceKeys)) }} &bull; {{ count($catalog) - count($activeServiceKeys) }} available in More Services
@@ -294,20 +294,20 @@ new class extends Component {
 
     <!-- More Services Modal / App Store Drawer -->
     @if ($show_more_services_modal)
-        <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-stone-950/60 backdrop-blur-xs">
-            <div class="w-full max-w-3xl rounded-2xl border border-stone-200 dark:border-stone-800 bg-white dark:bg-stone-900 p-6 sm:p-7 shadow-xl space-y-6 max-h-[90vh] overflow-y-auto">
-                <div class="flex items-center justify-between border-b border-stone-200 dark:border-stone-800 pb-4">
+        <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/60 backdrop-blur-xs">
+            <div class="w-full max-w-3xl rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 sm:p-7 shadow-xl space-y-6 max-h-[90vh] overflow-y-auto">
+                <div class="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-4">
                     <div class="flex items-center gap-3">
-                        <span class="flex size-10 items-center justify-center rounded-xl bg-amber-50 text-amber-700 border border-amber-200 dark:bg-amber-950/60 dark:text-amber-300 dark:border-amber-800">
+                        <span class="flex size-10 items-center justify-center rounded-xl bg-blue-50 text-blue-700 border border-blue-200 dark:bg-blue-950/60 dark:text-blue-300 dark:border-blue-800">
                             <flux:icon name="squares-plus" class="size-5" />
                         </span>
                         <div>
-                            <h3 class="text-lg font-extrabold text-stone-900 dark:text-stone-100">More Services App Store</h3>
-                            <p class="text-xs text-stone-600 dark:text-stone-400">Install or remove printing applications for {{ $shop ? $shop->name : 'your shop' }}</p>
+                            <h3 class="text-lg font-extrabold text-slate-900 dark:text-slate-100">More Services App Store</h3>
+                            <p class="text-xs text-slate-600 dark:text-slate-400">Install or remove printing applications for {{ $shop ? $shop->name : 'your shop' }}</p>
                         </div>
                     </div>
 
-                    <button type="button" wire:click="closeMoreServicesModal" aria-label="Close modal" class="size-9 rounded-xl border border-stone-200 dark:border-stone-800 bg-stone-50 dark:bg-stone-800 hover:bg-stone-100 dark:hover:bg-stone-700 text-stone-600 dark:text-stone-300 flex items-center justify-center transition-colors cursor-pointer">
+                    <button type="button" wire:click="closeMoreServicesModal" aria-label="Close modal" class="size-9 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 flex items-center justify-center transition-colors cursor-pointer">
                         <flux:icon name="x-mark" class="size-4" />
                     </button>
                 </div>
@@ -318,26 +318,26 @@ new class extends Component {
                             $isInstalled = in_array($key, $activeServiceKeys, true);
                             $isPreinstalled = PrintServiceCatalog::isPreinstalled($key);
                         @endphp
-                        <div class="flex items-start justify-between p-4 rounded-xl border border-stone-200 dark:border-stone-800 bg-stone-50 dark:bg-stone-950/60 gap-3">
+                        <div class="flex items-start justify-between p-4 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950/60 gap-3">
                             <div class="flex items-start gap-3 min-w-0">
                                 <div class="size-10 rounded-xl border {{ $service['badge_color'] }} flex shrink-0 items-center justify-center">
                                     <flux:icon name="{{ $service['icon'] }}" class="size-5" />
                                 </div>
                                 <div class="space-y-1 min-w-0">
-                                    <h4 class="text-xs font-bold text-stone-900 dark:text-stone-100">{{ $service['name'] }}</h4>
-                                    <p class="text-[11px] text-stone-600 dark:text-stone-400 leading-relaxed">{{ $service['description'] }}</p>
+                                    <h4 class="text-xs font-bold text-slate-900 dark:text-slate-100">{{ $service['name'] }}</h4>
+                                    <p class="text-[11px] text-slate-600 dark:text-slate-400 leading-relaxed">{{ $service['description'] }}</p>
                                 </div>
                             </div>
 
                             @if ($isPreinstalled)
-                                <span class="shrink-0 px-3 py-1.5 rounded-lg text-xs font-semibold bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-700 text-stone-500 dark:text-stone-400 select-none">
+                                <span class="shrink-0 px-3 py-1.5 rounded-lg text-xs font-semibold bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400 select-none">
                                     Pre-installed
                                 </span>
                             @else
                                 <button
                                     type="button"
                                     wire:click="toggleServiceStatus('{{ $key }}')"
-                                    class="shrink-0 px-3 py-1.5 rounded-lg text-xs font-bold transition-colors cursor-pointer {{ $isInstalled ? 'bg-rose-50 border border-rose-200 text-rose-700 hover:bg-rose-100 dark:bg-rose-950/60 dark:border-rose-800 dark:text-rose-300' : 'bg-amber-500 hover:bg-amber-400 text-stone-950' }}"
+                                    class="shrink-0 px-3 py-1.5 rounded-lg text-xs font-bold transition-colors cursor-pointer {{ $isInstalled ? 'bg-rose-50 border border-rose-200 text-rose-700 hover:bg-rose-100 dark:bg-rose-950/60 dark:border-rose-800 dark:text-rose-300' : 'bg-blue-600 hover:bg-blue-700 text-white dark:hover:bg-blue-500' }}"
                                 >
                                     {{ $isInstalled ? 'Remove' : 'Install' }}
                                 </button>
@@ -346,8 +346,8 @@ new class extends Component {
                     @endforeach
                 </div>
 
-                <div class="flex justify-end border-t border-stone-200 dark:border-stone-800 pt-4">
-                    <flux:button wire:click="closeMoreServicesModal" variant="primary" class="!bg-amber-500 hover:!bg-amber-400 !text-stone-950 font-bold px-6">
+                <div class="flex justify-end border-t border-slate-200 dark:border-slate-800 pt-4">
+                    <flux:button wire:click="closeMoreServicesModal" variant="primary" class="!bg-blue-600 hover:!bg-blue-700 !text-white font-bold px-6 dark:hover:!bg-blue-500">
                         Done Managing Services
                     </flux:button>
                 </div>

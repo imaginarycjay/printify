@@ -165,12 +165,12 @@ test('standardized reports and receipts provide deterministic role-aware return 
 
     Livewire::actingAs($owner)
         ->withQueryParams(['tab' => 'reports'])
-        ->test('pages::owner.⚡analytics-hub')
+        ->test('pages::owner.analytics-hub')
         ->assertSet('active_tab', 'reports');
 
     Livewire::actingAs($owner)
         ->withQueryParams(['tab' => 'invalid_tab'])
-        ->test('pages::owner.⚡analytics-hub')
+        ->test('pages::owner.analytics-hub')
         ->assertSet('active_tab', 'overview');
 
     $this->actingAs($customer)->get(route('orders.receipt', $order))
@@ -242,7 +242,7 @@ test('owner, staff, and customer operational pages render universal contextual b
     $this->actingAs($owner)->get(route('staff.dashboard'))
         ->assertRedirect(route('owner.dashboard'));
 
-    Livewire::actingAs($owner)->test('pages::staff.⚡staff-dashboard')
+    Livewire::actingAs($owner)->test('pages::staff.staff-dashboard')
         ->assertSeeHtml('data-test="universal-back-link"')
         ->assertSeeHtml(route('owner.dashboard'));
 
@@ -260,22 +260,31 @@ test('owner, staff, and customer operational pages render universal contextual b
 });
 
 test('operational blade views contain zero UI emojis and blank layout omits forced dark class', function () {
-    $directory = new RecursiveDirectoryIterator(resource_path('views/pages'));
+    $directory = new RecursiveDirectoryIterator(resource_path('views'));
     $iterator = new RecursiveIteratorIterator($directory);
     $violations = [];
+    $filenameViolations = [];
 
     foreach ($iterator as $file) {
         if (! $file instanceof SplFileInfo || ! $file->isFile() || ! str_ends_with($file->getFilename(), '.blade.php')) {
             continue;
         }
 
-        $contents = file_get_contents($file->getPathname()) ?: '';
-        if (preg_match('/[\x{1F300}-\x{1FAFF}\x{2600}-\x{27BF}]|✕|✓/u', $contents) === 1) {
-            $violations[] = $file->getPathname();
+        if (preg_match('/[^\x20-\x7E]/u', $file->getFilename()) === 1) {
+            $filenameViolations[] = $file->getPathname();
+        }
+
+        if (str_starts_with($file->getPathname(), resource_path('views/pages'))) {
+            $contents = file_get_contents($file->getPathname()) ?: '';
+            if (preg_match('/[\x{1F300}-\x{1FAFF}\x{2600}-\x{27BF}]|✕|✓/u', $contents) === 1) {
+                $violations[] = $file->getPathname();
+            }
         }
     }
 
-    expect($violations)->toBe([]);
+    expect($filenameViolations)->toBe([])
+        ->and($violations)->toBe([])
+        ->and(config('livewire.make_command.emoji'))->toBeFalse();
 
     $blankLayout = file_get_contents(resource_path('views/layouts/blank.blade.php')) ?: '';
     expect($blankLayout)->not->toContain('<html lang="{{ str_replace(\'_\', \'-\', app()->getLocale()) }}" class="dark">');

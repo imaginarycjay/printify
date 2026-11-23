@@ -36,7 +36,7 @@
                     @if (Route::has('password.request'))
                         <flux:link
                             data-theme-keep
-                            class="text-xs font-semibold !text-amber-700 hover:!text-amber-800 dark:!text-amber-400 dark:hover:!text-amber-300"
+                            class="text-xs font-semibold !text-blue-700 hover:!text-blue-800 dark:!text-blue-400 dark:hover:!text-blue-300"
                             :href="route('password.request')"
                         >
                             {{ __('Forgot password?') }}
@@ -60,7 +60,7 @@
                 variant="primary"
                 type="submit"
                 data-theme-keep
-                class="mt-1 w-full !bg-amber-500 !text-stone-950 font-semibold hover:!bg-amber-400"
+                class="mt-1 w-full !bg-blue-600 !text-white font-semibold hover:!bg-blue-700 dark:hover:!bg-blue-500"
                 data-test="login-button"
                 x-bind:disabled="submitting"
             >
@@ -73,7 +73,7 @@
                 <div class="w-full border-t border-[var(--auth-border)]"></div>
             </div>
             <div class="relative flex justify-center text-xs font-medium uppercase tracking-wider">
-                <span data-theme-keep class="bg-[var(--auth-card)] px-3 text-stone-500 dark:text-stone-400">
+                <span data-theme-keep class="bg-[var(--auth-card)] px-3 text-slate-500 dark:text-slate-400">
                     {{ __('Or') }}
                 </span>
             </div>
@@ -103,7 +103,7 @@
                 @click="notifyGoogle()"
                 data-theme-keep
                 data-test="google-login-button"
-                class="flex h-10 w-full cursor-pointer items-center justify-center gap-2.5 rounded-lg border border-stone-300 bg-white px-4 text-sm font-semibold text-stone-800 transition-colors hover:bg-stone-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber-500 dark:border-stone-600 dark:bg-stone-800 dark:text-stone-100 dark:hover:bg-stone-700/80"
+                class="flex h-10 w-full cursor-pointer items-center justify-center gap-2.5 rounded-lg border border-slate-300 bg-white px-4 text-sm font-semibold text-slate-800 transition-colors hover:bg-slate-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100 dark:hover:bg-slate-700/80"
             >
                 <svg class="size-4 shrink-0" viewBox="0 0 24 24" aria-hidden="true">
                     <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
@@ -114,14 +114,14 @@
                 <span>{{ __('Continue with Google') }}</span>
             </button>
 
-            <p x-show="googleNotice" x-cloak role="status" aria-live="polite" data-theme-keep class="text-center text-xs text-stone-600 dark:text-stone-400">
+            <p x-show="googleNotice" x-cloak role="status" aria-live="polite" data-theme-keep class="text-center text-xs text-slate-600 dark:text-slate-400">
                 {{ __('Google sign-in is coming soon. Please sign in with your email and password above for now.') }}
             </p>
         </div>
     </div>
 
     <x-slot:footer>
-        <p data-theme-keep class="mb-2.5 text-xs font-semibold text-stone-700 dark:text-stone-300">
+        <p data-theme-keep class="mb-2.5 text-xs font-semibold text-slate-700 dark:text-slate-300">
             {{ __('New to PressQueue? Create an account') }}
         </p>
 
@@ -129,35 +129,35 @@
             <a
                 href="{{ route('register') }}"
                 data-theme-keep
-                class="group flex items-center justify-between gap-2.5 rounded-xl border border-stone-300/90 bg-white px-3 py-2.5 transition-colors hover:border-stone-400 hover:bg-stone-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber-500 dark:border-stone-700 dark:bg-[#23201d] dark:hover:border-stone-500 dark:hover:bg-[#2b2723]"
+                class="group flex items-center justify-between gap-2.5 rounded-xl border border-slate-300/90 bg-white px-3 py-2.5 transition-colors hover:border-slate-400 hover:bg-slate-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600 dark:border-slate-700 dark:bg-slate-800/80 dark:hover:border-slate-500 dark:hover:bg-slate-800"
             >
                 <span class="flex min-w-0 items-center gap-2.5">
-                    <flux:icon name="user" class="size-4 shrink-0 text-stone-600 dark:text-stone-300" />
+                    <flux:icon name="user" class="size-4 shrink-0 text-slate-600 dark:text-slate-300" />
                     <span class="min-w-0">
-                        <span data-theme-keep class="block text-xs font-semibold text-stone-900 dark:text-white">{{ __('Customer account') }}</span>
-                        <span data-theme-keep class="block truncate text-[11px] text-stone-500 dark:text-stone-400">{{ __('Order printing') }}</span>
+                        <span data-theme-keep class="block text-xs font-semibold text-slate-900 dark:text-white">{{ __('Customer account') }}</span>
+                        <span data-theme-keep class="block truncate text-[11px] text-slate-500 dark:text-slate-400">{{ __('Order printing') }}</span>
                     </span>
                 </span>
-                <flux:icon name="arrow-right" class="size-3.5 shrink-0 text-stone-400 transition-transform group-hover:translate-x-0.5 group-hover:text-stone-700 dark:group-hover:text-stone-200" />
+                <flux:icon name="arrow-right" class="size-3.5 shrink-0 text-slate-400 transition-transform group-hover:translate-x-0.5 group-hover:text-slate-700 dark:group-hover:text-slate-200" />
             </a>
 
             <a
                 href="{{ route('owner.register') }}"
                 data-theme-keep
-                class="group flex items-center justify-between gap-2.5 rounded-xl border border-amber-500/40 bg-amber-500/[0.07] px-3 py-2.5 transition-colors hover:border-amber-500/80 hover:bg-amber-500/12 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber-500 dark:border-amber-500/45 dark:bg-amber-500/10 dark:hover:border-amber-400 dark:hover:bg-amber-500/15"
+                class="group flex items-center justify-between gap-2.5 rounded-xl border border-blue-600/35 bg-blue-50/70 px-3 py-2.5 transition-colors hover:border-blue-600/70 hover:bg-blue-100/70 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600 dark:border-blue-500/40 dark:bg-blue-950/40 dark:hover:border-blue-400 dark:hover:bg-blue-950/60"
             >
                 <span class="flex min-w-0 items-center gap-2.5">
-                    <flux:icon name="building-storefront" class="size-4 shrink-0 text-amber-700 dark:text-amber-400" />
+                    <flux:icon name="building-storefront" class="size-4 shrink-0 text-blue-700 dark:text-blue-400" />
                     <span class="min-w-0">
-                        <span data-theme-keep class="block text-xs font-semibold text-amber-800 dark:text-amber-300">{{ __('Print shop owner') }}</span>
-                        <span data-theme-keep class="block truncate text-[11px] text-stone-500 dark:text-stone-400">{{ __('Register your shop') }}</span>
+                        <span data-theme-keep class="block text-xs font-semibold text-blue-800 dark:text-blue-300">{{ __('Print shop owner') }}</span>
+                        <span data-theme-keep class="block truncate text-[11px] text-slate-500 dark:text-slate-400">{{ __('Register your shop') }}</span>
                     </span>
                 </span>
-                <flux:icon name="arrow-right" class="size-3.5 shrink-0 text-amber-700 transition-transform group-hover:translate-x-0.5 dark:text-amber-400" />
+                <flux:icon name="arrow-right" class="size-3.5 shrink-0 text-blue-700 transition-transform group-hover:translate-x-0.5 dark:text-blue-400" />
             </a>
         </div>
 
-        <p data-theme-keep class="mt-2.5 text-xs text-stone-600 dark:text-stone-400">
+        <p data-theme-keep class="mt-2.5 text-xs text-slate-600 dark:text-slate-400">
             {{ __('Production staff join using an invitation link sent by their shop owner.') }}
         </p>
     </x-slot:footer>

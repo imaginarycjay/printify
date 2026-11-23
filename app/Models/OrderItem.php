@@ -250,11 +250,11 @@ class OrderItem extends Model
     public function getFinishingLabel(): string
     {
         return match ($this->getFinishingType()) {
-            'staple' => '📎 Corner Staple',
-            'folder' => '📁 Sliding Folder & Fastener',
-            'ring_bind' => '🌀 Plastic Ring Binding',
-            'booklet' => '📘 Booklet Staple & Fold',
-            default => '📄 Loose Sheets (No Binding)',
+            'staple' => 'Corner Staple',
+            'folder' => 'Sliding Folder & Fastener',
+            'ring_bind' => 'Plastic Ring Binding',
+            'booklet' => 'Booklet Staple & Fold',
+            default => 'Loose Sheets (No Binding)',
         };
     }
 

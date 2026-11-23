@@ -53,7 +53,7 @@
                     <div data-theme-keep class="w-full border-t border-[var(--auth-border)]"></div>
                 </div>
                 <div class="relative flex justify-center text-xs uppercase tracking-wider">
-                    <span data-theme-keep class="bg-[var(--auth-card)] px-2.5 text-stone-500 dark:text-stone-400">
+                    <span data-theme-keep class="bg-[var(--auth-card)] px-2.5 text-slate-500 dark:text-slate-400">
                         {{ $separator }}
                     </span>
                 </div>
@@ -64,7 +64,7 @@
                     variant="outline"
                     icon="finger-print"
                     data-theme-keep
-                    class="w-full !border-stone-300 !bg-white !text-stone-800 hover:!bg-stone-50 dark:!border-stone-700 dark:!bg-stone-800/70 dark:!text-stone-100 dark:hover:!bg-stone-800"
+                    class="w-full !border-slate-300 !bg-white !text-slate-800 hover:!bg-slate-50 dark:!border-slate-700 dark:!bg-slate-800/70 dark:!text-slate-100 dark:hover:!bg-slate-800"
                     x-on:click="verify()"
                     x-bind:disabled="loading"
                 >

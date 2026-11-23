@@ -3,7 +3,7 @@
     <head>
         @include('partials.head')
     </head>
-    <body class="min-h-screen w-full bg-stone-100 dark:bg-stone-950 font-sans antialiased text-stone-900 dark:text-stone-100 selection:bg-amber-500 selection:text-white overflow-x-hidden">
+    <body class="min-h-screen w-full bg-slate-100 dark:bg-[#0b1120] font-sans antialiased text-slate-900 dark:text-slate-100 selection:bg-blue-600 selection:text-white overflow-x-hidden">
         {{ $slot }}
 
         @persist('toast')

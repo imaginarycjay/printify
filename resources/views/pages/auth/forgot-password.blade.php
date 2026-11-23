@@ -35,7 +35,7 @@
                 variant="primary"
                 type="submit"
                 data-theme-keep
-                class="mt-1 w-full !bg-amber-500 !text-stone-950 font-semibold hover:!bg-amber-400"
+                class="mt-1 w-full !bg-blue-600 !text-white font-semibold hover:!bg-blue-700 dark:hover:!bg-blue-500"
                 data-test="email-password-reset-link-button"
                 x-bind:disabled="submitting"
             >
@@ -48,7 +48,7 @@
         <div class="text-center text-sm">
             <flux:link
                 data-theme-keep
-                class="font-semibold !text-amber-700 hover:!text-amber-800 dark:!text-amber-400 dark:hover:!text-amber-300"
+                class="font-semibold !text-blue-700 hover:!text-blue-800 dark:!text-blue-400 dark:hover:!text-blue-300"
                 :href="route('login')"
             >
                 {{ __('Back to sign in') }}

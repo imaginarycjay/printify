@@ -47,7 +47,7 @@ class ThesisBindingModuleTest extends TestCase
 
         $this->actingAs($owner);
 
-        Livewire::test('pages::owner.⚡thesis-binding')
+        Livewire::test('pages::owner.thesis-binding')
             ->assertSet('hardbound_base_price', 350.0)
             ->assertSet('softbound_base_price', 150.0)
             ->assertSet('page_price_bw', 1.5)
@@ -76,7 +76,7 @@ class ThesisBindingModuleTest extends TestCase
 
         $this->actingAs($owner);
 
-        Livewire::test('pages::owner.⚡thesis-binding')
+        Livewire::test('pages::owner.thesis-binding')
             ->set('hardbound_base_price', 400.0)
             ->set('softbound_base_price', 180.0)
             ->set('page_price_bw', 2.0)
@@ -109,7 +109,7 @@ class ThesisBindingModuleTest extends TestCase
 
         $this->actingAs($owner);
 
-        Livewire::test('pages::owner.⚡thesis-binding')
+        Livewire::test('pages::owner.thesis-binding')
             ->set('new_color_input', 'Burgundy')
             ->call('addCoverColor')
             ->set('new_field_input', 'Advisor Name')
@@ -135,7 +135,7 @@ class ThesisBindingModuleTest extends TestCase
 
         $this->actingAs($owner);
 
-        $component = Livewire::test('pages::owner.⚡thesis-binding')
+        $component = Livewire::test('pages::owner.thesis-binding')
             ->set('new_inv_name', 'Special Gold Foil Sheet')
             ->set('new_inv_sku', 'FOL-GLD-99')
             ->set('new_inv_category', 'Foil')

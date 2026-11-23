@@ -5,14 +5,14 @@
                 href="{{ route('register') }}"
                 aria-current="page"
                 data-theme-keep
-                class="flex min-h-9 items-center justify-center rounded-lg bg-white px-3 text-xs font-semibold text-stone-900 shadow-2xs dark:bg-stone-700/90 dark:text-white"
+                class="flex min-h-9 items-center justify-center rounded-lg bg-white px-3 text-xs font-semibold text-slate-900 shadow-2xs dark:bg-slate-700/90 dark:text-white"
             >
                 {{ __('Customer') }}
             </a>
             <a
                 href="{{ route('owner.register') }}"
                 data-theme-keep
-                class="flex min-h-9 items-center justify-center rounded-lg px-3 text-xs font-medium text-stone-600 transition-colors hover:text-stone-900 dark:text-stone-300 dark:hover:text-white"
+                class="flex min-h-9 items-center justify-center rounded-lg px-3 text-xs font-medium text-slate-600 transition-colors hover:text-slate-900 dark:text-slate-300 dark:hover:text-white"
             >
                 {{ __('Print shop owner') }}
             </a>
@@ -94,7 +94,7 @@
                 variant="primary"
                 type="submit"
                 data-theme-keep
-                class="mt-1 w-full !bg-amber-500 !text-stone-950 font-semibold hover:!bg-amber-400"
+                class="mt-1 w-full !bg-blue-600 !text-white font-semibold hover:!bg-blue-700 dark:hover:!bg-blue-500"
                 data-test="register-user-button"
                 x-bind:disabled="submitting"
             >
@@ -104,18 +104,18 @@
     </div>
 
     <x-slot:footer>
-        <div data-theme-keep class="space-y-1.5 text-center text-sm text-stone-600 dark:text-stone-300">
+        <div data-theme-keep class="space-y-1.5 text-center text-sm text-slate-600 dark:text-slate-300">
             <p>
                 <span>{{ __('Already have an account?') }}</span>
                 <flux:link
                     data-theme-keep
-                    class="ms-1 font-semibold !text-amber-700 hover:!text-amber-800 dark:!text-amber-400 dark:hover:!text-amber-300"
+                    class="ms-1 font-semibold !text-blue-700 hover:!text-blue-800 dark:!text-blue-400 dark:hover:!text-blue-300"
                     :href="route('login')"
                 >
                     {{ __('Sign in') }}
                 </flux:link>
             </p>
-            <p data-theme-keep class="text-xs text-stone-500 dark:text-stone-400">
+            <p data-theme-keep class="text-xs text-slate-500 dark:text-slate-400">
                 {{ __('Production staff join through an invitation from their shop owner.') }}
             </p>
         </div>

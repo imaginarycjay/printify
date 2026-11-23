@@ -3,8 +3,8 @@
     <head>
         @include('partials.head')
     </head>
-    <body class="min-h-screen bg-white dark:bg-zinc-800">
-        <flux:sidebar sticky collapsible="mobile" class="border-e border-zinc-200 bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-900">
+    <body class="min-h-screen bg-slate-100 dark:bg-[#0b1120] text-slate-900 dark:text-slate-100 selection:bg-blue-600 selection:text-white">
+        <flux:sidebar sticky collapsible="mobile" class="border-e border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900">
             <flux:sidebar.header>
                 <x-app-logo :sidebar="true" href="{{ route('dashboard') }}" wire:navigate />
                 <flux:sidebar.collapse class="lg:hidden" />
@@ -31,7 +31,7 @@
             </flux:sidebar.nav>
 
             <div class="hidden lg:flex items-center justify-between px-2 py-1">
-                <span class="text-xs text-zinc-500 dark:text-zinc-400 font-medium">Theme</span>
+                <span class="text-xs text-slate-500 dark:text-slate-400 font-medium">Theme</span>
                 <x-theme-toggle />
             </div>
 

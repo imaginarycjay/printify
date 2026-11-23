@@ -14,7 +14,7 @@ new class extends Component {
         <a
             href="{{ route('register') }}"
             data-theme-keep
-            class="flex min-h-9 items-center justify-center rounded-lg px-3 text-xs font-medium text-stone-600 transition-colors hover:text-stone-900 dark:text-stone-300 dark:hover:text-white"
+            class="flex min-h-9 items-center justify-center rounded-lg px-3 text-xs font-medium text-slate-600 transition-colors hover:text-slate-900 dark:text-slate-300 dark:hover:text-white"
         >
             {{ __('Customer') }}
         </a>
@@ -22,7 +22,7 @@ new class extends Component {
             href="{{ route('owner.register') }}"
             aria-current="page"
             data-theme-keep
-            class="flex min-h-9 items-center justify-center rounded-lg bg-white px-3 text-xs font-semibold text-stone-900 shadow-2xs dark:bg-stone-700/90 dark:text-white"
+            class="flex min-h-9 items-center justify-center rounded-lg bg-white px-3 text-xs font-semibold text-slate-900 shadow-2xs dark:bg-slate-700/90 dark:text-white"
         >
             {{ __('Print shop owner') }}
         </a>
@@ -33,7 +33,7 @@ new class extends Component {
         :description="__('Create your owner account first, then configure your shop profile and services for approval.')"
     />
 
-    <p data-theme-keep class="rounded-xl border border-amber-500/25 bg-amber-500/10 px-3.5 py-2.5 text-xs leading-relaxed text-amber-900 dark:text-amber-200">
+    <p data-theme-keep class="rounded-xl border border-blue-200 bg-blue-50 px-3.5 py-2.5 text-xs leading-relaxed text-blue-900 dark:border-blue-800 dark:bg-blue-950/60 dark:text-blue-200">
         {{ __('Your shop appears in the public directory after you complete setup and receive administrator approval.') }}
     </p>
 
@@ -109,18 +109,18 @@ new class extends Component {
             variant="primary"
             icon-trailing="arrow-right"
             data-theme-keep
-            class="mt-1 w-full !bg-amber-500 !text-stone-950 font-semibold hover:!bg-amber-400"
+            class="mt-1 w-full !bg-blue-600 !text-white font-semibold hover:!bg-blue-700 dark:hover:!bg-blue-500"
             x-bind:disabled="submitting"
         >
             {{ __('Create owner account') }}
         </flux:button>
     </form>
 
-    <div data-theme-keep class="-mx-6 -mb-6 mt-2 border-t border-[var(--auth-border-subtle)] bg-[var(--auth-card-footer)] px-6 py-4 text-center text-sm text-stone-600 dark:text-stone-300 sm:-mx-7 sm:-mb-7 sm:px-7">
+    <div data-theme-keep class="-mx-6 -mb-6 mt-2 border-t border-[var(--auth-border-subtle)] bg-[var(--auth-card-footer)] px-6 py-4 text-center text-sm text-slate-600 dark:text-slate-300 sm:-mx-7 sm:-mb-7 sm:px-7">
         <span>{{ __('Already have an account?') }}</span>
         <flux:link
             data-theme-keep
-            class="ms-1 font-semibold !text-amber-700 hover:!text-amber-800 dark:!text-amber-400 dark:hover:!text-amber-300"
+            class="ms-1 font-semibold !text-blue-700 hover:!text-blue-800 dark:!text-blue-400 dark:hover:!text-blue-300"
             :href="route('login')"
         >
             {{ __('Sign in') }}

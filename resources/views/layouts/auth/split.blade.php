@@ -3,30 +3,25 @@
     <head>
         @include('partials.head')
     </head>
-    <body class="min-h-screen bg-stone-50 font-sans antialiased dark:bg-stone-950 text-stone-900 dark:text-stone-100 selection:bg-amber-500 selection:text-white">
+    <body class="min-h-screen bg-slate-100 font-sans antialiased dark:bg-[#0b1120] text-slate-900 dark:text-slate-100 selection:bg-blue-600 selection:text-white">
         <div class="relative grid min-h-svh w-full lg:grid-cols-12 overflow-hidden">
             <!-- Theme Toggle Upper Right Corner -->
             <div class="absolute top-4 right-4 z-50">
                 <x-theme-toggle />
             </div>
             <!-- Left Side: Integrated Print Operations Showcase -->
-            <div class="relative hidden flex-col justify-between p-10 lg:flex lg:col-span-6 xl:col-span-7 bg-white dark:bg-stone-900 text-stone-900 dark:text-white overflow-hidden border-r border-stone-200 dark:border-stone-800">
-                <!-- Ambient Glow Background Effects -->
-                <div class="absolute -top-32 -left-32 size-96 rounded-full bg-amber-500/20 blur-3xl pointer-events-none"></div>
-                <div class="absolute -bottom-32 -right-32 size-96 rounded-full bg-amber-600/10 blur-3xl pointer-events-none"></div>
-                <div class="absolute inset-0 bg-[radial-gradient(#d6d3d1_1px,transparent_1px)] dark:bg-[radial-gradient(#383838_1px,transparent_1px)] [background-size:24px_24px] opacity-30 pointer-events-none"></div>
-
+            <div class="relative hidden flex-col justify-between p-10 lg:flex lg:col-span-6 xl:col-span-7 bg-white dark:bg-slate-900 text-slate-900 dark:text-white overflow-hidden border-r border-slate-200 dark:border-slate-800">
                 <!-- Brand Header -->
                 <div class="relative z-10">
-                    <a href="{{ route('home') }}" class="inline-flex items-center gap-3 text-lg font-bold tracking-tight text-stone-900 dark:text-white group">
-                        <span class="flex size-11 items-center justify-center rounded-xl bg-gradient-to-br from-amber-400 to-amber-600 shadow-lg shadow-amber-500/25 group-hover:scale-105 transition-transform duration-200">
-                            <x-app-logo-icon class="size-7 fill-current text-stone-950" />
+                    <a href="{{ route('home') }}" class="inline-flex items-center gap-3 text-lg font-bold tracking-tight text-slate-900 dark:text-white group">
+                        <span class="flex size-11 items-center justify-center rounded-xl border border-slate-200 bg-white shadow-xs dark:border-slate-700 dark:bg-slate-800 group-hover:border-blue-600 dark:group-hover:border-blue-400 transition-colors">
+                            <x-app-logo-icon class="size-7" />
                         </span>
                         <div class="flex flex-col">
-                            <span class="text-xl font-extrabold tracking-tight text-stone-900 dark:text-white">
+                            <span class="text-xl font-extrabold tracking-tight text-slate-900 dark:text-white">
                                 {{ config('app.name', 'PressQueue') }}
                             </span>
-                            <span class="text-xs font-medium text-amber-700 dark:text-amber-400 tracking-wide uppercase">Unified Print Operations Engine</span>
+                            <span class="text-xs font-medium text-blue-700 dark:text-blue-400 tracking-wide uppercase">Unified Print Operations Engine</span>
                         </div>
                     </a>
                 </div>
@@ -34,14 +29,14 @@
                 <!-- Central Visual Showcase: 3 Integrated Pillars -->
                 <div class="relative z-10 my-auto space-y-6 max-w-xl">
                     <div class="space-y-2">
-                        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-700 dark:text-amber-400 text-xs font-semibold uppercase tracking-wider">
+                        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-50 border border-blue-200 text-blue-800 dark:bg-blue-950/60 dark:border-blue-800 dark:text-blue-300 text-xs font-semibold uppercase tracking-wider">
                             <flux:icon name="sparkles" class="size-3.5" />
                             Precision Print Architecture
                         </div>
-                        <h2 class="text-3xl font-extrabold tracking-tight text-stone-900 dark:text-white sm:text-4xl">
+                        <h2 class="text-3xl font-extrabold tracking-tight text-slate-900 dark:text-white sm:text-4xl">
                             Unified Platform for Shop Owners, Staff & Clients
                         </h2>
-                        <p class="text-sm text-stone-600 dark:text-stone-400 leading-relaxed">
+                        <p class="text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
                             Modular service configuration, real-time production queue management, and transparent order tracking.
                         </p>
                     </div>
@@ -49,48 +44,48 @@
                     <!-- 3 Integrated Pillars -->
                     <div class="grid gap-3 pt-2">
                         <!-- Pillar 1: Customer Order Portal -->
-                        <div class="group relative flex items-start gap-4 rounded-xl border border-stone-200 dark:border-stone-800 bg-stone-50/90 dark:bg-stone-900/80 p-4 backdrop-blur-md transition-all duration-200 hover:border-amber-500/50 hover:bg-amber-50/50 dark:hover:bg-stone-800/80">
-                            <div class="flex size-10 shrink-0 items-center justify-center rounded-lg bg-amber-500/10 text-amber-700 dark:text-amber-400 border border-amber-500/20 group-hover:bg-amber-500 group-hover:text-stone-950 transition-colors">
+                        <div class="group relative flex items-start gap-4 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/60 p-4 transition-colors duration-200 hover:border-blue-600/50 dark:hover:border-blue-500/50">
+                            <div class="flex size-10 shrink-0 items-center justify-center rounded-lg bg-blue-50 text-blue-700 border border-blue-200 dark:bg-blue-950/60 dark:text-blue-300 dark:border-blue-800 group-hover:bg-blue-600 group-hover:text-white group-hover:border-blue-600 transition-colors">
                                 <flux:icon name="shopping-bag" class="size-5" />
                             </div>
                             <div class="space-y-1">
                                 <div class="flex items-center gap-2">
-                                    <h3 class="text-sm font-semibold text-stone-900 dark:text-white">1. Customer Order Portal</h3>
-                                    <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-stone-200/80 text-stone-700 dark:bg-stone-800 dark:text-stone-300">Customer</span>
+                                    <h3 class="text-sm font-semibold text-slate-900 dark:text-white">1. Customer Order Portal</h3>
+                                    <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-slate-200/80 text-slate-700 dark:bg-slate-800 dark:text-slate-300">Customer</span>
                                 </div>
-                                <p class="text-xs text-stone-600 dark:text-stone-400 leading-relaxed">
+                                <p class="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
                                     Mobile-first digital storefront for hardbound/softbound binding, document printing, ID services, spec customization, and live status tracking.
                                 </p>
                             </div>
                         </div>
 
                         <!-- Pillar 2: Print Operations Hub -->
-                        <div class="group relative flex items-start gap-4 rounded-xl border border-stone-200 dark:border-stone-800 bg-stone-50/90 dark:bg-stone-900/80 p-4 backdrop-blur-md transition-all duration-200 hover:border-amber-500/50 hover:bg-amber-50/50 dark:hover:bg-stone-800/80">
-                            <div class="flex size-10 shrink-0 items-center justify-center rounded-lg bg-amber-500/10 text-amber-700 dark:text-amber-400 border border-amber-500/20 group-hover:bg-amber-500 group-hover:text-stone-950 transition-colors">
+                        <div class="group relative flex items-start gap-4 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/60 p-4 transition-colors duration-200 hover:border-blue-600/50 dark:hover:border-blue-500/50">
+                            <div class="flex size-10 shrink-0 items-center justify-center rounded-lg bg-blue-50 text-blue-700 border border-blue-200 dark:bg-blue-950/60 dark:text-blue-300 dark:border-blue-800 group-hover:bg-blue-600 group-hover:text-white group-hover:border-blue-600 transition-colors">
                                 <flux:icon name="queue-list" class="size-5" />
                             </div>
                             <div class="space-y-1">
                                 <div class="flex items-center gap-2">
-                                    <h3 class="text-sm font-semibold text-stone-900 dark:text-white">2. Print Operations Hub</h3>
-                                    <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-stone-200/80 text-amber-700 dark:bg-stone-800 dark:text-amber-400">Production Staff</span>
+                                    <h3 class="text-sm font-semibold text-slate-900 dark:text-white">2. Print Operations Hub</h3>
+                                    <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-blue-50 text-blue-700 dark:bg-blue-950/60 dark:text-blue-300">Production Staff</span>
                                 </div>
-                                <p class="text-xs text-stone-600 dark:text-stone-400 leading-relaxed">
+                                <p class="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
                                     Real-time job queue processing, print stage status updates, and automated customer status notifications.
                                 </p>
                             </div>
                         </div>
 
                         <!-- Pillar 3: Business Service Configurator -->
-                        <div class="group relative flex items-start gap-4 rounded-xl border border-stone-200 dark:border-stone-800 bg-stone-50/90 dark:bg-stone-900/80 p-4 backdrop-blur-md transition-all duration-200 hover:border-amber-500/50 hover:bg-amber-50/50 dark:hover:bg-stone-800/80">
-                            <div class="flex size-10 shrink-0 items-center justify-center rounded-lg bg-amber-500/10 text-amber-700 dark:text-amber-400 border border-amber-500/20 group-hover:bg-amber-500 group-hover:text-stone-950 transition-colors">
+                        <div class="group relative flex items-start gap-4 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/60 p-4 transition-colors duration-200 hover:border-blue-600/50 dark:hover:border-blue-500/50">
+                            <div class="flex size-10 shrink-0 items-center justify-center rounded-lg bg-blue-50 text-blue-700 border border-blue-200 dark:bg-blue-950/60 dark:text-blue-300 dark:border-blue-800 group-hover:bg-blue-600 group-hover:text-white group-hover:border-blue-600 transition-colors">
                                 <flux:icon name="squares-plus" class="size-5" />
                             </div>
                             <div class="space-y-1">
                                 <div class="flex items-center gap-2">
-                                    <h3 class="text-sm font-semibold text-stone-900 dark:text-white">3. Business Service Configurator</h3>
-                                    <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-stone-200/80 text-emerald-700 dark:bg-stone-800 dark:text-emerald-400">Business Owner</span>
+                                    <h3 class="text-sm font-semibold text-slate-900 dark:text-white">3. Business Service Configurator</h3>
+                                    <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300">Business Owner</span>
                                 </div>
-                                <p class="text-xs text-stone-600 dark:text-stone-400 leading-relaxed">
+                                <p class="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
                                     Modular setup wizard and expandable service manager to seamlessly activate, scale, or edit available printing services on-demand.
                                 </p>
                             </div>
@@ -99,22 +94,22 @@
                 </div>
 
                 <!-- Footer info -->
-                <div class="relative z-10 flex items-center justify-between text-xs text-stone-500 border-t border-stone-200 dark:border-stone-800/60 pt-4">
+                <div class="relative z-10 flex items-center justify-between text-xs text-slate-500 border-t border-slate-200 dark:border-slate-800 pt-4">
                     <span>&copy; {{ date('Y') }} {{ config('app.name', 'PressQueue') }}. All rights reserved.</span>
-                    <span class="flex items-center gap-1.5 text-stone-600 dark:text-stone-400">
+                    <span class="flex items-center gap-1.5 text-slate-600 dark:text-slate-400">
                         <span class="size-2 rounded-full bg-emerald-500 animate-pulse"></span>
                         Engine Active
                     </span>
                 </div>
             </div>
 
-            <!-- Right Side: Redesigned Auth Form Container -->
-            <div class="flex flex-col justify-center items-center p-6 sm:p-12 lg:col-span-6 xl:col-span-5 min-h-svh bg-stone-50 dark:bg-stone-950">
+            <!-- Right Side: Auth Form Container -->
+            <div class="flex flex-col justify-center items-center p-6 sm:p-12 lg:col-span-6 xl:col-span-5 min-h-svh bg-slate-100 dark:bg-[#0b1120]">
                 <!-- Mobile Top Brand Header -->
                 <div class="w-full max-w-md mb-6 lg:hidden text-center">
-                    <a href="{{ route('home') }}" class="inline-flex items-center gap-2 font-bold text-stone-900 dark:text-white">
-                        <span class="flex size-9 items-center justify-center rounded-lg bg-amber-500 text-stone-950">
-                            <x-app-logo-icon class="size-5 fill-current" />
+                    <a href="{{ route('home') }}" class="inline-flex items-center gap-2.5 font-bold text-slate-900 dark:text-white">
+                        <span class="flex size-9 items-center justify-center rounded-xl border border-slate-200 bg-white shadow-xs dark:border-slate-700 dark:bg-slate-800">
+                            <x-app-logo-icon class="size-5" />
                         </span>
                         <span class="text-lg tracking-tight">{{ config('app.name', 'PressQueue') }}</span>
                     </a>
@@ -122,7 +117,7 @@
 
                 <!-- Auth Card Box -->
                 <div class="w-full max-w-md space-y-6">
-                    <div class="rounded-2xl border border-stone-200/80 dark:border-stone-800/80 bg-white/90 dark:bg-stone-900/90 p-6 sm:p-8 shadow-xl shadow-stone-900/5 backdrop-blur-xl">
+                    <div class="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 sm:p-8 shadow-xs">
                         {{ $slot }}
                     </div>
                 </div>
