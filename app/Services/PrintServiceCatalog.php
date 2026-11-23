@@ -18,7 +18,7 @@ class PrintServiceCatalog
                 'description' => 'Real-time cashflow, gross profit margins, product mix breakdown, and financial reporting',
                 'icon' => 'chart-bar-square',
                 'gradient' => 'from-amber-500 via-orange-500 to-yellow-600',
-                'badge_color' => 'bg-amber-500/20 text-amber-300 border-amber-500/30',
+                'badge_color' => 'bg-amber-50 text-amber-800 border-amber-200 dark:bg-amber-950/60 dark:text-amber-300 dark:border-amber-800',
                 'is_preinstalled' => true,
             ],
             'inventory_hub' => [
@@ -27,7 +27,7 @@ class PrintServiceCatalog
                 'description' => 'Central raw materials, ready-to-buy products, real-time burn rates, and restock orders',
                 'icon' => 'archive-box',
                 'gradient' => 'from-emerald-500 via-teal-600 to-cyan-700',
-                'badge_color' => 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30',
+                'badge_color' => 'bg-emerald-50 text-emerald-800 border-emerald-200 dark:bg-emerald-950/60 dark:text-emerald-300 dark:border-emerald-800',
                 'is_preinstalled' => true,
             ],
             'production_hub' => [
@@ -36,7 +36,7 @@ class PrintServiceCatalog
                 'description' => 'Digital job queue, machine scheduling, 1-click stage advancement, and BOM consumption',
                 'icon' => 'queue-list',
                 'gradient' => 'from-amber-500 via-orange-600 to-amber-700',
-                'badge_color' => 'bg-amber-500/20 text-amber-300 border-amber-500/30',
+                'badge_color' => 'bg-amber-50 text-amber-800 border-amber-200 dark:bg-amber-950/60 dark:text-amber-300 dark:border-amber-800',
                 'is_preinstalled' => true,
             ],
             'thesis_binding' => [
@@ -45,7 +45,7 @@ class PrintServiceCatalog
                 'description' => 'Custom cover foil stamping, hardbound & softbound thesis compilation',
                 'icon' => 'book-open',
                 'gradient' => 'from-amber-500 to-amber-700',
-                'badge_color' => 'bg-amber-500/20 text-amber-300 border-amber-500/30',
+                'badge_color' => 'bg-amber-50 text-amber-800 border-amber-200 dark:bg-amber-950/60 dark:text-amber-300 dark:border-amber-800',
             ],
             'document_printing' => [
                 'key' => 'document_printing',
@@ -53,7 +53,7 @@ class PrintServiceCatalog
                 'description' => 'High-speed colored & monochrome document printing and booklet scanning',
                 'icon' => 'document-text',
                 'gradient' => 'from-blue-500 to-indigo-700',
-                'badge_color' => 'bg-blue-500/20 text-blue-300 border-blue-500/30',
+                'badge_color' => 'bg-sky-50 text-sky-800 border-sky-200 dark:bg-sky-950/60 dark:text-sky-300 dark:border-sky-800',
             ],
             'tarpaulin' => [
                 'key' => 'tarpaulin',
@@ -61,7 +61,7 @@ class PrintServiceCatalog
                 'description' => 'Large format outdoor & indoor tarpaulin banners and signage',
                 'icon' => 'photo',
                 'gradient' => 'from-purple-500 to-fuchsia-700',
-                'badge_color' => 'bg-purple-500/20 text-purple-300 border-purple-500/30',
+                'badge_color' => 'bg-purple-50 text-purple-800 border-purple-200 dark:bg-purple-950/60 dark:text-purple-300 dark:border-purple-800',
             ],
             'tshirt' => [
                 'key' => 'tshirt',
@@ -69,7 +69,7 @@ class PrintServiceCatalog
                 'description' => 'Sublimation, DTF, and silkscreen custom apparel printing',
                 'icon' => 'sparkles',
                 'gradient' => 'from-rose-500 to-pink-700',
-                'badge_color' => 'bg-rose-500/20 text-rose-300 border-rose-500/30',
+                'badge_color' => 'bg-rose-50 text-rose-800 border-rose-200 dark:bg-rose-950/60 dark:text-rose-300 dark:border-rose-800',
             ],
             'pvc_id' => [
                 'key' => 'pvc_id',
@@ -77,7 +77,7 @@ class PrintServiceCatalog
                 'description' => 'High-resolution glossy PVC identification cards & lanyard printing',
                 'icon' => 'identification',
                 'gradient' => 'from-emerald-500 to-teal-700',
-                'badge_color' => 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30',
+                'badge_color' => 'bg-emerald-50 text-emerald-800 border-emerald-200 dark:bg-emerald-950/60 dark:text-emerald-300 dark:border-emerald-800',
             ],
             'trophy' => [
                 'key' => 'trophy',
@@ -85,7 +85,7 @@ class PrintServiceCatalog
                 'description' => 'Acrylic plaque engraving, corporate tokens & sports trophy customization',
                 'icon' => 'trophy',
                 'gradient' => 'from-yellow-400 to-amber-600',
-                'badge_color' => 'bg-yellow-500/20 text-yellow-300 border-yellow-500/30',
+                'badge_color' => 'bg-amber-50 text-amber-800 border-amber-200 dark:bg-amber-950/60 dark:text-amber-300 dark:border-amber-800',
             ],
             'mug' => [
                 'key' => 'mug',
@@ -93,7 +93,7 @@ class PrintServiceCatalog
                 'description' => 'Ceramic magic mugs, white mugs & tumbler heat press customization',
                 'icon' => 'beaker',
                 'gradient' => 'from-cyan-500 to-blue-700',
-                'badge_color' => 'bg-cyan-500/20 text-cyan-300 border-cyan-500/30',
+                'badge_color' => 'bg-sky-50 text-sky-800 border-sky-200 dark:bg-sky-950/60 dark:text-sky-300 dark:border-sky-800',
             ],
             'sticker' => [
                 'key' => 'sticker',
@@ -101,7 +101,7 @@ class PrintServiceCatalog
                 'description' => 'Die-cut vinyl, waterproof product label & decal sticker printing',
                 'icon' => 'tag',
                 'gradient' => 'from-lime-500 to-green-700',
-                'badge_color' => 'bg-lime-500/20 text-lime-300 border-lime-500/30',
+                'badge_color' => 'bg-emerald-50 text-emerald-800 border-emerald-200 dark:bg-emerald-950/60 dark:text-emerald-300 dark:border-emerald-800',
             ],
         ];
     }

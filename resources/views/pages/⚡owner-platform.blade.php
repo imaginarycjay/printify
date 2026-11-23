@@ -97,44 +97,44 @@ new class extends Component {
 
             <div class="divide-y divide-stone-200 dark:divide-stone-800">
                 @forelse ($shopPrinters as $printer)
-                    <div wire:key="printer-{{ $printer->id }}" class="flex flex-col gap-3 py-4 lg:flex-row lg:items-center lg:justify-between">
-                        <div class="space-y-1">
+                    <div wire:key="printer-{{ $printer->id }}" class="grid gap-3 py-4 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-center">
+                        <div class="min-w-0 space-y-1">
                             <div class="flex flex-wrap items-center gap-2">
                                 <span class="font-bold">{{ $printer->name }}</span>
                                 <flux:badge :color="match ($printer->status) { 'online' => 'emerald', 'maintenance' => 'amber', default => 'red' }" size="sm">{{ ucfirst($printer->status) }}</flux:badge>
                                 @if ($printer->is_wide_format)
-                                    <flux:badge color="indigo" size="sm">Wide Format (RIP)</flux:badge>
+                                    <flux:badge color="sky" size="sm">Wide Format (RIP)</flux:badge>
                                 @endif
                             </div>
                             <p class="text-xs text-stone-500 dark:text-stone-400">
                                 Sizes: {{ ! empty($printer->supported_sizes) ? implode(', ', $printer->supported_sizes) : 'All sizes' }}
-                                &bull; Active queued items: {{ $printer->activeJobsCount() }}
+                                &bull; Active queued items: <span class="tabular-nums">{{ $printer->activeJobsCount() }}</span>
                             </p>
                         </div>
 
-                        <div class="flex flex-wrap items-center gap-2">
-                            <form method="POST" action="{{ route('owner.printers.update', $printer->id) }}" class="flex flex-wrap items-center gap-2">
+                        <div class="flex flex-wrap lg:flex-nowrap items-center gap-2 shrink-0">
+                            <form method="POST" action="{{ route('owner.printers.update', $printer->id) }}" class="flex flex-wrap sm:flex-nowrap items-center gap-2">
                                 @csrf
                                 @method('PATCH')
-                                <select name="status" class="min-h-10 rounded-xl border border-stone-300 bg-white px-3 text-xs font-semibold dark:border-stone-700 dark:bg-stone-950">
+                                <select name="status" class="min-h-10 rounded-xl border border-stone-300 bg-white px-3 text-xs font-semibold text-stone-900 dark:border-stone-700 dark:bg-stone-950 dark:text-stone-100">
                                     @foreach (['online' => 'Online', 'maintenance' => 'Maintenance', 'offline' => 'Offline'] as $statusKey => $statusLabel)
                                         <option value="{{ $statusKey }}" @selected($printer->status === $statusKey)>{{ $statusLabel }}</option>
                                     @endforeach
                                 </select>
                                 @if ($onlinePrinters->where('id', '!=', $printer->id)->isNotEmpty())
-                                    <select name="target_printer_id" class="min-h-10 rounded-xl border border-stone-300 bg-white px-3 text-xs dark:border-stone-700 dark:bg-stone-950">
-                                        <option value="">Failover target (unassign if empty)</option>
+                                    <select name="target_printer_id" class="min-h-10 max-w-[14rem] rounded-xl border border-stone-300 bg-white px-3 text-xs text-stone-900 dark:border-stone-700 dark:bg-stone-950 dark:text-stone-100">
+                                        <option value="">Failover target (unassign)</option>
                                         @foreach ($onlinePrinters->where('id', '!=', $printer->id) as $candidate)
-                                            <option value="{{ $candidate->id }}">Failover → {{ $candidate->name }}</option>
+                                            <option value="{{ $candidate->id }}">Failover: {{ $candidate->name }}</option>
                                         @endforeach
                                     </select>
                                 @endif
-                                <flux:button type="submit" size="sm">Save status</flux:button>
+                                <flux:button type="submit" size="sm" class="shrink-0 whitespace-nowrap">Save status</flux:button>
                             </form>
                             <form method="POST" action="{{ route('owner.printers.destroy', $printer->id) }}" x-data x-on:submit="if (! confirm('Remove this printer workstation?')) $event.preventDefault()">
                                 @csrf
                                 @method('DELETE')
-                                <flux:button type="submit" size="sm" variant="danger">Delete</flux:button>
+                                <flux:button type="submit" size="sm" variant="danger" class="shrink-0 whitespace-nowrap">Delete</flux:button>
                             </form>
                         </div>
                     </div>

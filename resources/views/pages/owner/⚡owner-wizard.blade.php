@@ -109,32 +109,37 @@ new class extends Component {
     }
 }; ?>
 
-<div class="min-h-screen bg-stone-950 text-stone-100 font-sans antialiased flex flex-col justify-between p-4 sm:p-8 relative overflow-x-hidden selection:bg-amber-500 selection:text-white">
-    <!-- Ambient Background Lighting -->
-    <div class="absolute -top-40 left-1/2 -translate-x-1/2 size-[600px] rounded-full bg-amber-500/15 blur-[120px] pointer-events-none"></div>
+<div class="pq-page flex flex-col justify-between p-4 sm:p-8">
+    @php
+        $wizardShop = auth()->user()?->operationalShop();
+    @endphp
 
     <!-- Wizard Header Bar -->
-    <header class="w-full max-w-4xl mx-auto flex items-center justify-between py-4 border-b border-stone-800/80 relative z-20">
+    <header class="w-full max-w-4xl mx-auto flex flex-wrap items-center justify-between gap-4 py-4 border-b border-stone-200 dark:border-stone-800">
         <div class="flex items-center gap-3">
-            <span class="flex size-10 items-center justify-center rounded-xl bg-gradient-to-br from-amber-400 to-amber-600 text-stone-950 font-bold shadow-md shadow-amber-500/20">
-                <x-app-logo-icon class="size-6 fill-current" />
-            </span>
+            @if ($wizardShop?->is_setup_completed)
+                <x-app-back-link :href="route('owner.dashboard')" label="App Launcher" :navigate="true" />
+            @else
+                <span data-theme-keep class="flex size-10 items-center justify-center rounded-xl bg-amber-500 text-stone-950 font-bold">
+                    <x-app-logo-icon class="size-6 fill-current" />
+                </span>
+            @endif
             <div>
-                <h1 class="text-lg font-bold text-white tracking-tight">{{ config('app.name', 'PressQueue') }}</h1>
-                <p class="text-xs text-amber-400 font-semibold uppercase tracking-wider">Business Owner Setup Wizard</p>
+                <h1 class="text-lg font-extrabold text-stone-900 dark:text-stone-100 tracking-tight">{{ config('app.name', 'PressQueue') }}</h1>
+                <p class="text-xs text-amber-700 dark:text-amber-400 font-semibold">Shop Setup Wizard</p>
             </div>
         </div>
 
         <!-- Step Indicator Pills & Theme Toggle -->
         <div class="flex items-center gap-3">
             <div class="flex items-center gap-2">
-                <span class="flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold {{ $step === 1 ? 'bg-amber-500 text-stone-950' : 'bg-stone-800 text-stone-400' }}">
-                    <span class="size-4 rounded-full flex items-center justify-center text-[10px] font-extrabold {{ $step === 1 ? 'bg-stone-950 text-amber-400' : 'bg-stone-700 text-stone-200' }}">1</span>
+                <span class="flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold {{ $step === 1 ? 'bg-amber-500 text-stone-950' : 'bg-white border border-stone-200 text-stone-600 dark:bg-stone-800 dark:border-stone-700 dark:text-stone-400' }}">
+                    <span class="size-4 rounded-full flex items-center justify-center text-[10px] font-extrabold {{ $step === 1 ? 'bg-stone-950 text-amber-400' : 'bg-stone-200 text-stone-700 dark:bg-stone-700 dark:text-stone-200' }}">1</span>
                     Shop Identity
                 </span>
-                <span class="text-stone-600">/</span>
-                <span class="flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold {{ $step === 2 ? 'bg-amber-500 text-stone-950' : 'bg-stone-800 text-stone-400' }}">
-                    <span class="size-4 rounded-full flex items-center justify-center text-[10px] font-extrabold {{ $step === 2 ? 'bg-stone-950 text-amber-400' : 'bg-stone-700 text-stone-200' }}">2</span>
+                <span class="text-stone-400 dark:text-stone-600">/</span>
+                <span class="flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold {{ $step === 2 ? 'bg-amber-500 text-stone-950' : 'bg-white border border-stone-200 text-stone-600 dark:bg-stone-800 dark:border-stone-700 dark:text-stone-400' }}">
+                    <span class="size-4 rounded-full flex items-center justify-center text-[10px] font-extrabold {{ $step === 2 ? 'bg-stone-950 text-amber-400' : 'bg-stone-200 text-stone-700 dark:bg-stone-700 dark:text-stone-200' }}">2</span>
                     Services Selection
                 </span>
             </div>
@@ -143,23 +148,23 @@ new class extends Component {
     </header>
 
     <!-- Main Wizard Card Body -->
-    <main class="w-full max-w-4xl mx-auto my-auto py-8 relative z-20">
-        <div class="rounded-3xl border border-stone-800 bg-stone-900/90 p-6 sm:p-10 shadow-2xl backdrop-blur-xl">
+    <main class="w-full max-w-4xl mx-auto my-auto py-8">
+        <div class="pq-card p-6 sm:p-10">
             @if ($step === 1)
                 <!-- Step 1: Print Shop Identity -->
                 <div class="space-y-6 max-w-xl mx-auto text-center sm:text-left">
                     <div class="space-y-2">
-                        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-400 text-xs font-semibold uppercase tracking-wider">
-                            <flux:icon name="building-storefront" class="size-4" />
+                        <span class="pq-badge-warning">
+                            <flux:icon name="building-storefront" class="size-3.5" />
                             Step 1 of 2
-                        </div>
-                        <h2 class="text-2xl sm:text-3xl font-extrabold tracking-tight text-white">What is the name of your Print Shop?</h2>
-                        <p class="text-sm text-stone-400">This will be displayed to customers on your storefront and on job production tickets.</p>
+                        </span>
+                        <h2 class="text-2xl sm:text-3xl font-extrabold tracking-tight text-stone-900 dark:text-stone-100">What is the name of your Print Shop?</h2>
+                        <p class="text-sm text-stone-600 dark:text-stone-400">This will be displayed to customers on your storefront and on job production tickets.</p>
                     </div>
 
                     <div class="space-y-4 pt-2">
                         <flux:field>
-                            <flux:label class="text-stone-300 font-semibold">{{ __('Print Shop Name') }}</flux:label>
+                            <flux:label class="text-stone-700 dark:text-stone-300 font-semibold">{{ __('Print Shop Name') }}</flux:label>
                             <flux:input
                                 wire:model.defer="shop_name"
                                 type="text"
@@ -173,7 +178,7 @@ new class extends Component {
                     </div>
 
                     <div class="flex items-center justify-end pt-4">
-                        <flux:button wire:click="nextStep" variant="primary" class="w-full sm:w-auto bg-amber-500 hover:bg-amber-400 text-stone-950 font-bold px-8 py-3 rounded-xl shadow-lg shadow-amber-500/25">
+                        <flux:button wire:click="nextStep" variant="primary" class="w-full sm:w-auto !bg-amber-500 hover:!bg-amber-400 !text-stone-950 font-bold px-8 py-3 rounded-xl">
                             Proceed
                         </flux:button>
                     </div>
@@ -181,25 +186,25 @@ new class extends Component {
             @else
                 <!-- Step 2: Select Services Offered -->
                 <div class="space-y-6">
-                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-stone-800 pb-4">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-stone-200 dark:border-stone-800 pb-4">
                         <div>
-                            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-400 text-xs font-semibold uppercase tracking-wider mb-2">
-                                <flux:icon name="squares-plus" class="size-4" />
+                            <span class="pq-badge-warning mb-2">
+                                <flux:icon name="squares-plus" class="size-3.5" />
                                 Step 2 of 2
-                            </div>
-                            <h2 class="text-2xl font-extrabold text-white">Select Services Offered by {{ $shop_name }}</h2>
-                            <p class="text-xs text-stone-400">Click to toggle the services available in your shop. You can install or remove services anytime later.</p>
+                            </span>
+                            <h2 class="text-2xl font-extrabold text-stone-900 dark:text-stone-100">Select Services Offered by {{ $shop_name }}</h2>
+                            <p class="text-xs text-stone-600 dark:text-stone-400">Click to toggle the services available in your shop. You can install or remove services anytime later.</p>
                         </div>
 
                         <div class="flex items-center gap-2">
-                            <span class="text-xs font-bold text-amber-400 px-3 py-1.5 rounded-lg bg-amber-500/10 border border-amber-500/20">
+                            <span class="pq-badge-warning tabular-nums">
                                 {{ count($selected_services) }} Services Selected
                             </span>
                         </div>
                     </div>
 
                     @error('selected_services')
-                        <div class="p-3 rounded-xl bg-red-500/10 border border-red-500/30 text-red-400 text-xs font-medium">
+                        <div class="p-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-800 dark:bg-rose-950/60 dark:border-rose-800 dark:text-rose-300 text-xs font-medium">
                             {{ $message }}
                         </div>
                     @enderror
@@ -213,29 +218,27 @@ new class extends Component {
                             @endphp
                             <div
                                 @if (! $isPreinstalled) wire:click="toggleService('{{ $key }}')" @endif
-                                class="group relative flex flex-col justify-between p-4 rounded-2xl border transition-all duration-200 cursor-pointer select-none {{ $isSelected ? 'border-amber-500 bg-amber-500/10 shadow-lg shadow-amber-500/10 ring-1 ring-amber-500' : 'border-stone-800 bg-stone-900/60 hover:border-stone-700 hover:bg-stone-800/60' }} {{ $isPreinstalled ? 'cursor-default' : '' }}"
+                                class="group relative flex flex-col justify-between p-4 rounded-2xl border transition-colors cursor-pointer select-none {{ $isSelected ? 'border-amber-500 bg-amber-50/70 dark:bg-amber-950/30 ring-1 ring-amber-500' : 'border-stone-200 bg-stone-50 hover:border-stone-300 hover:bg-white dark:border-stone-800 dark:bg-stone-900/60 dark:hover:border-stone-700' }} {{ $isPreinstalled ? 'cursor-default' : '' }}"
                             >
                                 <div class="flex items-start justify-between mb-3">
-                                    <!-- Squircle Icon Box -->
-                                    <div class="size-12 rounded-2xl bg-gradient-to-br {{ $service['gradient'] }} flex items-center justify-center text-white shadow-md group-hover:scale-105 transition-transform duration-200">
-                                        <flux:icon name="{{ $service['icon'] }}" class="size-6" />
+                                    <div class="size-10 rounded-xl border {{ $service['badge_color'] }} flex items-center justify-center">
+                                        <flux:icon name="{{ $service['icon'] }}" class="size-5" />
                                     </div>
 
                                     @if ($isPreinstalled)
-                                        <span class="px-2 py-0.5 rounded text-[9px] font-extrabold bg-violet-500/20 text-violet-300 border border-violet-500/30">Pre-installed</span>
+                                        <span class="pq-badge-neutral">Pre-installed</span>
                                     @else
-                                        <!-- Checkmark Pill -->
-                                        <div class="size-6 rounded-full flex items-center justify-center transition-colors {{ $isSelected ? 'bg-amber-500 text-stone-950' : 'bg-stone-800 border border-stone-700 text-transparent' }}">
+                                        <div class="size-6 rounded-full flex items-center justify-center transition-colors {{ $isSelected ? 'bg-amber-500 text-stone-950' : 'bg-white border border-stone-300 text-transparent dark:bg-stone-800 dark:border-stone-700' }}">
                                             <flux:icon name="check" class="size-3.5 stroke-[3]" />
                                         </div>
                                     @endif
                                 </div>
 
                                 <div class="space-y-1">
-                                    <h3 class="text-sm font-bold text-white group-hover:text-amber-400 transition-colors leading-tight">
+                                    <h3 class="text-sm font-bold text-stone-900 dark:text-stone-100 group-hover:text-amber-700 dark:group-hover:text-amber-400 transition-colors leading-tight">
                                         {{ $service['name'] }}
                                     </h3>
-                                    <p class="text-[11px] text-stone-400 line-clamp-2 leading-relaxed">
+                                    <p class="text-[11px] text-stone-600 dark:text-stone-400 line-clamp-2 leading-relaxed">
                                         {{ $service['description'] }}
                                     </p>
                                 </div>
@@ -244,12 +247,12 @@ new class extends Component {
                     </div>
 
                     <!-- Navigation Footer -->
-                    <div class="flex items-center justify-between border-t border-stone-800 pt-6 mt-6">
-                        <flux:button wire:click="previousStep" variant="subtle" class="border border-stone-800 hover:border-stone-700 bg-stone-900/60 hover:bg-stone-800 text-stone-300 hover:text-white font-medium px-6 py-3 rounded-xl transition-all">
+                    <div class="flex items-center justify-between border-t border-stone-200 dark:border-stone-800 pt-6 mt-6">
+                        <flux:button wire:click="previousStep" variant="subtle" class="border border-stone-300 dark:border-stone-700 bg-white dark:bg-stone-900 text-stone-700 dark:text-stone-200 hover:bg-stone-50 font-medium px-6 py-3 rounded-xl">
                             Return
                         </flux:button>
 
-                        <flux:button wire:click="completeSetup" variant="primary" class="bg-amber-500 hover:bg-amber-400 text-stone-950 font-bold px-8 py-3 rounded-xl shadow-lg shadow-amber-500/25">
+                        <flux:button wire:click="completeSetup" variant="primary" class="!bg-amber-500 hover:!bg-amber-400 !text-stone-950 font-bold px-8 py-3 rounded-xl">
                             Finish Setup
                         </flux:button>
                     </div>
@@ -259,7 +262,7 @@ new class extends Component {
     </main>
 
     <!-- Footer -->
-    <footer class="w-full max-w-4xl mx-auto text-center text-xs text-stone-600 py-4 relative z-20">
+    <footer class="w-full max-w-4xl mx-auto text-center text-xs text-stone-500 dark:text-stone-400 py-4">
         &copy; {{ date('Y') }} {{ config('app.name', 'PressQueue') }}. All rights reserved.
     </footer>
 </div>

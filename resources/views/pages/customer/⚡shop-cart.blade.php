@@ -372,9 +372,7 @@ new #[Title('Multi-Item Cart & Checkout')] class extends Component {
     }
 }; ?>
 
-<div class="min-h-screen w-full bg-stone-950 text-stone-100 font-sans antialiased relative selection:bg-amber-500 selection:text-white pb-24">
-    <div class="absolute -top-40 left-1/2 -translate-x-1/2 size-[600px] rounded-full bg-amber-500/10 blur-[140px] pointer-events-none"></div>
-
+<div class="min-h-screen w-full pq-page relative pb-24">
     @php
         $user = auth()->user();
         $shop = $this->selectedShop();
@@ -415,24 +413,22 @@ new #[Title('Multi-Item Cart & Checkout')] class extends Component {
             : null;
     @endphp
 
-    <header class="w-full max-w-6xl mx-auto px-4 sm:px-6 py-4 flex flex-wrap items-center justify-between gap-4 border-b border-stone-800/80 relative z-20">
-        <div class="flex items-center gap-3">
-            <a href="{{ route('shops.show', $shop->id) }}" wire:navigate class="p-2 rounded-xl bg-stone-900 border border-stone-800 text-stone-400 hover:text-amber-400 transition-colors">
-                <flux:icon name="arrow-left" class="size-4" />
-            </a>
-            <div>
-                <div class="flex items-center gap-2">
-                    <h1 class="text-base font-extrabold text-white tracking-tight">{{ $shop->name }} — Unified Cart &amp; Checkout</h1>
-                    <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-500/20 text-amber-400 border border-amber-500/30">Multi-Service</span>
+    <header class="w-full pq-topbar sticky top-0 z-30">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 py-3.5 flex flex-wrap items-center justify-between gap-4">
+            <div class="flex items-center gap-3 min-w-0">
+                <x-app-back-link :href="route('shops.show', $shop->id)" :label="$shop->name" :navigate="true" />
+                <div class="min-w-0">
+                    <h1 class="text-sm sm:text-base font-bold text-stone-900 dark:text-white tracking-tight truncate">{{ $shop->name }} — Unified Cart &amp; Checkout</h1>
+                    <p class="text-[11px] text-stone-600 dark:text-stone-400 truncate">Combine thesis binding and document printing into one tracked order with atomic stock reservation.</p>
                 </div>
-                <p class="text-[11px] text-stone-400">Combine thesis binding and document printing into one tracked order with atomic stock reservation.</p>
             </div>
-        </div>
 
-        <div class="flex items-center gap-2 text-xs font-bold">
-            <span class="px-2.5 py-1 rounded-full {{ $step === 1 ? 'bg-amber-500 text-stone-950' : 'bg-stone-900 text-stone-400 border border-stone-800' }}">1. Build Cart</span>
-            <span class="px-2.5 py-1 rounded-full {{ $step === 2 ? 'bg-amber-500 text-stone-950' : 'bg-stone-900 text-stone-400 border border-stone-800' }}">2. Pay &amp; Verify</span>
-            <span class="px-2.5 py-1 rounded-full {{ $step === 3 ? 'bg-emerald-500 text-stone-950' : 'bg-stone-900 text-stone-400 border border-stone-800' }}">3. Receipt</span>
+            <div class="flex items-center gap-2 text-xs font-bold shrink-0">
+                <span class="px-2.5 py-1 rounded-full tabular-nums {{ $step === 1 ? 'bg-amber-500 text-stone-950 font-black' : 'bg-stone-100 dark:bg-stone-900 text-stone-600 dark:text-stone-400 border border-stone-200 dark:border-stone-800' }}">1. Build Cart</span>
+                <span class="px-2.5 py-1 rounded-full tabular-nums {{ $step === 2 ? 'bg-amber-500 text-stone-950 font-black' : 'bg-stone-100 dark:bg-stone-900 text-stone-600 dark:text-stone-400 border border-stone-200 dark:border-stone-800' }}">2. Pay &amp; Verify</span>
+                <span class="px-2.5 py-1 rounded-full tabular-nums {{ $step === 3 ? 'bg-emerald-600 text-white font-black' : 'bg-stone-100 dark:bg-stone-900 text-stone-600 dark:text-stone-400 border border-stone-200 dark:border-stone-800' }}">3. Receipt</span>
+                <x-theme-toggle />
+            </div>
         </div>
     </header>
 
@@ -442,14 +438,14 @@ new #[Title('Multi-Item Cart & Checkout')] class extends Component {
                 <!-- Left Column: Service Configurator -->
                 <div class="lg:col-span-7 space-y-6">
                     @if ($stock_error_message)
-                        <div class="p-4 rounded-2xl border border-red-500/40 bg-red-500/10 text-red-200 space-y-2">
-                            <div class="flex items-center gap-2 font-bold text-sm text-red-300">
-                                <flux:icon name="exclamation-triangle" class="size-4 text-red-400 shrink-0" />
+                        <div class="p-4 rounded-2xl border border-red-300 dark:border-red-500/40 bg-red-50 dark:bg-red-500/10 text-red-900 dark:text-red-200 space-y-2">
+                            <div class="flex items-center gap-2 font-bold text-sm text-red-800 dark:text-red-300">
+                                <flux:icon name="exclamation-triangle" class="size-4 shrink-0" />
                                 <span>Insufficient Material Stock</span>
                             </div>
                             <p class="text-xs">{{ $stock_error_message }}</p>
                             @if ($stock_fallback_suggestions !== [])
-                                <div class="text-xs text-amber-200 pt-1">
+                                <div class="text-xs text-amber-800 dark:text-amber-200 pt-1">
                                     <span class="font-bold">Available Alternatives:</span>
                                     <ul class="list-disc pl-5 mt-1 space-y-0.5">
                                         @foreach ($stock_fallback_suggestions as $suggestionIdx => $suggestion)
@@ -465,21 +461,21 @@ new #[Title('Multi-Item Cart & Checkout')] class extends Component {
                     @endif
 
                     @error('cart')
-                        <div class="p-3 rounded-xl border border-red-500/40 bg-red-500/10 text-xs text-red-300 font-semibold">{{ $message }}</div>
+                        <div class="p-3 rounded-xl pq-badge-danger text-xs font-semibold">{{ $message }}</div>
                     @enderror
 
-                    <div class="p-6 rounded-3xl bg-stone-900/90 border border-stone-800 space-y-5 shadow-xl">
-                        <div class="flex flex-wrap items-center justify-between gap-3 border-b border-stone-800 pb-4">
+                    <div class="pq-card p-6 space-y-5">
+                        <div class="flex flex-wrap items-center justify-between gap-3 border-b border-stone-200 dark:border-stone-800 pb-4">
                             <div>
-                                <h2 class="text-sm font-black text-white uppercase tracking-wider">Add Print Job to Cart</h2>
-                                <p class="text-xs text-stone-400">Max upload {{ $max_upload_mb }} MB &bull; Max binding thickness {{ $max_binding_sheets }} physical sheets</p>
+                                <h2 class="text-sm font-bold text-stone-900 dark:text-white uppercase tracking-wider">Add Print Job to Cart</h2>
+                                <p class="text-xs text-stone-600 dark:text-stone-400 tabular-nums">Max upload {{ $max_upload_mb }} MB &bull; Max binding thickness {{ $max_binding_sheets }} physical sheets</p>
                             </div>
                             <div class="flex items-center gap-2">
                                 @if (in_array('thesis_binding', $active_service_keys, true))
                                     <button
                                         type="button"
                                         wire:click="selectDraftService('thesis_binding')"
-                                        class="px-3.5 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer {{ $draft_service_key === 'thesis_binding' ? 'bg-amber-500 text-stone-950' : 'bg-stone-950 text-stone-300 border border-stone-800' }}"
+                                        class="px-3.5 py-2 rounded-xl text-xs font-bold transition-colors cursor-pointer {{ $draft_service_key === 'thesis_binding' ? 'bg-amber-500 text-stone-950 font-black' : 'bg-stone-100 dark:bg-stone-950 text-stone-700 dark:text-stone-300 border border-stone-300 dark:border-stone-800 hover:bg-stone-200 dark:hover:bg-stone-800' }}"
                                     >
                                         Thesis Binding
                                     </button>
@@ -488,7 +484,7 @@ new #[Title('Multi-Item Cart & Checkout')] class extends Component {
                                     <button
                                         type="button"
                                         wire:click="selectDraftService('document_printing')"
-                                        class="px-3.5 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer {{ $draft_service_key === 'document_printing' ? 'bg-blue-600 text-white' : 'bg-stone-950 text-stone-300 border border-stone-800' }}"
+                                        class="px-3.5 py-2 rounded-xl text-xs font-bold transition-colors cursor-pointer {{ $draft_service_key === 'document_printing' ? 'bg-blue-600 text-white font-black' : 'bg-stone-100 dark:bg-stone-950 text-stone-700 dark:text-stone-300 border border-stone-300 dark:border-stone-800 hover:bg-stone-200 dark:hover:bg-stone-800' }}"
                                     >
                                         Document Printing
                                     </button>
@@ -500,8 +496,8 @@ new #[Title('Multi-Item Cart & Checkout')] class extends Component {
                             <div class="space-y-4">
                                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                     <div>
-                                        <label class="block text-xs font-bold text-stone-300 mb-1">Fulfillment Mode</label>
-                                        <select wire:model.live="thesis_fulfillment_type" class="w-full rounded-xl bg-stone-950 border border-stone-800 px-3 py-2 text-xs text-white">
+                                        <label class="block text-xs font-bold text-stone-700 dark:text-stone-300 mb-1">Fulfillment Mode</label>
+                                        <select wire:model.live="thesis_fulfillment_type" class="w-full rounded-xl bg-white dark:bg-stone-950 border border-stone-300 dark:border-stone-800 px-3 py-2 text-xs text-stone-900 dark:text-white">
                                             <option value="{{ OrderItem::FULFILLMENT_FULL_PACKAGE }}">Full Print + Binding</option>
                                             @if ($allow_customer_supplied_paper)
                                                 <option value="{{ OrderItem::FULFILLMENT_COVER_ONLY }}">Cover &amp; Binding Only (Supply Paper)</option>
@@ -509,8 +505,8 @@ new #[Title('Multi-Item Cart & Checkout')] class extends Component {
                                         </select>
                                     </div>
                                     <div>
-                                        <label class="block text-xs font-bold text-stone-300 mb-1">Binding Style</label>
-                                        <select wire:model.live="thesis_binding_type" @disabled($thesis_fulfillment_type === OrderItem::FULFILLMENT_COVER_ONLY) class="w-full rounded-xl bg-stone-950 border border-stone-800 px-3 py-2 text-xs text-white">
+                                        <label class="block text-xs font-bold text-stone-700 dark:text-stone-300 mb-1">Binding Style</label>
+                                        <select wire:model.live="thesis_binding_type" @disabled($thesis_fulfillment_type === OrderItem::FULFILLMENT_COVER_ONLY) class="w-full rounded-xl bg-white dark:bg-stone-950 border border-stone-300 dark:border-stone-800 px-3 py-2 text-xs text-stone-900 dark:text-white">
                                             <option value="hardbound">Hardbound</option>
                                             <option value="softbound">Softbound</option>
                                         </select>
@@ -520,56 +516,56 @@ new #[Title('Multi-Item Cart & Checkout')] class extends Component {
                                 <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
                                     @if ($thesis_fulfillment_type === OrderItem::FULFILLMENT_COVER_ONLY)
                                         <div class="col-span-2">
-                                            <label class="block text-xs font-bold text-stone-300 mb-1">Supplied Pages Count</label>
-                                            <input type="number" min="1" max="2000" wire:model.live="thesis_preprinted_total_pages" class="w-full rounded-xl bg-stone-950 border border-stone-800 px-3 py-2 text-xs text-white" />
-                                            @error('preprinted_total_pages') <p class="text-[11px] text-red-400 mt-1">{{ $message }}</p> @enderror
+                                            <label class="block text-xs font-bold text-stone-700 dark:text-stone-300 mb-1">Supplied Pages Count</label>
+                                            <input type="number" min="1" max="2000" wire:model.live="thesis_preprinted_total_pages" class="w-full rounded-xl bg-white dark:bg-stone-950 border border-stone-300 dark:border-stone-800 px-3 py-2 text-xs text-stone-900 dark:text-white tabular-nums" />
+                                            @error('preprinted_total_pages') <p class="text-[11px] text-red-600 dark:text-red-400 mt-1">{{ $message }}</p> @enderror
                                         </div>
                                     @else
                                         <div>
-                                            <label class="block text-xs font-bold text-stone-300 mb-1">B&amp;W Pages</label>
-                                            <input type="number" min="0" max="2000" wire:model.live="thesis_bw_pages" class="w-full rounded-xl bg-stone-950 border border-stone-800 px-3 py-2 text-xs text-white" />
+                                            <label class="block text-xs font-bold text-stone-700 dark:text-stone-300 mb-1">B&amp;W Pages</label>
+                                            <input type="number" min="0" max="2000" wire:model.live="thesis_bw_pages" class="w-full rounded-xl bg-white dark:bg-stone-950 border border-stone-300 dark:border-stone-800 px-3 py-2 text-xs text-stone-900 dark:text-white tabular-nums" />
                                         </div>
                                         <div>
-                                            <label class="block text-xs font-bold text-stone-300 mb-1">Color Pages</label>
-                                            <input type="number" min="0" max="2000" wire:model.live="thesis_color_pages" class="w-full rounded-xl bg-stone-950 border border-stone-800 px-3 py-2 text-xs text-white" />
+                                            <label class="block text-xs font-bold text-stone-700 dark:text-stone-300 mb-1">Color Pages</label>
+                                            <input type="number" min="0" max="2000" wire:model.live="thesis_color_pages" class="w-full rounded-xl bg-white dark:bg-stone-950 border border-stone-300 dark:border-stone-800 px-3 py-2 text-xs text-stone-900 dark:text-white tabular-nums" />
                                         </div>
                                     @endif
 
                                     <div>
-                                        <label class="block text-xs font-bold text-stone-300 mb-1">Print Sides</label>
-                                        <select wire:model.live="thesis_print_sides" class="w-full rounded-xl bg-stone-950 border border-stone-800 px-3 py-2 text-xs text-white">
+                                        <label class="block text-xs font-bold text-stone-700 dark:text-stone-300 mb-1">Print Sides</label>
+                                        <select wire:model.live="thesis_print_sides" class="w-full rounded-xl bg-white dark:bg-stone-950 border border-stone-300 dark:border-stone-800 px-3 py-2 text-xs text-stone-900 dark:text-white">
                                             <option value="simplex">Simplex (1-Sided)</option>
                                             <option value="duplex">Duplex (Back-to-Back)</option>
                                         </select>
                                     </div>
                                     <div>
-                                        <label class="block text-xs font-bold text-stone-300 mb-1">Copies</label>
-                                        <input type="number" min="1" max="50" wire:model.live="thesis_copies_count" class="w-full rounded-xl bg-stone-950 border border-stone-800 px-3 py-2 text-xs text-white" />
+                                        <label class="block text-xs font-bold text-stone-700 dark:text-stone-300 mb-1">Copies</label>
+                                        <input type="number" min="1" max="50" wire:model.live="thesis_copies_count" class="w-full rounded-xl bg-white dark:bg-stone-950 border border-stone-300 dark:border-stone-800 px-3 py-2 text-xs text-stone-900 dark:text-white tabular-nums" />
                                     </div>
                                 </div>
-                                @error('binding_limit') <p class="text-xs text-red-400 font-semibold">{{ $message }}</p> @enderror
-                                @error('total_pages') <p class="text-xs text-red-400 font-semibold">{{ $message }}</p> @enderror
+                                @error('binding_limit') <p class="text-xs text-red-600 dark:text-red-400 font-semibold">{{ $message }}</p> @enderror
+                                @error('total_pages') <p class="text-xs text-red-600 dark:text-red-400 font-semibold">{{ $message }}</p> @enderror
 
                                 <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
                                     <div>
-                                        <label class="block text-xs font-bold text-stone-300 mb-1">Paper Size</label>
-                                        <select wire:model.live="thesis_paper_size" class="w-full rounded-xl bg-stone-950 border border-stone-800 px-3 py-2 text-xs text-white">
+                                        <label class="block text-xs font-bold text-stone-700 dark:text-stone-300 mb-1">Paper Size</label>
+                                        <select wire:model.live="thesis_paper_size" class="w-full rounded-xl bg-white dark:bg-stone-950 border border-stone-300 dark:border-stone-800 px-3 py-2 text-xs text-stone-900 dark:text-white">
                                             @foreach ($available_paper_sizes as $size)
                                                 <option wire:key="thesis-size-{{ $size }}" value="{{ $size }}">{{ $size }}</option>
                                             @endforeach
                                         </select>
                                     </div>
                                     <div>
-                                        <label class="block text-xs font-bold text-stone-300 mb-1">Cover Color</label>
-                                        <select wire:model.live="thesis_cover_color" class="w-full rounded-xl bg-stone-950 border border-stone-800 px-3 py-2 text-xs text-white">
+                                        <label class="block text-xs font-bold text-stone-700 dark:text-stone-300 mb-1">Cover Color</label>
+                                        <select wire:model.live="thesis_cover_color" class="w-full rounded-xl bg-white dark:bg-stone-950 border border-stone-300 dark:border-stone-800 px-3 py-2 text-xs text-stone-900 dark:text-white">
                                             @foreach ($available_cover_colors as $color)
                                                 <option wire:key="thesis-color-{{ $color }}" value="{{ $color }}">{{ $color }}</option>
                                             @endforeach
                                         </select>
                                     </div>
                                     <div>
-                                        <label class="block text-xs font-bold text-stone-300 mb-1">Foil Stamping</label>
-                                        <select wire:model.live="thesis_foil_color" class="w-full rounded-xl bg-stone-950 border border-stone-800 px-3 py-2 text-xs text-white">
+                                        <label class="block text-xs font-bold text-stone-700 dark:text-stone-300 mb-1">Foil Stamping</label>
+                                        <select wire:model.live="thesis_foil_color" class="w-full rounded-xl bg-white dark:bg-stone-950 border border-stone-300 dark:border-stone-800 px-3 py-2 text-xs text-stone-900 dark:text-white">
                                             @foreach ($available_foil_colors as $foil)
                                                 <option wire:key="thesis-foil-{{ $foil }}" value="{{ $foil }}">{{ $foil }}</option>
                                             @endforeach
@@ -578,28 +574,28 @@ new #[Title('Multi-Item Cart & Checkout')] class extends Component {
                                 </div>
 
                                 @if ($thesis_binding_type === 'hardbound' && $required_custom_fields !== [])
-                                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2 border-t border-stone-800">
+                                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2 border-t border-stone-200 dark:border-stone-800">
                                         @foreach ($required_custom_fields as $field)
                                             <div wire:key="cover-field-{{ \Illuminate\Support\Str::slug($field) }}">
-                                                <label class="block text-[11px] font-bold text-stone-300 mb-1">{{ $field }}</label>
-                                                <input type="text" wire:model="thesis_custom_fields_data.{{ $field }}" class="w-full rounded-xl bg-stone-950 border border-stone-800 px-3 py-1.5 text-xs text-white" />
-                                                @error("thesis_custom_fields_data.{$field}") <p class="text-[11px] text-red-400 mt-1">{{ $message }}</p> @enderror
+                                                <label class="block text-[11px] font-bold text-stone-700 dark:text-stone-300 mb-1">{{ $field }}</label>
+                                                <input type="text" wire:model="thesis_custom_fields_data.{{ $field }}" class="w-full rounded-xl bg-white dark:bg-stone-950 border border-stone-300 dark:border-stone-800 px-3 py-1.5 text-xs text-stone-900 dark:text-white" />
+                                                @error("thesis_custom_fields_data.{$field}") <p class="text-[11px] text-red-600 dark:text-red-400 mt-1">{{ $message }}</p> @enderror
                                             </div>
                                         @endforeach
                                     </div>
                                 @endif
 
                                 @if ($thesisAddons->isNotEmpty())
-                                    <div class="space-y-2 pt-2 border-t border-stone-800">
-                                        <label class="block text-xs font-bold text-stone-300">Optional Add-Ons</label>
+                                    <div class="space-y-2 pt-2 border-t border-stone-200 dark:border-stone-800">
+                                        <label class="block text-xs font-bold text-stone-700 dark:text-stone-300">Optional Add-Ons</label>
                                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
                                             @foreach ($thesisAddons as $addon)
-                                                <label wire:key="addon-opt-{{ $addon->id }}" class="flex items-center justify-between gap-2 p-2.5 rounded-xl bg-stone-950 border border-stone-800 text-xs cursor-pointer">
+                                                <label wire:key="addon-opt-{{ $addon->id }}" class="pq-well flex items-center justify-between gap-2 p-2.5 text-xs cursor-pointer">
                                                     <span class="flex items-center gap-2">
-                                                        <input type="checkbox" wire:model.live="thesis_selected_addon_ids" value="{{ $addon->id }}" class="rounded border-stone-700 bg-stone-900 text-amber-500" />
-                                                        <span>{{ $addon->name }}</span>
+                                                        <input type="checkbox" wire:model.live="thesis_selected_addon_ids" value="{{ $addon->id }}" class="rounded border-stone-300 dark:border-stone-700 bg-white dark:bg-stone-900 text-amber-500" />
+                                                        <span class="text-stone-800 dark:text-stone-200 font-medium">{{ $addon->name }}</span>
                                                     </span>
-                                                    <span class="font-bold text-amber-400">₱{{ number_format((float) $addon->selling_price, 2) }}</span>
+                                                    <span class="font-bold text-amber-700 dark:text-amber-400 tabular-nums">₱{{ number_format((float) $addon->selling_price, 2) }}</span>
                                                 </label>
                                             @endforeach
                                         </div>
@@ -610,57 +606,57 @@ new #[Title('Multi-Item Cart & Checkout')] class extends Component {
                             <div class="space-y-4">
                                 <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
                                     <div>
-                                        <label class="block text-xs font-bold text-stone-300 mb-1">Total Pages</label>
-                                        <input type="number" min="1" max="5000" wire:model.live="doc_total_pages" class="w-full rounded-xl bg-stone-950 border border-stone-800 px-3 py-2 text-xs text-white" />
+                                        <label class="block text-xs font-bold text-stone-700 dark:text-stone-300 mb-1">Total Pages</label>
+                                        <input type="number" min="1" max="5000" wire:model.live="doc_total_pages" class="w-full rounded-xl bg-white dark:bg-stone-950 border border-stone-300 dark:border-stone-800 px-3 py-2 text-xs text-stone-900 dark:text-white tabular-nums" />
                                     </div>
                                     <div>
-                                        <label class="block text-xs font-bold text-stone-300 mb-1">Color Mode</label>
-                                        <select wire:model.live="doc_color_mode" class="w-full rounded-xl bg-stone-950 border border-stone-800 px-3 py-2 text-xs text-white">
+                                        <label class="block text-xs font-bold text-stone-700 dark:text-stone-300 mb-1">Color Mode</label>
+                                        <select wire:model.live="doc_color_mode" class="w-full rounded-xl bg-white dark:bg-stone-950 border border-stone-300 dark:border-stone-800 px-3 py-2 text-xs text-stone-900 dark:text-white">
                                             <option value="bw">All Black &amp; White</option>
                                             <option value="color">All Full Color</option>
                                             <option value="mixed">Selective Color Pages</option>
                                         </select>
                                     </div>
                                     <div>
-                                        <label class="block text-xs font-bold text-stone-300 mb-1">Print Sides</label>
-                                        <select wire:model.live="doc_print_sides" class="w-full rounded-xl bg-stone-950 border border-stone-800 px-3 py-2 text-xs text-white">
+                                        <label class="block text-xs font-bold text-stone-700 dark:text-stone-300 mb-1">Print Sides</label>
+                                        <select wire:model.live="doc_print_sides" class="w-full rounded-xl bg-white dark:bg-stone-950 border border-stone-300 dark:border-stone-800 px-3 py-2 text-xs text-stone-900 dark:text-white">
                                             <option value="simplex">Simplex (1-Sided)</option>
                                             <option value="duplex">Duplex (2-Sided)</option>
                                         </select>
                                     </div>
                                     <div>
-                                        <label class="block text-xs font-bold text-stone-300 mb-1">Copies</label>
-                                        <input type="number" min="1" max="500" wire:model.live="doc_copies_count" class="w-full rounded-xl bg-stone-950 border border-stone-800 px-3 py-2 text-xs text-white" />
+                                        <label class="block text-xs font-bold text-stone-700 dark:text-stone-300 mb-1">Copies</label>
+                                        <input type="number" min="1" max="500" wire:model.live="doc_copies_count" class="w-full rounded-xl bg-white dark:bg-stone-950 border border-stone-300 dark:border-stone-800 px-3 py-2 text-xs text-stone-900 dark:text-white tabular-nums" />
                                     </div>
                                 </div>
 
                                 @if ($doc_color_mode === 'mixed')
                                     <div>
-                                        <label class="block text-xs font-bold text-stone-300 mb-1">Color Page Numbers (e.g. 1, 3, 5-8)</label>
-                                        <input type="text" wire:model.live="doc_custom_color_pages" placeholder="e.g. 1, 4-6" class="w-full rounded-xl bg-stone-950 border border-stone-800 px-3 py-2 text-xs text-white" />
+                                        <label class="block text-xs font-bold text-stone-700 dark:text-stone-300 mb-1">Color Page Numbers (e.g. 1, 3, 5-8)</label>
+                                        <input type="text" wire:model.live="doc_custom_color_pages" placeholder="e.g. 1, 4-6" class="w-full rounded-xl bg-white dark:bg-stone-950 border border-stone-300 dark:border-stone-800 px-3 py-2 text-xs text-stone-900 dark:text-white placeholder-stone-400" />
                                     </div>
                                 @endif
 
                                 <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
                                     <div>
-                                        <label class="block text-xs font-bold text-stone-300 mb-1">Paper Size</label>
-                                        <select wire:model.live="doc_paper_size" class="w-full rounded-xl bg-stone-950 border border-stone-800 px-3 py-2 text-xs text-white">
+                                        <label class="block text-xs font-bold text-stone-700 dark:text-stone-300 mb-1">Paper Size</label>
+                                        <select wire:model.live="doc_paper_size" class="w-full rounded-xl bg-white dark:bg-stone-950 border border-stone-300 dark:border-stone-800 px-3 py-2 text-xs text-stone-900 dark:text-white">
                                             <option value="A4">A4</option>
                                             <option value="Letter">Letter (Short)</option>
                                             <option value="Legal">Legal (Long)</option>
                                         </select>
                                     </div>
                                     <div>
-                                        <label class="block text-xs font-bold text-stone-300 mb-1">Paper Stock</label>
-                                        <select wire:model.live="doc_paper_stock" class="w-full rounded-xl bg-stone-950 border border-stone-800 px-3 py-2 text-xs text-white">
+                                        <label class="block text-xs font-bold text-stone-700 dark:text-stone-300 mb-1">Paper Stock</label>
+                                        <select wire:model.live="doc_paper_stock" class="w-full rounded-xl bg-white dark:bg-stone-950 border border-stone-300 dark:border-stone-800 px-3 py-2 text-xs text-stone-900 dark:text-white">
                                             <option value="70gsm">70gsm Standard</option>
                                             <option value="80gsm">80gsm Thick</option>
                                             <option value="100gsm">100gsm Specialty</option>
                                         </select>
                                     </div>
                                     <div>
-                                        <label class="block text-xs font-bold text-stone-300 mb-1">Finishing</label>
-                                        <select wire:model.live="doc_finishing_type" class="w-full rounded-xl bg-stone-950 border border-stone-800 px-3 py-2 text-xs text-white">
+                                        <label class="block text-xs font-bold text-stone-700 dark:text-stone-300 mb-1">Finishing</label>
+                                        <select wire:model.live="doc_finishing_type" class="w-full rounded-xl bg-white dark:bg-stone-950 border border-stone-300 dark:border-stone-800 px-3 py-2 text-xs text-stone-900 dark:text-white">
                                             <option value="loose">Loose Sheets</option>
                                             <option value="staple">Corner Staple</option>
                                             <option value="folder">Sliding Folder &amp; Fastener</option>
@@ -673,25 +669,25 @@ new #[Title('Multi-Item Cart & Checkout')] class extends Component {
                         @endif
 
                         <!-- Shared File Upload -->
-                        <div class="pt-3 border-t border-stone-800">
-                            <label class="block text-xs font-bold text-stone-300 mb-1">
+                        <div class="pt-3 border-t border-stone-200 dark:border-stone-800">
+                            <label class="block text-xs font-bold text-stone-700 dark:text-stone-300 mb-1">
                                 Attach Document / Manuscript PDF
-                                <span class="text-stone-500 font-normal">(PDF/DOCX, up to {{ $max_upload_mb }} MB)</span>
+                                <span class="text-stone-500 dark:text-stone-400 font-normal">(PDF/DOCX, up to {{ $max_upload_mb }} MB)</span>
                             </label>
-                            <input type="file" wire:model="draft_document_file" class="block w-full text-xs text-stone-400 file:mr-3 file:py-2 file:px-3 file:rounded-xl file:border-0 file:bg-stone-800 file:text-stone-200 file:font-bold" />
-                            @error('draft_document_file') <p class="text-xs text-red-400 mt-1 font-semibold">{{ $message }}</p> @enderror
+                            <input type="file" wire:model="draft_document_file" class="block w-full text-xs text-stone-600 dark:text-stone-400 file:mr-3 file:py-2 file:px-3 file:rounded-xl file:border-0 file:bg-stone-200 dark:file:bg-stone-800 file:text-stone-800 dark:file:text-stone-200 file:font-bold cursor-pointer" />
+                            @error('draft_document_file') <p class="text-xs text-red-600 dark:text-red-400 mt-1 font-semibold">{{ $message }}</p> @enderror
                         </div>
 
-                        <div class="flex flex-wrap items-center justify-between gap-4 pt-3 border-t border-stone-800">
+                        <div class="flex flex-wrap items-center justify-between gap-4 pt-3 border-t border-stone-200 dark:border-stone-800">
                             <div>
-                                <span class="text-[11px] text-stone-400 block">Estimated Item Subtotal</span>
-                                <span class="text-lg font-black text-amber-400">₱{{ number_format($draftPreviewPrice, 2) }}</span>
+                                <span class="text-[11px] text-stone-600 dark:text-stone-400 block">Estimated Item Subtotal</span>
+                                <span class="text-lg font-black text-amber-700 dark:text-amber-400 tabular-nums">₱{{ number_format($draftPreviewPrice, 2) }}</span>
                             </div>
                             <button
                                 type="button"
                                 wire:click="addItemToCart"
                                 wire:loading.attr="disabled"
-                                class="px-5 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-stone-950 text-xs font-black uppercase tracking-wider shadow-md shadow-amber-500/20 cursor-pointer"
+                                class="px-5 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-600 text-stone-950 text-xs font-bold uppercase tracking-wider shadow-sm cursor-pointer"
                             >
                                 + Add Item to Cart
                             </button>
@@ -701,31 +697,31 @@ new #[Title('Multi-Item Cart & Checkout')] class extends Component {
 
                 <!-- Right Column: Cart Summary & Place Order -->
                 <div class="lg:col-span-5 space-y-5">
-                    <div class="p-6 rounded-3xl bg-stone-900/90 border border-stone-800 space-y-5 shadow-xl">
-                        <div class="flex items-center justify-between border-b border-stone-800 pb-3">
-                            <h2 class="text-sm font-black text-white uppercase tracking-wider">Your Cart ({{ count($cart_items) }})</h2>
-                            <span class="text-xs text-stone-400">{{ $shop->name }}</span>
+                    <div class="pq-card p-6 space-y-5">
+                        <div class="flex items-center justify-between border-b border-stone-200 dark:border-stone-800 pb-3">
+                            <h2 class="text-sm font-bold text-stone-900 dark:text-white uppercase tracking-wider tabular-nums">Your Cart ({{ count($cart_items) }})</h2>
+                            <span class="text-xs text-stone-600 dark:text-stone-400">{{ $shop->name }}</span>
                         </div>
 
                         @if ($cart_items === [])
-                            <div class="p-6 rounded-2xl border border-dashed border-stone-800 text-center text-xs text-stone-500">
-                                Configure a thesis binding or document printing job on the left, then click <strong class="text-stone-300">+ Add Item to Cart</strong>.
+                            <div class="p-6 rounded-2xl border border-dashed border-stone-300 dark:border-stone-800 text-center text-xs text-stone-500 dark:text-stone-400">
+                                Configure a thesis binding or document printing job on the left, then click <strong class="text-stone-800 dark:text-stone-300">+ Add Item to Cart</strong>.
                             </div>
                         @else
                             <div class="space-y-3">
                                 @foreach ($cart_items as $index => $cartItem)
-                                    <div wire:key="cart-item-{{ $index }}" class="p-3.5 rounded-2xl bg-stone-950 border border-stone-800 space-y-1.5">
+                                    <div wire:key="cart-item-{{ $index }}" class="pq-well p-3.5 space-y-1.5">
                                         <div class="flex items-start justify-between gap-2">
                                             <div>
-                                                <div class="text-xs font-bold text-white">{{ $cartItem['summary_title'] ?? 'Print Item' }}</div>
-                                                <div class="text-[11px] text-stone-400">{{ $cartItem['summary_specs'] ?? '' }}</div>
+                                                <div class="text-xs font-bold text-stone-900 dark:text-white">{{ $cartItem['summary_title'] ?? 'Print Item' }}</div>
+                                                <div class="text-[11px] text-stone-600 dark:text-stone-400">{{ $cartItem['summary_specs'] ?? '' }}</div>
                                                 @if (! empty($cartItem['document_original_name']))
-                                                    <div class="text-[10px] text-amber-400 mt-0.5">File: {{ $cartItem['document_original_name'] }}</div>
+                                                    <div class="text-[10px] text-amber-700 dark:text-amber-400 mt-0.5">File: {{ $cartItem['document_original_name'] }}</div>
                                                 @endif
                                             </div>
                                             <div class="text-right shrink-0">
-                                                <div class="text-xs font-black text-emerald-400">₱{{ number_format((float) ($cartItem['preview_total'] ?? 0), 2) }}</div>
-                                                <button type="button" wire:click="removeCartItem({{ $index }})" class="text-[10px] font-bold text-red-400 hover:text-red-300 mt-1 cursor-pointer">
+                                                <div class="text-xs font-bold text-emerald-700 dark:text-emerald-400 tabular-nums">₱{{ number_format((float) ($cartItem['preview_total'] ?? 0), 2) }}</div>
+                                                <button type="button" wire:click="removeCartItem({{ $index }})" class="text-[10px] font-bold text-red-700 dark:text-red-400 hover:underline mt-1 cursor-pointer">
                                                     Remove
                                                 </button>
                                             </div>
@@ -735,41 +731,41 @@ new #[Title('Multi-Item Cart & Checkout')] class extends Component {
                             </div>
                         @endif
 
-                        <div class="space-y-3 pt-3 border-t border-stone-800 text-xs">
-                            <label class="flex items-center justify-between gap-3 p-3 rounded-2xl bg-stone-950 border border-stone-800 cursor-pointer">
+                        <div class="space-y-3 pt-3 border-t border-stone-200 dark:border-stone-800 text-xs">
+                            <label class="pq-well flex items-center justify-between gap-3 p-3 cursor-pointer">
                                 <span>
-                                    <span class="font-bold text-white block">Rush Turnaround Priority</span>
-                                    <span class="text-[11px] text-stone-400">Prioritized queue handling when available</span>
+                                    <span class="font-bold text-stone-900 dark:text-white block">Rush Turnaround Priority</span>
+                                    <span class="text-[11px] text-stone-600 dark:text-stone-400">Prioritized queue handling when available</span>
                                 </span>
-                                <input type="checkbox" wire:model.live="is_rush" class="rounded border-stone-700 bg-stone-900 text-amber-500" />
+                                <input type="checkbox" wire:model.live="is_rush" class="rounded border-stone-300 dark:border-stone-700 bg-white dark:bg-stone-900 text-amber-500" />
                             </label>
 
                             <div>
-                                <label class="block text-xs font-bold text-stone-300 mb-1">Preferred Payment Plan</label>
-                                <select wire:model.live="payment_option" class="w-full rounded-xl bg-stone-950 border border-stone-800 px-3 py-2 text-xs text-white">
+                                <label class="block text-xs font-bold text-stone-700 dark:text-stone-300 mb-1">Preferred Payment Plan</label>
+                                <select wire:model.live="payment_option" class="w-full rounded-xl bg-white dark:bg-stone-950 border border-stone-300 dark:border-stone-800 px-3 py-2 text-xs text-stone-900 dark:text-white">
                                     <option value="{{ Order::PAYMENT_OPTION_FULL_100 }}">100% Full Upfront Payment</option>
                                     <option value="{{ Order::PAYMENT_OPTION_DOWNPAYMENT_50 }}">50% Downpayment + Balance on Pickup</option>
                                 </select>
                             </div>
 
                             <div>
-                                <label class="block text-xs font-bold text-stone-300 mb-1">Special Instructions (Optional)</label>
-                                <textarea wire:model="order_notes" rows="2" placeholder="Optional instructions for the print shop..." class="w-full rounded-xl bg-stone-950 border border-stone-800 px-3 py-2 text-xs text-white"></textarea>
+                                <label class="block text-xs font-bold text-stone-700 dark:text-stone-300 mb-1">Special Instructions (Optional)</label>
+                                <textarea wire:model="order_notes" rows="2" placeholder="Optional instructions for the print shop..." class="w-full rounded-xl bg-white dark:bg-stone-950 border border-stone-300 dark:border-stone-800 px-3 py-2 text-xs text-stone-900 dark:text-white placeholder-stone-400"></textarea>
                             </div>
                         </div>
 
-                        <div class="p-4 rounded-2xl bg-stone-950 border border-stone-800 space-y-1.5 text-xs">
-                            <div class="flex justify-between text-stone-400">
+                        <div class="pq-well p-4 space-y-1.5 text-xs tabular-nums">
+                            <div class="flex justify-between text-stone-600 dark:text-stone-400">
                                 <span>Items Subtotal</span>
                                 <span>₱{{ number_format($cartSubtotal, 2) }}</span>
                             </div>
-                            <div class="flex justify-between text-stone-400">
+                            <div class="flex justify-between text-stone-600 dark:text-stone-400">
                                 <span>Rush Processing Fee</span>
                                 <span>₱{{ number_format($estimatedRushFee, 2) }}</span>
                             </div>
-                            <div class="flex justify-between pt-2 border-t border-stone-800 text-sm font-black text-white">
+                            <div class="flex justify-between pt-2 border-t border-stone-200 dark:border-stone-800 text-sm font-bold text-stone-900 dark:text-white">
                                 <span>Estimated Grand Total</span>
-                                <span class="text-amber-400">₱{{ number_format($cartGrandTotal, 2) }}</span>
+                                <span class="text-amber-700 dark:text-amber-400">₱{{ number_format($cartGrandTotal, 2) }}</span>
                             </div>
                         </div>
 
@@ -778,7 +774,7 @@ new #[Title('Multi-Item Cart & Checkout')] class extends Component {
                             wire:click="placeOrder"
                             wire:loading.attr="disabled"
                             @disabled($cart_items === [])
-                            class="w-full py-3 rounded-2xl bg-amber-500 hover:bg-amber-400 disabled:opacity-50 text-stone-950 text-xs font-black uppercase tracking-wider shadow-lg shadow-amber-500/20 cursor-pointer"
+                            class="w-full py-3 rounded-xl bg-amber-500 hover:bg-amber-600 disabled:opacity-50 text-stone-950 text-xs font-bold uppercase tracking-wider shadow-sm cursor-pointer"
                         >
                             Place Order &amp; Reserve Stock &rarr;
                         </button>
@@ -786,19 +782,19 @@ new #[Title('Multi-Item Cart & Checkout')] class extends Component {
                 </div>
             </div>
         @elseif ($step === 2 && $createdOrder)
-            <div class="max-w-2xl mx-auto p-6 sm:p-8 rounded-3xl bg-stone-900/90 border border-stone-800 space-y-6 shadow-2xl">
-                <div class="flex flex-wrap items-center justify-between gap-3 border-b border-stone-800 pb-4">
+            <div class="pq-card max-w-2xl mx-auto p-6 sm:p-8 space-y-6">
+                <div class="flex flex-wrap items-center justify-between gap-3 border-b border-stone-200 dark:border-stone-800 pb-4">
                     <div>
-                        <span class="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase bg-amber-500/20 text-amber-400 border border-amber-500/30">Stock Reserved — Step 2 of 3</span>
-                        <h2 class="text-xl font-black text-white mt-2">Submit Payment Proof</h2>
-                        <p class="text-xs text-stone-400">
-                            Order <strong class="font-mono text-amber-400">{{ $createdOrder->order_number }}</strong>
-                            &bull; Tracking Code <strong class="font-mono text-white">{{ $createdOrder->tracking_code }}</strong>
+                        <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase pq-badge-warning">Stock Reserved — Step 2 of 3</span>
+                        <h2 class="text-xl font-bold text-stone-900 dark:text-white mt-2">Submit Payment Proof</h2>
+                        <p class="text-xs text-stone-600 dark:text-stone-400">
+                            Order <strong class="font-mono text-amber-700 dark:text-amber-400">{{ $createdOrder->order_number }}</strong>
+                            &bull; Tracking Code <strong class="font-mono text-stone-900 dark:text-white">{{ $createdOrder->tracking_code }}</strong>
                         </p>
                     </div>
                     <div class="text-right">
-                        <span class="text-[11px] text-stone-400 block">Order Total</span>
-                        <span class="text-xl font-black text-emerald-400">₱{{ number_format((float) $createdOrder->total_amount, 2) }}</span>
+                        <span class="text-[11px] text-stone-600 dark:text-stone-400 block">Order Total</span>
+                        <span class="text-xl font-black text-emerald-700 dark:text-emerald-400 tabular-nums">₱{{ number_format((float) $createdOrder->total_amount, 2) }}</span>
                     </div>
                 </div>
 
@@ -806,102 +802,102 @@ new #[Title('Multi-Item Cart & Checkout')] class extends Component {
                     <button
                         type="button"
                         wire:click="selectPaymentOption('{{ Order::PAYMENT_OPTION_DOWNPAYMENT_50 }}')"
-                        class="p-4 rounded-2xl border text-left transition-all cursor-pointer {{ $payment_option === Order::PAYMENT_OPTION_DOWNPAYMENT_50 ? 'border-amber-500 bg-amber-500/10' : 'border-stone-800 bg-stone-950' }}"
+                        class="p-4 rounded-2xl border text-left transition-colors cursor-pointer {{ $payment_option === Order::PAYMENT_OPTION_DOWNPAYMENT_50 ? 'border-amber-500 bg-amber-50 dark:bg-amber-500/10' : 'border-stone-200 dark:border-stone-800 bg-stone-50 dark:bg-stone-950' }}"
                     >
-                        <div class="text-xs font-black text-white">50% Downpayment</div>
-                        <div class="text-[11px] text-stone-400 mt-1">Minimum required upfront: ₱{{ number_format($createdOrder->minimumUpfrontAmount(), 2) }}</div>
+                        <div class="text-xs font-bold text-stone-900 dark:text-white">50% Downpayment</div>
+                        <div class="text-[11px] text-stone-600 dark:text-stone-400 mt-1 tabular-nums">Minimum required upfront: ₱{{ number_format($createdOrder->minimumUpfrontAmount(), 2) }}</div>
                     </button>
                     <button
                         type="button"
                         wire:click="selectPaymentOption('{{ Order::PAYMENT_OPTION_FULL_100 }}')"
-                        class="p-4 rounded-2xl border text-left transition-all cursor-pointer {{ $payment_option === Order::PAYMENT_OPTION_FULL_100 ? 'border-emerald-500 bg-emerald-500/10' : 'border-stone-800 bg-stone-950' }}"
+                        class="p-4 rounded-2xl border text-left transition-colors cursor-pointer {{ $payment_option === Order::PAYMENT_OPTION_FULL_100 ? 'border-emerald-600 bg-emerald-50 dark:bg-emerald-500/10' : 'border-stone-200 dark:border-stone-800 bg-stone-50 dark:bg-stone-950' }}"
                     >
-                        <div class="text-xs font-black text-white">100% Full Payment</div>
-                        <div class="text-[11px] text-stone-400 mt-1">Settle full amount now: ₱{{ number_format((float) $createdOrder->total_amount, 2) }}</div>
+                        <div class="text-xs font-bold text-stone-900 dark:text-white">100% Full Payment</div>
+                        <div class="text-[11px] text-stone-600 dark:text-stone-400 mt-1 tabular-nums">Settle full amount now: ₱{{ number_format((float) $createdOrder->total_amount, 2) }}</div>
                     </button>
                 </div>
 
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                        <label class="block text-xs font-bold text-stone-300 mb-1">Payment Method</label>
-                        <select wire:model="payment_method" class="w-full rounded-xl bg-stone-950 border border-stone-800 px-3 py-2 text-xs text-white">
+                        <label class="block text-xs font-bold text-stone-700 dark:text-stone-300 mb-1">Payment Method</label>
+                        <select wire:model="payment_method" class="w-full rounded-xl bg-white dark:bg-stone-950 border border-stone-300 dark:border-stone-800 px-3 py-2 text-xs text-stone-900 dark:text-white">
                             <option value="gcash">GCash</option>
                             <option value="maya">Maya</option>
                             <option value="bank_transfer">Bank Transfer / InstaPay</option>
                         </select>
                     </div>
                     <div>
-                        <label class="block text-xs font-bold text-stone-300 mb-1">Amount Paid (PHP)</label>
-                        <input type="number" step="0.01" wire:model="payment_amount" class="w-full rounded-xl bg-stone-950 border border-stone-800 px-3 py-2 text-xs text-white" />
-                        @error('amount') <p class="text-[11px] text-red-400 mt-1">{{ $message }}</p> @enderror
+                        <label class="block text-xs font-bold text-stone-700 dark:text-stone-300 mb-1">Amount Paid (PHP)</label>
+                        <input type="number" step="0.01" wire:model="payment_amount" class="w-full rounded-xl bg-white dark:bg-stone-950 border border-stone-300 dark:border-stone-800 px-3 py-2 text-xs text-stone-900 dark:text-white tabular-nums" />
+                        @error('amount') <p class="text-[11px] text-red-600 dark:text-red-400 mt-1">{{ $message }}</p> @enderror
                     </div>
                 </div>
 
                 <div>
-                    <label class="block text-xs font-bold text-stone-300 mb-1">Transaction Reference Number</label>
-                    <input type="text" wire:model="payment_reference_no" placeholder="e.g. GCASH-90881234" class="w-full rounded-xl bg-stone-950 border border-stone-800 px-3 py-2 text-xs text-white font-mono" />
-                    @error('reference_no') <p class="text-[11px] text-red-400 mt-1">{{ $message }}</p> @enderror
+                    <label class="block text-xs font-bold text-stone-700 dark:text-stone-300 mb-1">Transaction Reference Number</label>
+                    <input type="text" wire:model="payment_reference_no" placeholder="e.g. GCASH-90881234" class="w-full rounded-xl bg-white dark:bg-stone-950 border border-stone-300 dark:border-stone-800 px-3 py-2 text-xs text-stone-900 dark:text-white placeholder-stone-400 font-mono" />
+                    @error('reference_no') <p class="text-[11px] text-red-600 dark:text-red-400 mt-1">{{ $message }}</p> @enderror
                 </div>
 
                 <div>
-                    <label class="block text-xs font-bold text-stone-300 mb-1">Upload Payment Proof Screenshot / PDF (Optional)</label>
-                    <input type="file" wire:model="payment_proof_file" class="block w-full text-xs text-stone-400 file:mr-3 file:py-2 file:px-3 file:rounded-xl file:border-0 file:bg-stone-800 file:text-stone-200 file:font-bold" />
-                    @error('proof_file') <p class="text-[11px] text-red-400 mt-1">{{ $message }}</p> @enderror
+                    <label class="block text-xs font-bold text-stone-700 dark:text-stone-300 mb-1">Upload Payment Proof Screenshot / PDF (Optional)</label>
+                    <input type="file" wire:model="payment_proof_file" class="block w-full text-xs text-stone-600 dark:text-stone-400 file:mr-3 file:py-2 file:px-3 file:rounded-xl file:border-0 file:bg-stone-200 dark:file:bg-stone-800 file:text-stone-800 dark:file:text-stone-200 file:font-bold cursor-pointer" />
+                    @error('proof_file') <p class="text-[11px] text-red-600 dark:text-red-400 mt-1">{{ $message }}</p> @enderror
                 </div>
 
                 <div class="flex flex-wrap items-center justify-between gap-3 pt-2">
-                    <a href="{{ route('customer.dashboard') }}" wire:navigate class="text-xs font-bold text-stone-400 hover:text-white">
+                    <a href="{{ route('customer.dashboard') }}" wire:navigate class="text-xs font-bold text-stone-600 dark:text-stone-400 hover:text-stone-900 dark:hover:text-white">
                         Submit Later in Dashboard
                     </a>
                     <button
                         type="button"
                         wire:click="submitPaymentProof"
                         wire:loading.attr="disabled"
-                        class="px-6 py-3 rounded-2xl bg-emerald-500 hover:bg-emerald-400 text-stone-950 text-xs font-black uppercase tracking-wider shadow-lg cursor-pointer"
+                        class="px-6 py-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold uppercase tracking-wider shadow-sm cursor-pointer"
                     >
                         Submit Payment Proof
                     </button>
                 </div>
             </div>
         @elseif ($step === 3 && $createdOrder)
-            <div class="max-w-xl mx-auto p-8 rounded-3xl bg-stone-900/90 border border-emerald-500/40 text-center space-y-5 shadow-2xl">
-                <div class="size-14 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center mx-auto border border-emerald-500/40">
+            <div class="pq-card !border-emerald-300 dark:!border-emerald-500/40 max-w-xl mx-auto p-8 text-center space-y-5">
+                <div class="size-14 rounded-full pq-badge-success flex items-center justify-center mx-auto">
                     <flux:icon name="check-badge" class="size-8" />
                 </div>
                 <div>
-                    <h2 class="text-2xl font-black text-white">Order &amp; Payment Proof Submitted!</h2>
-                    <p class="text-xs text-stone-400 mt-1">
+                    <h2 class="text-2xl font-bold text-stone-900 dark:text-white">Order &amp; Payment Proof Submitted!</h2>
+                    <p class="text-xs text-stone-600 dark:text-stone-400 mt-1">
                         Your proof is awaiting shop verification before entering production.
                     </p>
                 </div>
 
-                <div class="p-4 rounded-2xl bg-stone-950 border border-stone-800 space-y-1.5 text-xs text-left">
+                <div class="pq-well p-4 space-y-1.5 text-xs text-left tabular-nums">
                     <div class="flex justify-between">
-                        <span class="text-stone-400">Order Number</span>
-                        <strong class="font-mono text-amber-400">{{ $createdOrder->order_number }}</strong>
+                        <span class="text-stone-600 dark:text-stone-400">Order Number</span>
+                        <strong class="font-mono text-amber-700 dark:text-amber-400">{{ $createdOrder->order_number }}</strong>
                     </div>
                     <div class="flex justify-between">
-                        <span class="text-stone-400">Tracking Code</span>
-                        <strong class="font-mono text-white">{{ $createdOrder->tracking_code }}</strong>
+                        <span class="text-stone-600 dark:text-stone-400">Tracking Code</span>
+                        <strong class="font-mono text-stone-900 dark:text-white">{{ $createdOrder->tracking_code }}</strong>
                     </div>
                     <div class="flex justify-between">
-                        <span class="text-stone-400">Order Total</span>
-                        <strong class="text-white">₱{{ number_format((float) $createdOrder->total_amount, 2) }}</strong>
+                        <span class="text-stone-600 dark:text-stone-400">Order Total</span>
+                        <strong class="text-stone-900 dark:text-white">₱{{ number_format((float) $createdOrder->total_amount, 2) }}</strong>
                     </div>
                     <div class="flex justify-between">
-                        <span class="text-stone-400">Balance Due After Approval</span>
-                        <strong class="text-amber-300">₱{{ number_format(max(0, (float) $createdOrder->total_amount - (float) $createdOrder->amount_paid), 2) }}</strong>
+                        <span class="text-stone-600 dark:text-stone-400">Balance Due After Approval</span>
+                        <strong class="text-amber-700 dark:text-amber-300">₱{{ number_format(max(0, (float) $createdOrder->total_amount - (float) $createdOrder->amount_paid), 2) }}</strong>
                     </div>
                 </div>
 
                 <div class="flex flex-wrap items-center justify-center gap-3 pt-2">
-                    <a href="{{ route('orders.receipt', $createdOrder) }}" target="_blank" class="px-4 py-2.5 rounded-xl bg-stone-800 hover:bg-stone-700 text-xs font-bold text-white">
+                    <a href="{{ route('orders.receipt', $createdOrder) }}" target="_blank" class="px-4 py-2.5 rounded-xl bg-stone-100 dark:bg-stone-800 hover:bg-stone-200 dark:hover:bg-stone-700 border border-stone-200 dark:border-stone-700 text-xs font-bold text-stone-800 dark:text-white">
                         Official Receipt
                     </a>
-                    <a href="{{ route('orders.receipt', ['order' => $createdOrder, 'format' => 'pdf']) }}" class="px-4 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-xs font-black text-stone-950">
+                    <a href="{{ route('orders.receipt', ['order' => $createdOrder, 'format' => 'pdf']) }}" class="px-4 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-600 text-xs font-bold text-stone-950">
                         Download PDF Receipt
                     </a>
-                    <a href="{{ route('customer.dashboard') }}" wire:navigate class="px-4 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-xs font-black text-stone-950">
+                    <a href="{{ route('customer.dashboard') }}" wire:navigate class="px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-xs font-bold text-white">
                         Go to My Orders
                     </a>
                 </div>

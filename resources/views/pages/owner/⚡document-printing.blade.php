@@ -195,12 +195,7 @@ new #[Title('Document Printing & Finishing Configuration')] class extends Compon
     }
 }; ?>
 
-<div class="min-h-screen w-full bg-stone-950 text-stone-100 font-sans antialiased flex flex-col justify-between relative selection:bg-amber-500 selection:text-white">
-    
-    <!-- Ambient Background Glows -->
-    <div class="absolute -top-32 left-1/4 size-[600px] rounded-full bg-blue-500/5 blur-[160px] pointer-events-none"></div>
-    <div class="absolute top-1/2 -right-32 size-[500px] rounded-full bg-indigo-500/5 blur-[160px] pointer-events-none"></div>
-
+<div class="pq-page flex flex-col justify-between">
     @php
         $user = auth()->user();
         $shop = $user?->operationalShop();
@@ -208,83 +203,77 @@ new #[Title('Document Printing & Finishing Configuration')] class extends Compon
     @endphp
 
     <!-- Top Navigation Header -->
-    <header class="w-full bg-stone-900/90 border-b border-stone-800/80 backdrop-blur-md sticky top-0 z-30 px-4 sm:px-8 py-3.5 flex flex-wrap gap-3 items-center justify-between">
-        <div class="flex items-center gap-3.5">
-            <span class="flex size-10 items-center justify-center rounded-2xl bg-gradient-to-br from-blue-500 to-indigo-700 text-white font-black shadow-lg shadow-blue-500/20">
-                <flux:icon name="document-text" class="size-5 text-white" />
+    <header class="pq-topbar px-4 sm:px-8 py-3.5 flex flex-wrap gap-3 items-center justify-between">
+        <div class="flex items-center gap-3 min-w-0">
+            <x-app-back-link :href="route('owner.dashboard')" label="App Launcher" :navigate="true" />
+            <span class="hidden sm:flex size-10 shrink-0 items-center justify-center rounded-xl border border-sky-200 bg-sky-50 text-sky-700 dark:border-sky-800 dark:bg-sky-950/60 dark:text-sky-300">
+                <flux:icon name="document-text" class="size-5" />
             </span>
-            <div>
-                <div class="flex items-center gap-2">
-                    <h1 class="text-sm sm:text-base font-extrabold text-white tracking-tight">
-                        Document Printing & Ring Binding
-                    </h1>
-                    <span class="px-2 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-blue-500/15 text-blue-300 border border-blue-500/30">
-                        Service App
-                    </span>
-                </div>
-                <p class="text-[11px] text-stone-400">{{ $shop ? $shop->name : 'PressQueue' }} &bull; Page Rates, Duplex Rules, Finishing Options & BOM Recipes</p>
+            <div class="min-w-0">
+                <h1 class="truncate text-sm sm:text-base font-extrabold text-stone-900 dark:text-stone-100 tracking-tight">
+                    Document Printing &amp; Ring Binding
+                </h1>
+                <p class="truncate text-xs text-stone-600 dark:text-stone-400">{{ $shop ? $shop->name : 'PressQueue' }} &bull; Page Rates, Duplex Rules, Finishing Options &amp; BOM Recipes</p>
             </div>
         </div>
 
-        <div class="flex flex-wrap items-center gap-2.5 sm:gap-3">
-            <a href="{{ route('owner.platform') }}#availability" wire:navigate class="inline-flex min-h-11 items-center gap-2 rounded-xl border border-stone-800 px-3 text-xs font-bold text-stone-300 hover:border-blue-500/50 hover:text-blue-400">
+        <div class="flex flex-wrap items-center gap-2">
+            <a href="{{ route('owner.platform') }}#availability" wire:navigate class="inline-flex min-h-10 items-center gap-1.5 rounded-xl border border-stone-200 bg-white px-3 text-xs font-semibold text-stone-700 hover:border-amber-500 hover:text-stone-950 dark:border-stone-800 dark:bg-stone-900 dark:text-stone-300 dark:hover:text-white transition-colors">
                 <flux:icon name="signal" class="size-4" /> Availability
+            </a>
+            <a href="{{ route('owner.inventory-hub', ['from' => 'document-printing']) }}" wire:navigate class="inline-flex min-h-10 items-center gap-1.5 rounded-xl border border-stone-200 bg-white px-3 text-xs font-semibold text-stone-700 hover:border-amber-500 hover:text-stone-950 dark:border-stone-800 dark:bg-stone-900 dark:text-stone-300 dark:hover:text-white transition-colors">
+                <flux:icon name="archive-box" class="size-4" /> Inventory
             </a>
             <x-theme-toggle />
 
-            <button 
+            <button
+                type="button"
                 wire:click="saveSettings"
-                class="px-4 py-1.5 rounded-xl text-xs font-black bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-400 hover:to-indigo-500 text-white shadow-md shadow-blue-500/20 transition-all cursor-pointer flex items-center gap-1.5"
+                class="min-h-10 px-4 py-2 rounded-xl text-xs font-bold bg-amber-500 hover:bg-amber-400 text-stone-950 transition-colors cursor-pointer inline-flex items-center gap-1.5"
             >
                 <flux:icon name="check" class="size-3.5" />
                 <span>Save Rates</span>
             </button>
-
-            <a 
-                href="{{ route('owner.dashboard') }}" 
-                wire:navigate
-                class="px-3.5 py-1.5 rounded-xl text-xs font-bold bg-stone-950 hover:bg-stone-800 text-stone-300 border border-stone-800 transition-all flex items-center gap-1.5"
-            >
-                <flux:icon name="arrow-left" class="size-3.5" />
-                <span>Launcher</span>
-            </a>
         </div>
     </header>
 
     <!-- Main Config Body -->
     <main class="flex-1 w-full max-w-5xl mx-auto px-4 sm:px-8 py-8 space-y-6">
-        
         <!-- Tab Navigation Bar -->
-        <div class="flex items-center gap-2 border-b border-stone-800/80 pb-3 overflow-x-auto">
-            <button 
+        <div class="flex items-center gap-2 border-b border-stone-200 dark:border-stone-800 pb-3 overflow-x-auto">
+            <button
+                type="button"
                 wire:click="$set('active_tab', 'rates')"
-                class="px-4 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all flex items-center gap-2 {{ $active_tab === 'rates' ? 'bg-blue-500 text-white shadow-md shadow-blue-500/20 font-black' : 'bg-stone-900 text-stone-400 hover:text-white border border-stone-800' }}"
+                class="px-4 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-colors flex items-center gap-2 cursor-pointer {{ $active_tab === 'rates' ? 'bg-stone-900 text-white dark:bg-amber-500 dark:text-stone-950' : 'bg-white text-stone-700 border border-stone-200 hover:border-amber-500 dark:bg-stone-900 dark:text-stone-300 dark:border-stone-800' }}"
             >
                 <flux:icon name="currency-dollar" class="size-4" />
-                1. Page Rates & Sizes
+                1. Page Rates &amp; Sizes
             </button>
 
-            <button 
+            <button
+                type="button"
                 wire:click="$set('active_tab', 'stocks')"
-                class="px-4 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all flex items-center gap-2 {{ $active_tab === 'stocks' ? 'bg-blue-500 text-white shadow-md shadow-blue-500/20 font-black' : 'bg-stone-900 text-stone-400 hover:text-white border border-stone-800' }}"
+                class="px-4 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-colors flex items-center gap-2 cursor-pointer {{ $active_tab === 'stocks' ? 'bg-stone-900 text-white dark:bg-amber-500 dark:text-stone-950' : 'bg-white text-stone-700 border border-stone-200 hover:border-amber-500 dark:bg-stone-900 dark:text-stone-300 dark:border-stone-800' }}"
             >
                 <flux:icon name="scale" class="size-4" />
-                2. Paper Stock & Duplex
+                2. Paper Stock &amp; Duplex
             </button>
 
-            <button 
+            <button
+                type="button"
                 wire:click="$set('active_tab', 'finishing')"
-                class="px-4 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all flex items-center gap-2 {{ $active_tab === 'finishing' ? 'bg-blue-500 text-white shadow-md shadow-blue-500/20 font-black' : 'bg-stone-900 text-stone-400 hover:text-white border border-stone-800' }}"
+                class="px-4 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-colors flex items-center gap-2 cursor-pointer {{ $active_tab === 'finishing' ? 'bg-stone-900 text-white dark:bg-amber-500 dark:text-stone-950' : 'bg-white text-stone-700 border border-stone-200 hover:border-amber-500 dark:bg-stone-900 dark:text-stone-300 dark:border-stone-800' }}"
             >
                 <flux:icon name="sparkles" class="size-4" />
-                3. Finishing & Binding
+                3. Finishing &amp; Binding
             </button>
 
-            <button 
+            <button
+                type="button"
                 wire:click="$set('active_tab', 'bom')"
-                class="px-4 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all flex items-center gap-2 {{ $active_tab === 'bom' ? 'bg-emerald-500 text-stone-950 shadow-md shadow-emerald-500/20 font-black' : 'bg-stone-900 text-emerald-400 hover:text-white border border-emerald-500/30' }}"
+                class="px-4 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-colors flex items-center gap-2 cursor-pointer {{ $active_tab === 'bom' ? 'bg-stone-900 text-white dark:bg-amber-500 dark:text-stone-950' : 'bg-white text-stone-700 border border-stone-200 hover:border-amber-500 dark:bg-stone-900 dark:text-stone-300 dark:border-stone-800' }}"
             >
-                <flux:icon name="archive-box" class="size-4 text-emerald-400" />
+                <flux:icon name="archive-box" class="size-4" />
                 4. Inventory BOM Recipes
             </button>
         </div>
@@ -292,110 +281,110 @@ new #[Title('Document Printing & Finishing Configuration')] class extends Compon
         <!-- Tab 1: Page Rates & Sizes -->
         @if ($active_tab === 'rates')
             <div class="space-y-6">
-                <div class="p-6 rounded-3xl bg-stone-900/80 border border-stone-800/90 space-y-6 shadow-md backdrop-blur-sm">
-                    <div class="border-b border-stone-800/80 pb-3">
-                        <h3 class="text-base font-black text-white tracking-tight flex items-center gap-2">
-                            <flux:icon name="document-text" class="size-5 text-blue-400" />
-                            Monochrome (Black & White) Page Rates
+                <div class="pq-card p-6 space-y-6">
+                    <div class="border-b border-stone-200 dark:border-stone-800 pb-3">
+                        <h3 class="text-base font-extrabold text-stone-900 dark:text-stone-100 tracking-tight flex items-center gap-2">
+                            <flux:icon name="document-text" class="size-5 text-sky-600 dark:text-sky-400" />
+                            Monochrome (Black &amp; White) Page Rates
                         </h3>
-                        <p class="text-xs text-stone-400">Standard per-page printing fee for grayscale text and documents</p>
+                        <p class="text-xs text-stone-600 dark:text-stone-400">Standard per-page printing fee for grayscale text and documents</p>
                     </div>
 
                     <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
                         <div class="space-y-1.5">
-                            <label class="text-xs font-bold text-stone-300">Short / Letter (8.5 x 11 in)</label>
+                            <label class="text-xs font-bold text-stone-700 dark:text-stone-300">Short / Letter (8.5 x 11 in)</label>
                             <div class="relative">
                                 <span class="absolute left-3 top-1/2 -translate-y-1/2 text-stone-500 font-bold text-xs">₱</span>
-                                <input 
-                                    wire:model="page_price_bw_short" 
-                                    type="number" 
+                                <input
+                                    wire:model="page_price_bw_short"
+                                    type="number"
                                     step="0.25"
-                                    class="w-full bg-stone-950 border border-stone-800 focus:border-blue-500 rounded-xl pl-8 pr-3 py-2 text-sm text-white font-mono font-bold outline-none"
+                                    class="w-full bg-white dark:bg-stone-950 border border-stone-300 dark:border-stone-700 focus:border-amber-500 rounded-xl pl-8 pr-3 py-2 text-sm text-stone-900 dark:text-stone-100 font-mono tabular-nums font-bold outline-none"
                                 />
                             </div>
-                            <span class="text-[10px] text-stone-500">Default rate: ₱1.50 / page</span>
+                            <span class="text-[11px] text-stone-500 dark:text-stone-400 tabular-nums">Default rate: ₱1.50 / page</span>
                         </div>
 
                         <div class="space-y-1.5">
-                            <label class="text-xs font-bold text-stone-300">A4 (8.27 x 11.69 in)</label>
+                            <label class="text-xs font-bold text-stone-700 dark:text-stone-300">A4 (8.27 x 11.69 in)</label>
                             <div class="relative">
                                 <span class="absolute left-3 top-1/2 -translate-y-1/2 text-stone-500 font-bold text-xs">₱</span>
-                                <input 
-                                    wire:model="page_price_bw_a4" 
-                                    type="number" 
+                                <input
+                                    wire:model="page_price_bw_a4"
+                                    type="number"
                                     step="0.25"
-                                    class="w-full bg-stone-950 border border-stone-800 focus:border-blue-500 rounded-xl pl-8 pr-3 py-2 text-sm text-white font-mono font-bold outline-none"
+                                    class="w-full bg-white dark:bg-stone-950 border border-stone-300 dark:border-stone-700 focus:border-amber-500 rounded-xl pl-8 pr-3 py-2 text-sm text-stone-900 dark:text-stone-100 font-mono tabular-nums font-bold outline-none"
                                 />
                             </div>
-                            <span class="text-[10px] text-stone-500">Default rate: ₱1.50 / page</span>
+                            <span class="text-[11px] text-stone-500 dark:text-stone-400 tabular-nums">Default rate: ₱1.50 / page</span>
                         </div>
 
                         <div class="space-y-1.5">
-                            <label class="text-xs font-bold text-stone-300">Long / Legal (8.5 x 13 in)</label>
+                            <label class="text-xs font-bold text-stone-700 dark:text-stone-300">Long / Legal (8.5 x 13 in)</label>
                             <div class="relative">
                                 <span class="absolute left-3 top-1/2 -translate-y-1/2 text-stone-500 font-bold text-xs">₱</span>
-                                <input 
-                                    wire:model="page_price_bw_long" 
-                                    type="number" 
+                                <input
+                                    wire:model="page_price_bw_long"
+                                    type="number"
                                     step="0.25"
-                                    class="w-full bg-stone-950 border border-stone-800 focus:border-blue-500 rounded-xl pl-8 pr-3 py-2 text-sm text-white font-mono font-bold outline-none"
+                                    class="w-full bg-white dark:bg-stone-950 border border-stone-300 dark:border-stone-700 focus:border-amber-500 rounded-xl pl-8 pr-3 py-2 text-sm text-stone-900 dark:text-stone-100 font-mono tabular-nums font-bold outline-none"
                                 />
                             </div>
-                            <span class="text-[10px] text-stone-500">Default rate: ₱2.00 / page</span>
+                            <span class="text-[11px] text-stone-500 dark:text-stone-400 tabular-nums">Default rate: ₱2.00 / page</span>
                         </div>
                     </div>
                 </div>
 
-                <div class="p-6 rounded-3xl bg-stone-900/80 border border-stone-800/90 space-y-6 shadow-md backdrop-blur-sm">
-                    <div class="border-b border-stone-800/80 pb-3">
-                        <h3 class="text-base font-black text-white tracking-tight flex items-center gap-2">
-                            <flux:icon name="sparkles" class="size-5 text-amber-400" />
+                <div class="pq-card p-6 space-y-6">
+                    <div class="border-b border-stone-200 dark:border-stone-800 pb-3">
+                        <h3 class="text-base font-extrabold text-stone-900 dark:text-stone-100 tracking-tight flex items-center gap-2">
+                            <flux:icon name="sparkles" class="size-5 text-amber-600 dark:text-amber-400" />
                             Full Colored Page Rates
                         </h3>
-                        <p class="text-xs text-stone-400">High-resolution colored graphics, charts, diagrams, and photo prints</p>
+                        <p class="text-xs text-stone-600 dark:text-stone-400">High-resolution colored graphics, charts, diagrams, and photo prints</p>
                     </div>
 
                     <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
                         <div class="space-y-1.5">
-                            <label class="text-xs font-bold text-stone-300">Short / Letter Color</label>
+                            <label class="text-xs font-bold text-stone-700 dark:text-stone-300">Short / Letter Color</label>
                             <div class="relative">
                                 <span class="absolute left-3 top-1/2 -translate-y-1/2 text-stone-500 font-bold text-xs">₱</span>
-                                <input 
-                                    wire:model="page_price_color_short" 
-                                    type="number" 
+                                <input
+                                    wire:model="page_price_color_short"
+                                    type="number"
                                     step="0.50"
-                                    class="w-full bg-stone-950 border border-stone-800 focus:border-blue-500 rounded-xl pl-8 pr-3 py-2 text-sm text-white font-mono font-bold outline-none"
+                                    class="w-full bg-white dark:bg-stone-950 border border-stone-300 dark:border-stone-700 focus:border-amber-500 rounded-xl pl-8 pr-3 py-2 text-sm text-stone-900 dark:text-stone-100 font-mono tabular-nums font-bold outline-none"
                                 />
                             </div>
-                            <span class="text-[10px] text-stone-500">Default rate: ₱5.00 / page</span>
+                            <span class="text-[11px] text-stone-500 dark:text-stone-400 tabular-nums">Default rate: ₱5.00 / page</span>
                         </div>
 
                         <div class="space-y-1.5">
-                            <label class="text-xs font-bold text-stone-300">A4 Color</label>
+                            <label class="text-xs font-bold text-stone-700 dark:text-stone-300">A4 Color</label>
                             <div class="relative">
                                 <span class="absolute left-3 top-1/2 -translate-y-1/2 text-stone-500 font-bold text-xs">₱</span>
-                                <input 
-                                    wire:model="page_price_color_a4" 
-                                    type="number" 
+                                <input
+                                    wire:model="page_price_color_a4"
+                                    type="number"
                                     step="0.50"
-                                    class="w-full bg-stone-950 border border-stone-800 focus:border-blue-500 rounded-xl pl-8 pr-3 py-2 text-sm text-white font-mono font-bold outline-none"
+                                    class="w-full bg-white dark:bg-stone-950 border border-stone-300 dark:border-stone-700 focus:border-amber-500 rounded-xl pl-8 pr-3 py-2 text-sm text-stone-900 dark:text-stone-100 font-mono tabular-nums font-bold outline-none"
                                 />
                             </div>
-                            <span class="text-[10px] text-stone-500">Default rate: ₱5.00 / page</span>
+                            <span class="text-[11px] text-stone-500 dark:text-stone-400 tabular-nums">Default rate: ₱5.00 / page</span>
                         </div>
 
                         <div class="space-y-1.5">
-                            <label class="text-xs font-bold text-stone-300">Long / Legal Color</label>
+                            <label class="text-xs font-bold text-stone-700 dark:text-stone-300">Long / Legal Color</label>
                             <div class="relative">
                                 <span class="absolute left-3 top-1/2 -translate-y-1/2 text-stone-500 font-bold text-xs">₱</span>
-                                <input 
-                                    wire:model="page_price_color_long" 
-                                    type="number" 
+                                <input
+                                    wire:model="page_price_color_long"
+                                    type="number"
                                     step="0.50"
-                                    class="w-full bg-stone-950 border border-stone-800 focus:border-blue-500 rounded-xl pl-8 pr-3 py-2 text-sm text-white font-mono font-bold outline-none"
+                                    class="w-full bg-white dark:bg-stone-950 border border-stone-300 dark:border-stone-700 focus:border-amber-500 rounded-xl pl-8 pr-3 py-2 text-sm text-stone-900 dark:text-stone-100 font-mono tabular-nums font-bold outline-none"
                                 />
                             </div>
-                            <span class="text-[10px] text-stone-500">Default rate: ₱6.00 / page</span>
+                            <span class="text-[11px] text-stone-500 dark:text-stone-400 tabular-nums">Default rate: ₱6.00 / page</span>
                         </div>
                     </div>
                 </div>
@@ -404,72 +393,72 @@ new #[Title('Document Printing & Finishing Configuration')] class extends Compon
 
         <!-- Tab 2: Paper Stock & Duplex Settings -->
         @if ($active_tab === 'stocks')
-            <div class="p-6 rounded-3xl bg-stone-900/80 border border-stone-800/90 space-y-6 shadow-md backdrop-blur-sm">
-                <div class="border-b border-stone-800/80 pb-3">
-                    <h3 class="text-base font-black text-white tracking-tight flex items-center gap-2">
-                        <flux:icon name="scale" class="size-5 text-indigo-400" />
-                        Paper Stock Weight Surcharges & Duplex Discount
+            <div class="pq-card p-6 space-y-6">
+                <div class="border-b border-stone-200 dark:border-stone-800 pb-3">
+                    <h3 class="text-base font-extrabold text-stone-900 dark:text-stone-100 tracking-tight flex items-center gap-2">
+                        <flux:icon name="scale" class="size-5 text-sky-600 dark:text-sky-400" />
+                        Paper Stock Weight Surcharges &amp; Duplex Discount
                     </h3>
-                    <p class="text-xs text-stone-400">Configure extra fees for heavy paper stock and discounts for paper-saving back-to-back printing</p>
+                    <p class="text-xs text-stone-600 dark:text-stone-400">Configure extra fees for heavy paper stock and discounts for paper-saving back-to-back printing</p>
                 </div>
 
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                    <div class="p-4 rounded-2xl bg-stone-950 border border-stone-800 space-y-4">
-                        <h4 class="text-xs font-black uppercase text-stone-300">Paper Weight Add-on (per physical sheet)</h4>
-                        
+                    <div class="pq-well p-4 space-y-4">
+                        <h4 class="text-xs font-extrabold uppercase tracking-wider text-stone-700 dark:text-stone-300">Paper Weight Add-on (per physical sheet)</h4>
+
                         <div class="space-y-1">
-                            <label class="text-xs font-bold text-stone-400">Standard 70gsm (Default)</label>
-                            <div class="text-xs font-bold text-emerald-400">+₱0.00 (Included in base)</div>
+                            <label class="text-xs font-semibold text-stone-600 dark:text-stone-400">Standard 70gsm (Default)</label>
+                            <div class="text-xs font-bold text-emerald-700 dark:text-emerald-400 tabular-nums">+₱0.00 (Included in base)</div>
                         </div>
 
                         <div class="space-y-1">
-                            <label class="text-xs font-bold text-stone-400">Premium 80gsm Extra Fee</label>
+                            <label class="text-xs font-semibold text-stone-700 dark:text-stone-300">Premium 80gsm Extra Fee</label>
                             <div class="relative">
                                 <span class="absolute left-3 top-1/2 -translate-y-1/2 text-stone-500 font-bold text-xs">₱</span>
-                                <input 
-                                    wire:model="paper_stock_80gsm_price" 
-                                    type="number" 
+                                <input
+                                    wire:model="paper_stock_80gsm_price"
+                                    type="number"
                                     step="0.25"
-                                    class="w-full bg-stone-900 border border-stone-800 rounded-xl pl-8 pr-3 py-1.5 text-xs text-white font-mono font-bold outline-none"
+                                    class="w-full bg-white dark:bg-stone-900 border border-stone-300 dark:border-stone-700 rounded-xl pl-8 pr-3 py-1.5 text-xs text-stone-900 dark:text-stone-100 font-mono tabular-nums font-bold outline-none focus:border-amber-500"
                                 />
                             </div>
                         </div>
 
                         <div class="space-y-1">
-                            <label class="text-xs font-bold text-stone-400">Specialty 100gsm Extra Fee</label>
+                            <label class="text-xs font-semibold text-stone-700 dark:text-stone-300">Specialty 100gsm Extra Fee</label>
                             <div class="relative">
                                 <span class="absolute left-3 top-1/2 -translate-y-1/2 text-stone-500 font-bold text-xs">₱</span>
-                                <input 
-                                    wire:model="paper_stock_100gsm_price" 
-                                    type="number" 
+                                <input
+                                    wire:model="paper_stock_100gsm_price"
+                                    type="number"
                                     step="0.25"
-                                    class="w-full bg-stone-900 border border-stone-800 rounded-xl pl-8 pr-3 py-1.5 text-xs text-white font-mono font-bold outline-none"
+                                    class="w-full bg-white dark:bg-stone-900 border border-stone-300 dark:border-stone-700 rounded-xl pl-8 pr-3 py-1.5 text-xs text-stone-900 dark:text-stone-100 font-mono tabular-nums font-bold outline-none focus:border-amber-500"
                                 />
                             </div>
                         </div>
                     </div>
 
-                    <div class="p-4 rounded-2xl bg-stone-950 border border-stone-800 space-y-4 flex flex-col justify-between">
+                    <div class="pq-well p-4 space-y-4 flex flex-col justify-between">
                         <div>
-                            <h4 class="text-xs font-black uppercase text-stone-300">Duplex (Back-to-Back) Discount</h4>
-                            <p class="text-[11px] text-stone-400 mt-1">
-                                Encourage students to save paper by offering an automated percentage discount when printing 2-sided pages.
+                            <h4 class="text-xs font-extrabold uppercase tracking-wider text-stone-700 dark:text-stone-300">Duplex (Back-to-Back) Discount</h4>
+                            <p class="text-xs text-stone-600 dark:text-stone-400 mt-1">
+                                Encourage customers to save paper by offering an automated percentage discount when printing 2-sided pages.
                             </p>
                         </div>
 
                         <div class="space-y-1.5">
-                            <label class="text-xs font-bold text-stone-300">Duplex Discount (%)</label>
+                            <label class="text-xs font-bold text-stone-700 dark:text-stone-300">Duplex Discount (%)</label>
                             <div class="relative">
-                                <input 
-                                    wire:model="duplex_discount_percent" 
-                                    type="number" 
+                                <input
+                                    wire:model="duplex_discount_percent"
+                                    type="number"
                                     min="0"
                                     max="50"
-                                    class="w-full bg-stone-900 border border-stone-800 rounded-xl pl-3 pr-8 py-2 text-sm text-white font-mono font-bold outline-none"
+                                    class="w-full bg-white dark:bg-stone-900 border border-stone-300 dark:border-stone-700 rounded-xl pl-3 pr-8 py-2 text-sm text-stone-900 dark:text-stone-100 font-mono tabular-nums font-bold outline-none focus:border-amber-500"
                                 />
                                 <span class="absolute right-3 top-1/2 -translate-y-1/2 text-stone-500 font-bold text-xs">%</span>
                             </div>
-                            <span class="text-[10px] text-stone-500">e.g. 10% discount off page total</span>
+                            <span class="text-[11px] text-stone-500 dark:text-stone-400">e.g. 10% discount off page total</span>
                         </div>
                     </div>
                 </div>
@@ -478,92 +467,104 @@ new #[Title('Document Printing & Finishing Configuration')] class extends Compon
 
         <!-- Tab 3: Finishing & Binding Services -->
         @if ($active_tab === 'finishing')
-            <div class="p-6 rounded-3xl bg-stone-900/80 border border-stone-800/90 space-y-6 shadow-md backdrop-blur-sm">
-                <div class="border-b border-stone-800/80 pb-3">
-                    <h3 class="text-base font-black text-white tracking-tight flex items-center gap-2">
-                        <flux:icon name="sparkles" class="size-5 text-amber-400" />
-                        Finishing & Post-Press Binding Services
+            <div class="pq-card p-6 space-y-6">
+                <div class="border-b border-stone-200 dark:border-stone-800 pb-3">
+                    <h3 class="text-base font-extrabold text-stone-900 dark:text-stone-100 tracking-tight flex items-center gap-2">
+                        <flux:icon name="sparkles" class="size-5 text-amber-600 dark:text-amber-400" />
+                        Finishing &amp; Post-Press Binding Services
                     </h3>
-                    <p class="text-xs text-stone-400">Offer value-added binding options to turn loose printouts into organized handouts, reviewers, and portfolios</p>
+                    <p class="text-xs text-stone-600 dark:text-stone-400">Offer value-added binding options to turn loose printouts into organized handouts, reviewers, and portfolios</p>
                 </div>
 
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <!-- Corner Stapling -->
-                    <div class="p-4 rounded-2xl bg-stone-950 border border-stone-800 space-y-3">
+                    <div class="pq-well p-4 space-y-3">
                         <div class="flex items-center justify-between">
-                            <span class="font-bold text-xs text-white">📎 Corner Stapling</span>
+                            <span class="font-bold text-xs text-stone-900 dark:text-stone-100 inline-flex items-center gap-1.5">
+                                <flux:icon name="paper-clip" class="size-4 text-stone-500" />
+                                Corner Stapling
+                            </span>
                             <label class="relative inline-flex items-center cursor-pointer">
                                 <input type="checkbox" wire:model="allow_staple" class="sr-only peer">
-                                <div class="w-9 h-5 bg-stone-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-blue-500"></div>
+                                <div class="w-9 h-5 bg-stone-300 dark:bg-stone-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-amber-500"></div>
                             </label>
                         </div>
                         <div class="relative">
                             <span class="absolute left-3 top-1/2 -translate-y-1/2 text-stone-500 font-bold text-xs">₱</span>
-                            <input 
-                                wire:model="staple_price" 
-                                type="number" 
+                            <input
+                                wire:model="staple_price"
+                                type="number"
                                 step="1"
-                                class="w-full bg-stone-900 border border-stone-800 rounded-xl pl-8 pr-3 py-1.5 text-xs text-white font-mono font-bold outline-none"
+                                class="w-full bg-white dark:bg-stone-900 border border-stone-300 dark:border-stone-700 rounded-xl pl-8 pr-3 py-1.5 text-xs text-stone-900 dark:text-stone-100 font-mono tabular-nums font-bold outline-none focus:border-amber-500"
                             />
                         </div>
                     </div>
 
                     <!-- Sliding Folder & Fastener -->
-                    <div class="p-4 rounded-2xl bg-stone-950 border border-stone-800 space-y-3">
+                    <div class="pq-well p-4 space-y-3">
                         <div class="flex items-center justify-between">
-                            <span class="font-bold text-xs text-white">📁 Sliding Folder & Fastener</span>
+                            <span class="font-bold text-xs text-stone-900 dark:text-stone-100 inline-flex items-center gap-1.5">
+                                <flux:icon name="folder" class="size-4 text-stone-500" />
+                                Sliding Folder &amp; Fastener
+                            </span>
                             <label class="relative inline-flex items-center cursor-pointer">
                                 <input type="checkbox" wire:model="allow_folder_fastener" class="sr-only peer">
-                                <div class="w-9 h-5 bg-stone-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-blue-500"></div>
+                                <div class="w-9 h-5 bg-stone-300 dark:bg-stone-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-amber-500"></div>
                             </label>
                         </div>
                         <div class="relative">
                             <span class="absolute left-3 top-1/2 -translate-y-1/2 text-stone-500 font-bold text-xs">₱</span>
-                            <input 
-                                wire:model="folder_fastener_price" 
-                                type="number" 
+                            <input
+                                wire:model="folder_fastener_price"
+                                type="number"
                                 step="1"
-                                class="w-full bg-stone-900 border border-stone-800 rounded-xl pl-8 pr-3 py-1.5 text-xs text-white font-mono font-bold outline-none"
+                                class="w-full bg-white dark:bg-stone-900 border border-stone-300 dark:border-stone-700 rounded-xl pl-8 pr-3 py-1.5 text-xs text-stone-900 dark:text-stone-100 font-mono tabular-nums font-bold outline-none focus:border-amber-500"
                             />
                         </div>
                     </div>
 
                     <!-- Plastic Ring / Coil Binding -->
-                    <div class="p-4 rounded-2xl bg-stone-950 border border-stone-800 space-y-3">
+                    <div class="pq-well p-4 space-y-3">
                         <div class="flex items-center justify-between">
-                            <span class="font-bold text-xs text-white">🌀 Plastic Ring Binding (with Clear PVC)</span>
+                            <span class="font-bold text-xs text-stone-900 dark:text-stone-100 inline-flex items-center gap-1.5">
+                                <flux:icon name="book-open" class="size-4 text-stone-500" />
+                                Plastic Ring Binding (with Clear PVC)
+                            </span>
                             <label class="relative inline-flex items-center cursor-pointer">
                                 <input type="checkbox" wire:model="allow_ring_binding" class="sr-only peer">
-                                <div class="w-9 h-5 bg-stone-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-blue-500"></div>
+                                <div class="w-9 h-5 bg-stone-300 dark:bg-stone-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-amber-500"></div>
                             </label>
                         </div>
                         <div class="relative">
                             <span class="absolute left-3 top-1/2 -translate-y-1/2 text-stone-500 font-bold text-xs">₱</span>
-                            <input 
-                                wire:model="ring_bind_base_price" 
-                                type="number" 
+                            <input
+                                wire:model="ring_bind_base_price"
+                                type="number"
                                 step="5"
-                                class="w-full bg-stone-900 border border-stone-800 rounded-xl pl-8 pr-3 py-1.5 text-xs text-white font-mono font-bold outline-none"
+                                class="w-full bg-white dark:bg-stone-900 border border-stone-300 dark:border-stone-700 rounded-xl pl-8 pr-3 py-1.5 text-xs text-stone-900 dark:text-stone-100 font-mono tabular-nums font-bold outline-none focus:border-amber-500"
                             />
                         </div>
                     </div>
 
                     <!-- Rush Processing Fee -->
-                    <div class="p-4 rounded-2xl bg-stone-950 border border-stone-800 space-y-3">
+                    <div class="pq-well p-4 space-y-3">
                         <div class="flex items-center justify-between">
-                            <span class="font-bold text-xs text-amber-400">⚡ Rush Order Surcharge</span>
+                            <span class="font-bold text-xs text-amber-700 dark:text-amber-400 inline-flex items-center gap-1.5">
+                                <flux:icon name="bolt" class="size-4" />
+                                Rush Order Surcharge
+                            </span>
                             <label class="relative inline-flex items-center cursor-pointer">
                                 <input type="checkbox" wire:model="allow_rush_orders" class="sr-only peer">
-                                <div class="w-9 h-5 bg-stone-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-amber-500"></div>
+                                <div class="w-9 h-5 bg-stone-300 dark:bg-stone-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-amber-500"></div>
                             </label>
                         </div>
                         <div class="relative">
                             <span class="absolute left-3 top-1/2 -translate-y-1/2 text-stone-500 font-bold text-xs">₱</span>
-                            <input 
-                                wire:model="rush_fee_amount" 
-                                type="number" 
+                            <input
+                                wire:model="rush_fee_amount"
+                                type="number"
                                 step="10"
-                                class="w-full bg-stone-900 border border-stone-800 rounded-xl pl-8 pr-3 py-1.5 text-xs text-white font-mono font-bold outline-none"
+                                class="w-full bg-white dark:bg-stone-900 border border-stone-300 dark:border-stone-700 rounded-xl pl-8 pr-3 py-1.5 text-xs text-stone-900 dark:text-stone-100 font-mono tabular-nums font-bold outline-none focus:border-amber-500"
                             />
                         </div>
                     </div>
@@ -573,107 +574,124 @@ new #[Title('Document Printing & Finishing Configuration')] class extends Compon
 
         <!-- Tab 4: Automated Inventory BOM Recipes -->
         @if ($active_tab === 'bom')
-            <div class="p-6 rounded-3xl bg-stone-900/80 border border-stone-800/90 space-y-6 shadow-md backdrop-blur-sm">
-                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-stone-800/80 pb-3">
+            <div class="pq-card p-6 space-y-6">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-stone-200 dark:border-stone-800 pb-3">
                     <div>
-                        <h3 class="text-base font-black text-white tracking-tight flex items-center gap-2">
-                            <flux:icon name="archive-box" class="size-5 text-emerald-400" />
+                        <h3 class="text-base font-extrabold text-stone-900 dark:text-stone-100 tracking-tight flex items-center gap-2">
+                            <flux:icon name="archive-box" class="size-5 text-emerald-700 dark:text-emerald-400" />
                             Automated Inventory Bill of Materials (BOM) Linking
                         </h3>
-                        <p class="text-xs text-stone-400">Link document sizes and ring bindings directly to Central Inventory items to automate stock deduction</p>
+                        <p class="text-xs text-stone-600 dark:text-stone-400">Link document sizes and ring bindings directly to Central Inventory items to automate stock deduction</p>
                     </div>
 
                     <!-- Auto-deduct toggle -->
-                    <label class="inline-flex items-center gap-2 cursor-pointer bg-stone-950 px-3 py-1.5 rounded-xl border border-stone-800">
+                    <label class="inline-flex items-center gap-2 cursor-pointer bg-stone-50 dark:bg-stone-950 px-3 py-1.5 rounded-xl border border-stone-200 dark:border-stone-800">
                         <input type="checkbox" wire:model="auto_deduct_inventory" class="sr-only peer">
-                        <div class="w-8 h-4 bg-stone-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-3 after:w-3 after:transition-all peer-checked:bg-emerald-500"></div>
-                        <span class="text-xs font-bold text-stone-300">Auto-Deduct Stock</span>
+                        <div class="w-8 h-4 bg-stone-300 dark:bg-stone-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-3 after:w-3 after:transition-all peer-checked:bg-emerald-600"></div>
+                        <span class="text-xs font-bold text-stone-700 dark:text-stone-300">Auto-Deduct Stock</span>
                     </label>
                 </div>
 
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
                     <!-- Short Paper BOM -->
-                    <div class="p-4 rounded-2xl bg-stone-950 border border-stone-800 space-y-2">
-                        <label class="text-xs font-bold text-stone-300">📄 Short / Letter Paper Stock Item</label>
-                        <select wire:model="bom_short_paper_item_id" class="w-full bg-stone-900 border border-stone-800 text-xs text-white rounded-xl px-3 py-2 outline-none focus:border-emerald-500">
+                    <div class="pq-well p-4 space-y-2">
+                        <label class="text-xs font-bold text-stone-700 dark:text-stone-300 inline-flex items-center gap-1.5">
+                            <flux:icon name="document" class="size-3.5 text-stone-500" />
+                            Short / Letter Paper Stock Item
+                        </label>
+                        <select wire:model="bom_short_paper_item_id" class="w-full bg-white dark:bg-stone-900 border border-stone-300 dark:border-stone-700 text-xs text-stone-900 dark:text-stone-100 rounded-xl px-3 py-2 outline-none focus:border-amber-500">
                             <option value="">-- Do not link (Manual) --</option>
                             @foreach ($inventoryItems as $item)
                                 <option value="{{ $item->id }}">{{ $item->name }} (Stock: {{ $item->stock_qty }} {{ $item->unit }})</option>
                             @endforeach
                         </select>
-                        <p class="text-[10px] text-stone-500">Deducts 1 sheet per simplex page (or 1 sheet per 2 duplex pages)</p>
+                        <p class="text-[11px] text-stone-500 dark:text-stone-400">Deducts 1 sheet per simplex page (or 1 sheet per 2 duplex pages)</p>
                     </div>
 
                     <!-- A4 Paper BOM -->
-                    <div class="p-4 rounded-2xl bg-stone-950 border border-stone-800 space-y-2">
-                        <label class="text-xs font-bold text-stone-300">📄 A4 Paper Stock Item</label>
-                        <select wire:model="bom_a4_paper_item_id" class="w-full bg-stone-900 border border-stone-800 text-xs text-white rounded-xl px-3 py-2 outline-none focus:border-emerald-500">
+                    <div class="pq-well p-4 space-y-2">
+                        <label class="text-xs font-bold text-stone-700 dark:text-stone-300 inline-flex items-center gap-1.5">
+                            <flux:icon name="document" class="size-3.5 text-stone-500" />
+                            A4 Paper Stock Item
+                        </label>
+                        <select wire:model="bom_a4_paper_item_id" class="w-full bg-white dark:bg-stone-900 border border-stone-300 dark:border-stone-700 text-xs text-stone-900 dark:text-stone-100 rounded-xl px-3 py-2 outline-none focus:border-amber-500">
                             <option value="">-- Do not link (Manual) --</option>
                             @foreach ($inventoryItems as $item)
                                 <option value="{{ $item->id }}">{{ $item->name }} (Stock: {{ $item->stock_qty }} {{ $item->unit }})</option>
                             @endforeach
                         </select>
-                        <p class="text-[10px] text-stone-500">Deducts 1 sheet per simplex page (or 1 sheet per 2 duplex pages)</p>
+                        <p class="text-[11px] text-stone-500 dark:text-stone-400">Deducts 1 sheet per simplex page (or 1 sheet per 2 duplex pages)</p>
                     </div>
 
                     <!-- Long Paper BOM -->
-                    <div class="p-4 rounded-2xl bg-stone-950 border border-stone-800 space-y-2">
-                        <label class="text-xs font-bold text-stone-300">📄 Long / Legal Paper Stock Item</label>
-                        <select wire:model="bom_long_paper_item_id" class="w-full bg-stone-900 border border-stone-800 text-xs text-white rounded-xl px-3 py-2 outline-none focus:border-emerald-500">
+                    <div class="pq-well p-4 space-y-2">
+                        <label class="text-xs font-bold text-stone-700 dark:text-stone-300 inline-flex items-center gap-1.5">
+                            <flux:icon name="document" class="size-3.5 text-stone-500" />
+                            Long / Legal Paper Stock Item
+                        </label>
+                        <select wire:model="bom_long_paper_item_id" class="w-full bg-white dark:bg-stone-900 border border-stone-300 dark:border-stone-700 text-xs text-stone-900 dark:text-stone-100 rounded-xl px-3 py-2 outline-none focus:border-amber-500">
                             <option value="">-- Do not link (Manual) --</option>
                             @foreach ($inventoryItems as $item)
                                 <option value="{{ $item->id }}">{{ $item->name }} (Stock: {{ $item->stock_qty }} {{ $item->unit }})</option>
                             @endforeach
                         </select>
-                        <p class="text-[10px] text-stone-500">Deducts 1 sheet per simplex page (or 1 sheet per 2 duplex pages)</p>
+                        <p class="text-[11px] text-stone-500 dark:text-stone-400">Deducts 1 sheet per simplex page (or 1 sheet per 2 duplex pages)</p>
                     </div>
 
                     <!-- Plastic Ring Spine BOM -->
-                    <div class="p-4 rounded-2xl bg-stone-950 border border-stone-800 space-y-2">
-                        <label class="text-xs font-bold text-stone-300">🌀 Plastic Ring Comb / Coil Spines</label>
-                        <select wire:model="bom_ring_spine_item_id" class="w-full bg-stone-900 border border-stone-800 text-xs text-white rounded-xl px-3 py-2 outline-none focus:border-emerald-500">
+                    <div class="pq-well p-4 space-y-2">
+                        <label class="text-xs font-bold text-stone-700 dark:text-stone-300 inline-flex items-center gap-1.5">
+                            <flux:icon name="book-open" class="size-3.5 text-stone-500" />
+                            Plastic Ring Comb / Coil Spines
+                        </label>
+                        <select wire:model="bom_ring_spine_item_id" class="w-full bg-white dark:bg-stone-900 border border-stone-300 dark:border-stone-700 text-xs text-stone-900 dark:text-stone-100 rounded-xl px-3 py-2 outline-none focus:border-amber-500">
                             <option value="">-- Do not link (Manual) --</option>
                             @foreach ($inventoryItems as $item)
                                 <option value="{{ $item->id }}">{{ $item->name }} (Stock: {{ $item->stock_qty }} {{ $item->unit }})</option>
                             @endforeach
                         </select>
-                        <p class="text-[10px] text-stone-500">Deducts 1 ring spine per ring-bound copy</p>
+                        <p class="text-[11px] text-stone-500 dark:text-stone-400">Deducts 1 ring spine per ring-bound copy</p>
                     </div>
 
                     <!-- PVC Acetate Sheet BOM -->
-                    <div class="p-4 rounded-2xl bg-stone-950 border border-stone-800 space-y-2">
-                        <label class="text-xs font-bold text-stone-300">🛡️ Clear PVC Acetate Covers</label>
-                        <select wire:model="bom_pvc_acetate_item_id" class="w-full bg-stone-900 border border-stone-800 text-xs text-white rounded-xl px-3 py-2 outline-none focus:border-emerald-500">
+                    <div class="pq-well p-4 space-y-2">
+                        <label class="text-xs font-bold text-stone-700 dark:text-stone-300 inline-flex items-center gap-1.5">
+                            <flux:icon name="shield-check" class="size-3.5 text-stone-500" />
+                            Clear PVC Acetate Covers
+                        </label>
+                        <select wire:model="bom_pvc_acetate_item_id" class="w-full bg-white dark:bg-stone-900 border border-stone-300 dark:border-stone-700 text-xs text-stone-900 dark:text-stone-100 rounded-xl px-3 py-2 outline-none focus:border-amber-500">
                             <option value="">-- Do not link (Manual) --</option>
                             @foreach ($inventoryItems as $item)
                                 <option value="{{ $item->id }}">{{ $item->name }} (Stock: {{ $item->stock_qty }} {{ $item->unit }})</option>
                             @endforeach
                         </select>
-                        <p class="text-[10px] text-stone-500">Deducts 1-2 PVC sheets per ring-bound copy</p>
+                        <p class="text-[11px] text-stone-500 dark:text-stone-400">Deducts 1-2 PVC sheets per ring-bound copy</p>
                     </div>
 
                     <!-- Morocco / Back Cover Board BOM -->
-                    <div class="p-4 rounded-2xl bg-stone-950 border border-stone-800 space-y-2">
-                        <label class="text-xs font-bold text-stone-300">📘 Morocco / Linen Back Board Item</label>
-                        <select wire:model="bom_back_cover_item_id" class="w-full bg-stone-900 border border-stone-800 text-xs text-white rounded-xl px-3 py-2 outline-none focus:border-emerald-500">
+                    <div class="pq-well p-4 space-y-2">
+                        <label class="text-xs font-bold text-stone-700 dark:text-stone-300 inline-flex items-center gap-1.5">
+                            <flux:icon name="rectangle-stack" class="size-3.5 text-stone-500" />
+                            Morocco / Linen Back Board Item
+                        </label>
+                        <select wire:model="bom_back_cover_item_id" class="w-full bg-white dark:bg-stone-900 border border-stone-300 dark:border-stone-700 text-xs text-stone-900 dark:text-stone-100 rounded-xl px-3 py-2 outline-none focus:border-amber-500">
                             <option value="">-- Do not link (Manual) --</option>
                             @foreach ($inventoryItems as $item)
                                 <option value="{{ $item->id }}">{{ $item->name }} (Stock: {{ $item->stock_qty }} {{ $item->unit }})</option>
                             @endforeach
                         </select>
-                        <p class="text-[10px] text-stone-500">Deducts 1 board sheet per ring-bound copy</p>
+                        <p class="text-[11px] text-stone-500 dark:text-stone-400">Deducts 1 board sheet per ring-bound copy</p>
                     </div>
                 </div>
             </div>
         @endif
-
     </main>
 
     <!-- Footer Bar -->
-    <footer class="w-full bg-stone-900/60 border-t border-stone-800/80 px-4 sm:px-8 py-3 flex flex-col sm:flex-row items-center justify-between text-xs text-stone-500 gap-2">
+    <footer class="w-full bg-white dark:bg-stone-900 border-t border-stone-200 dark:border-stone-800 px-4 sm:px-8 py-3 flex flex-col sm:flex-row items-center justify-between text-xs text-stone-500 dark:text-stone-400 gap-2">
         <span>&copy; {{ date('Y') }} {{ $shop ? $shop->name : 'PressQueue' }} &bull; Document Printing Service Module</span>
-        <span class="text-stone-500 font-medium">
-            Duplex Sheet Calculation & Automated Ring BOM Burn
+        <span class="font-medium">
+            Duplex Sheet Calculation &amp; Automated Ring BOM Burn
         </span>
     </footer>
 

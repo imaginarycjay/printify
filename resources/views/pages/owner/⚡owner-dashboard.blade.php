@@ -58,11 +58,7 @@ new class extends Component {
     }
 }; ?>
 
-<div class="h-screen w-screen overflow-y-auto no-scrollbar bg-stone-950 text-stone-100 font-sans antialiased flex flex-col justify-between p-4 sm:px-8 sm:py-4 relative selection:bg-amber-500 selection:text-white">
-    <!-- Ambient Background Glow -->
-    <div class="absolute -top-40 left-1/2 -translate-x-1/2 size-[600px] rounded-full bg-amber-500/10 blur-[140px] pointer-events-none"></div>
-    <div class="absolute -bottom-40 right-10 size-[500px] rounded-full bg-indigo-500/10 blur-[140px] pointer-events-none"></div>
-
+<div class="pq-page flex flex-col justify-between p-4 sm:px-8 sm:py-5">
     @php
         $user = auth()->user();
         $shop = $user?->printShop;
@@ -76,57 +72,59 @@ new class extends Component {
         $installedApps = collect($catalog)->filter(function ($item) use ($activeServiceKeys) {
             return in_array($item['key'], $activeServiceKeys, true);
         })->filter(function ($item) {
-            if (empty($this->search)) return true;
+            if (empty($this->search)) {
+                return true;
+            }
+
             return str_contains(strtolower($item['name']), strtolower($this->search))
                 || str_contains(strtolower($item['description']), strtolower($this->search));
         });
     @endphp
 
     <!-- App Launcher Top Navigation Bar -->
-    <header class="w-full max-w-6xl mx-auto flex flex-wrap gap-4 items-center justify-between py-2 sm:py-3 border-b border-stone-800/80 relative z-20">
+    <header class="w-full max-w-6xl mx-auto flex flex-wrap gap-4 items-center justify-between py-3 border-b border-stone-200 dark:border-stone-800">
         <div class="flex items-center gap-3">
-            <span class="flex size-10 items-center justify-center rounded-xl bg-gradient-to-br from-amber-400 to-amber-600 text-stone-950 font-bold shadow-md shadow-amber-500/20">
+            <span data-theme-keep class="flex size-10 shrink-0 items-center justify-center rounded-xl bg-amber-500 text-stone-950">
                 <x-app-logo-icon class="size-6 fill-current" />
             </span>
-            <div>
+            <div class="min-w-0">
                 <div class="flex items-center gap-2">
-                    <h1 class="text-base font-bold text-white tracking-tight">{{ $shop ? $shop->name : config('app.name', 'PressQueue') }}</h1>
-                    <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-500/20 text-amber-400 border border-amber-500/30">Owner Hub</span>
+                    <h1 class="truncate text-base font-extrabold text-stone-900 dark:text-stone-100 tracking-tight">{{ $shop ? $shop->name : config('app.name', 'PressQueue') }}</h1>
+                    <span class="pq-badge-warning">Owner</span>
                 </div>
-                <p class="text-[11px] text-stone-400">Single Sign-On Print Operations Facility</p>
+                <p class="text-xs text-stone-600 dark:text-stone-400">Shop workspace &amp; applications</p>
             </div>
         </div>
 
-        <div class="flex items-center gap-3">
+        <div class="flex flex-wrap items-center gap-2.5">
             @if ($shop)
-                <a href="{{ route('owner.platform') }}" wire:navigate class="inline-flex min-h-11 items-center gap-2 rounded-xl border border-stone-800 bg-stone-900 px-3 text-xs font-bold text-stone-300 hover:border-amber-500/50 hover:text-amber-400 transition-colors">
+                <a href="{{ route('owner.platform') }}" wire:navigate class="inline-flex min-h-10 items-center gap-2 rounded-xl border border-stone-200 bg-white px-3 text-xs font-semibold text-stone-700 hover:border-amber-500 hover:text-stone-950 dark:border-stone-800 dark:bg-stone-900 dark:text-stone-300 dark:hover:text-white transition-colors">
                     <flux:icon name="cog-6-tooth" class="size-4" />
                     Shop Settings
                 </a>
             @endif
-            <livewire:notification-bell />
-            <x-theme-toggle />
-
-            <a href="{{ route('owner.wizard') }}" wire:navigate class="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-stone-800 bg-stone-900/60 text-xs font-semibold text-stone-300 hover:text-white hover:border-stone-700 transition-all">
-                <flux:icon name="cog-6-tooth" class="size-3.5 text-stone-400" />
+            <a href="{{ route('owner.wizard') }}" wire:navigate class="hidden sm:inline-flex min-h-10 items-center gap-1.5 px-3 rounded-xl border border-stone-200 bg-white text-xs font-semibold text-stone-700 hover:border-amber-500 hover:text-stone-950 dark:border-stone-800 dark:bg-stone-900 dark:text-stone-300 dark:hover:text-white transition-colors">
+                <flux:icon name="adjustments-horizontal" class="size-3.5 text-stone-500 dark:text-stone-400" />
                 Re-run Setup Wizard
             </a>
+            <livewire:notification-bell />
+            <x-theme-toggle />
 
             <!-- Profile Settings Link -->
             <a
                 href="{{ route('profile.edit') }}"
                 wire:navigate
-                class="group flex items-center gap-2.5 bg-stone-900 border border-stone-800 hover:border-amber-500/50 hover:bg-stone-800/80 rounded-full py-1 px-3 transition-all duration-200 cursor-pointer shadow-md shadow-stone-950/50"
+                class="group flex items-center gap-2 bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 hover:border-amber-500 rounded-full py-1 px-3 transition-colors cursor-pointer"
             >
                 @if ($user?->avatarUrl())
-                    <img src="{{ $user->avatarUrl() }}" alt="{{ $user->name }}" class="size-6 rounded-full object-cover border border-amber-500/50 shadow-sm" />
+                    <img src="{{ $user->avatarUrl() }}" alt="{{ $user->name }}" class="size-6 rounded-full object-cover border border-amber-500/40" />
                 @else
-                    <span class="size-6 rounded-full bg-gradient-to-br from-amber-400 to-amber-600 text-stone-950 text-xs font-extrabold flex items-center justify-center shadow-sm">
+                    <span data-theme-keep class="size-6 rounded-full bg-amber-500 text-stone-950 text-xs font-extrabold flex items-center justify-center">
                         {{ $user?->initials() }}
                     </span>
                 @endif
-                <span class="text-xs font-bold text-stone-200 group-hover:text-amber-300 hidden sm:inline transition-colors duration-200">{{ $user?->name }}</span>
-                <flux:icon name="cog-6-tooth" class="size-3.5 text-stone-400 group-hover:text-amber-400 group-hover:rotate-45 transition-all duration-300" />
+                <span class="text-xs font-bold text-stone-800 dark:text-stone-200 group-hover:text-amber-700 dark:group-hover:text-amber-400 hidden sm:inline">{{ $user?->name }}</span>
+                <flux:icon name="cog-6-tooth" class="size-3.5 text-stone-400 group-hover:text-amber-600 dark:group-hover:text-amber-400" />
             </a>
 
             <!-- Log Out Button -->
@@ -135,9 +133,9 @@ new class extends Component {
                 <button
                     type="submit"
                     title="Log Out"
-                    class="group flex items-center gap-1.5 bg-stone-900 border border-stone-800 hover:border-red-500/50 hover:bg-red-500/10 text-red-400 hover:text-red-300 rounded-full py-1 px-3 transition-all duration-200 cursor-pointer shadow-md shadow-stone-950/50"
+                    class="inline-flex min-h-10 items-center gap-1.5 bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 hover:border-rose-300 hover:bg-rose-50 text-rose-700 dark:hover:bg-rose-950/60 dark:text-rose-300 rounded-xl px-3 transition-colors cursor-pointer"
                 >
-                    <flux:icon name="arrow-right-start-on-rectangle" class="size-3.5 text-red-400 group-hover:scale-110 transition-transform duration-200" />
+                    <flux:icon name="arrow-right-start-on-rectangle" class="size-4" />
                     <span class="text-xs font-bold hidden sm:inline">Log Out</span>
                 </button>
             </form>
@@ -145,22 +143,18 @@ new class extends Component {
     </header>
 
     @if ($shop && $shop->getAttribute('approval_status') !== 'approved')
-        <aside class="relative z-20 mx-auto mt-4 flex w-full max-w-6xl flex-wrap items-center justify-between gap-3 rounded-2xl border border-amber-500/30 bg-amber-500/10 p-4 text-sm">
-            <p class="text-amber-700 dark:text-amber-300"><strong>{{ match ($shop->getAttribute('approval_status')) { 'rejected' => 'Application needs changes.', 'suspended' => 'Shop suspended.', default => 'Shop approval pending.' } }}</strong> Your shop is hidden from customers until approved.</p>
-            <a href="{{ route('owner.platform') }}" wire:navigate class="inline-flex min-h-11 items-center gap-2 font-bold text-amber-700 dark:text-amber-400">Review shop profile <flux:icon name="arrow-right" class="size-4" /></a>
+        <aside class="mx-auto mt-4 flex w-full max-w-6xl flex-wrap items-center justify-between gap-3 rounded-2xl border border-amber-200 bg-amber-50 p-4 text-sm dark:border-amber-800 dark:bg-amber-950/50">
+            <p class="text-amber-900 dark:text-amber-200"><strong>{{ match ($shop->getAttribute('approval_status')) { 'rejected' => 'Application needs changes.', 'suspended' => 'Shop suspended.', default => 'Shop approval pending.' } }}</strong> Your shop is hidden from customers until approved.</p>
+            <a href="{{ route('owner.platform') }}" wire:navigate class="inline-flex min-h-10 items-center gap-2 font-bold text-amber-800 hover:underline dark:text-amber-300">Review shop profile <flux:icon name="arrow-right" class="size-4" /></a>
         </aside>
     @endif
 
     <!-- Main App Launcher Body -->
-    <main class="w-full max-w-5xl mx-auto my-auto py-10 relative z-20 space-y-8">
+    <main class="w-full max-w-5xl mx-auto my-auto py-8 sm:py-10 space-y-8">
         <!-- Main App Launcher Title & Stats -->
         <div class="text-center space-y-3">
-            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-400 text-xs font-semibold uppercase tracking-wider">
-                <flux:icon name="squares-2x2" class="size-3.5" />
-                PressQueue App Launcher
-            </div>
-            <h2 class="text-3xl sm:text-4xl font-extrabold tracking-tight text-white">App Launcher</h2>
-            <p class="text-xs sm:text-sm text-stone-400">
+            <h2 class="text-3xl sm:text-4xl font-extrabold tracking-tight text-stone-900 dark:text-stone-100">App Launcher</h2>
+            <p class="text-xs sm:text-sm text-stone-600 dark:text-stone-400">
                 {{ count($activeServiceKeys) }} active printing applications available in your shop
             </p>
 
@@ -175,19 +169,19 @@ new class extends Component {
                     ->count();
             @endphp
             <div class="pt-1">
-                <a 
-                    href="{{ route('owner.analytics-hub') }}" 
-                    wire:navigate 
-                    class="inline-flex items-center gap-3 px-4 py-2 rounded-2xl bg-stone-900/90 border border-stone-800 hover:border-amber-500/50 transition-all text-xs text-stone-300 hover:text-white shadow-md group"
+                <a
+                    href="{{ route('owner.analytics-hub') }}"
+                    wire:navigate
+                    class="inline-flex flex-wrap items-center justify-center gap-3 px-4 py-2 rounded-xl bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 hover:border-amber-500 transition-colors text-xs text-stone-700 dark:text-stone-300 shadow-xs group"
                 >
-                    <span class="flex items-center gap-1 text-emerald-400 font-bold">
-                        <span class="size-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                    <span class="flex items-center gap-1.5 text-emerald-700 dark:text-emerald-400 font-bold tabular-nums">
+                        <span class="size-2 rounded-full bg-emerald-600 dark:bg-emerald-400"></span>
                         Today: ₱{{ number_format($todaySales, 2) }}
                     </span>
-                    <span class="text-stone-600">&bull;</span>
-                    <span class="text-stone-400 font-medium">{{ $pendingOrders }} active floor jobs</span>
-                    <span class="text-stone-600">&bull;</span>
-                    <span class="text-amber-400 font-bold group-hover:underline flex items-center gap-1">
+                    <span class="text-stone-300 dark:text-stone-700">&bull;</span>
+                    <span class="text-stone-600 dark:text-stone-400 font-medium tabular-nums">{{ $pendingOrders }} active floor {{ Str::plural('job', $pendingOrders) }}</span>
+                    <span class="text-stone-300 dark:text-stone-700">&bull;</span>
+                    <span class="text-amber-700 dark:text-amber-400 font-bold group-hover:underline flex items-center gap-1">
                         Analytics Hub &rarr;
                     </span>
                 </a>
@@ -197,26 +191,25 @@ new class extends Component {
         <!-- Center Search Filter Input Bar -->
         <div class="max-w-md mx-auto">
             <div class="relative">
-                <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-stone-500">
+                <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-stone-400">
                     <flux:icon name="magnifying-glass" class="size-4" />
                 </div>
                 <input
                     wire:model.live.debounce.150ms="search"
                     type="text"
                     placeholder="Search installed printing applications..."
-                    class="w-full pl-10 pr-4 py-3 rounded-2xl bg-stone-900/80 border border-stone-800 text-stone-100 placeholder-stone-500 text-sm focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500 transition-all backdrop-blur-md"
+                    class="w-full pl-10 pr-16 py-2.5 rounded-xl bg-white dark:bg-stone-900 border border-stone-300 dark:border-stone-700 text-stone-900 dark:text-stone-100 placeholder-stone-400 dark:placeholder-stone-500 text-sm focus:outline-none focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20"
                 />
                 @if (!empty($search))
-                    <button wire:click="$set('search', '')" class="absolute inset-y-0 right-0 pr-3.5 flex items-center text-stone-500 hover:text-white text-xs">
+                    <button wire:click="$set('search', '')" class="absolute inset-y-0 right-0 pr-3.5 flex items-center text-stone-500 hover:text-stone-900 dark:hover:text-white text-xs font-semibold">
                         Clear
                     </button>
                 @endif
             </div>
         </div>
 
-        <!-- Squircle App Launcher Grid -->
-        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-6 pt-4 max-w-4xl mx-auto">
-            <!-- Installed Service App Tiles -->
+        <!-- Editorial Module Card Grid -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 pt-2 max-w-5xl mx-auto">
             @foreach ($installedApps as $app)
                 @php
                     $isPreinstalled = !empty($app['is_preinstalled']);
@@ -230,24 +223,29 @@ new class extends Component {
                     };
                 @endphp
                 @if ($route)
-                    <a href="{{ $route }}" wire:navigate class="group flex flex-col items-center text-center space-y-2.5 cursor-pointer">
+                    <a href="{{ $route }}" wire:navigate class="pq-card group flex flex-col justify-between p-5 text-left transition-colors hover:border-amber-500 cursor-pointer">
                 @else
-                    <div class="group flex flex-col items-center text-center space-y-2.5 cursor-pointer">
+                    <div class="pq-card group flex flex-col justify-between p-5 text-left">
                 @endif
-                    <!-- Squircle Container -->
-                    <div class="size-20 sm:size-24 rounded-3xl bg-gradient-to-br {{ $app['gradient'] }} flex items-center justify-center text-white shadow-xl shadow-stone-950/40 group-hover:scale-105 group-hover:shadow-amber-500/20 transition-all duration-300 relative border border-white/10">
-                        <flux:icon name="{{ $app['icon'] }}" class="size-10 sm:size-11 stroke-[1.5]" />
+                    <div class="flex items-start justify-between gap-3">
+                        <span class="flex size-11 shrink-0 items-center justify-center rounded-xl border {{ $app['badge_color'] }}">
+                            <flux:icon name="{{ $app['icon'] }}" class="size-5" />
+                        </span>
                         @if ($isPreinstalled)
-                            <span class="absolute top-2 right-2 px-1.5 py-0.5 rounded-md bg-violet-400 text-stone-950 text-[9px] font-black uppercase shadow tracking-wider">CORE</span>
+                            <span class="pq-badge-neutral">Core</span>
                         @else
-                            <span class="absolute top-2 right-2 size-2.5 rounded-full bg-emerald-400 ring-2 ring-stone-950"></span>
+                            <span class="pq-badge-success">Active</span>
                         @endif
                     </div>
 
-                    <!-- App Title -->
-                    <span class="text-xs sm:text-sm font-bold text-stone-200 group-hover:text-amber-400 transition-colors line-clamp-2 leading-tight px-1">
-                        {{ $app['name'] }}
-                    </span>
+                    <div class="mt-4 space-y-1">
+                        <h3 class="text-sm font-extrabold text-stone-900 dark:text-stone-100 group-hover:text-amber-700 dark:group-hover:text-amber-400 transition-colors">
+                            {{ $app['name'] }}
+                        </h3>
+                        <p class="text-xs text-stone-600 dark:text-stone-400 line-clamp-2 leading-relaxed">
+                            {{ $app['description'] }}
+                        </p>
+                    </div>
                 @if ($route)
                     </a>
                 @else
@@ -256,88 +254,90 @@ new class extends Component {
             @endforeach
 
             <!-- Special "+ More Services" App Tile -->
-            <div
+            <button
+                type="button"
                 wire:click="openMoreServicesModal"
-                class="group flex flex-col items-center text-center space-y-2.5 cursor-pointer"
+                class="group flex flex-col justify-between p-5 text-left rounded-2xl border-2 border-dashed border-stone-300 dark:border-stone-700 bg-stone-50 dark:bg-stone-900/50 hover:border-amber-500 hover:bg-white dark:hover:bg-stone-900 transition-colors cursor-pointer"
             >
-                <!-- Squircle Container for More Services -->
-                <div class="size-20 sm:size-24 rounded-3xl bg-stone-900 border-2 border-dashed border-amber-500/40 group-hover:border-amber-500 flex items-center justify-center text-amber-400 shadow-xl shadow-stone-950/40 group-hover:scale-105 group-hover:bg-amber-500/10 transition-all duration-300 relative">
-                    <flux:icon name="squares-plus" class="size-10 sm:size-11 stroke-[1.5]" />
-                    <span class="absolute -top-1 -right-1 px-1.5 py-0.5 rounded-full bg-amber-500 text-stone-950 text-[9px] font-extrabold">App Store</span>
+                <div class="flex items-start justify-between gap-3 w-full">
+                    <span class="flex size-11 shrink-0 items-center justify-center rounded-xl border border-amber-200 bg-amber-50 text-amber-700 dark:border-amber-800 dark:bg-amber-950/60 dark:text-amber-300">
+                        <flux:icon name="squares-plus" class="size-5" />
+                    </span>
+                    <span class="pq-badge-warning">App Store</span>
                 </div>
 
-                <!-- App Title -->
-                <span class="text-xs sm:text-sm font-bold text-amber-400 group-hover:text-amber-300 transition-colors leading-tight">
-                    + More Services
-                </span>
-            </div>
+                <div class="mt-4 space-y-1">
+                    <h3 class="text-sm font-extrabold text-amber-700 dark:text-amber-400">
+                        + More Services
+                    </h3>
+                    <p class="text-xs text-stone-600 dark:text-stone-400 leading-relaxed">
+                        Install or remove optional printing modules for your shop.
+                    </p>
+                </div>
+            </button>
         </div>
 
         @if ($installedApps->isEmpty() && !empty($search))
-            <div class="text-center py-8 text-stone-500 text-xs">
+            <div class="text-center py-8 text-stone-500 dark:text-stone-400 text-xs">
                 No installed applications found matching "{{ $search }}".
             </div>
         @endif
     </main>
 
     <!-- Footer Bar -->
-    <footer class="w-full max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between text-xs text-stone-600 border-t border-stone-800/80 pt-4 gap-2 relative z-20">
+    <footer class="w-full max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between text-xs text-stone-500 dark:text-stone-400 border-t border-stone-200 dark:border-stone-800 pt-4 gap-2">
         <span>&copy; {{ date('Y') }} {{ config('app.name', 'PressQueue') }} &bull; {{ $shop ? $shop->name : 'Print Shop' }}</span>
-        <span class="text-stone-500 font-medium">
-            {{ count($activeServiceKeys) }} installed apps &bull; {{ count($catalog) - count($activeServiceKeys) }} available in More Services
+        <span class="font-medium tabular-nums">
+            {{ count($activeServiceKeys) }} installed {{ Str::plural('app', count($activeServiceKeys)) }} &bull; {{ count($catalog) - count($activeServiceKeys) }} available in More Services
         </span>
     </footer>
 
     <!-- More Services Modal / App Store Drawer -->
     @if ($show_more_services_modal)
-        <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-stone-950/80 backdrop-blur-md animate-fadeIn">
-            <div class="w-full max-w-3xl rounded-3xl border border-stone-800 bg-stone-900 p-6 sm:p-8 shadow-2xl space-y-6 max-h-[90vh] overflow-y-auto">
-                <div class="flex items-center justify-between border-b border-stone-800 pb-4">
+        <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-stone-950/60 backdrop-blur-xs">
+            <div class="w-full max-w-3xl rounded-2xl border border-stone-200 dark:border-stone-800 bg-white dark:bg-stone-900 p-6 sm:p-7 shadow-xl space-y-6 max-h-[90vh] overflow-y-auto">
+                <div class="flex items-center justify-between border-b border-stone-200 dark:border-stone-800 pb-4">
                     <div class="flex items-center gap-3">
-                        <span class="flex size-10 items-center justify-center rounded-xl bg-amber-500/10 text-amber-400 border border-amber-500/20">
-                            <flux:icon name="squares-plus" class="size-6" />
+                        <span class="flex size-10 items-center justify-center rounded-xl bg-amber-50 text-amber-700 border border-amber-200 dark:bg-amber-950/60 dark:text-amber-300 dark:border-amber-800">
+                            <flux:icon name="squares-plus" class="size-5" />
                         </span>
                         <div>
-                            <h3 class="text-xl font-extrabold text-white">More Services App Store</h3>
-                            <p class="text-xs text-stone-400">Install or remove printing applications for {{ $shop ? $shop->name : 'your shop' }}</p>
+                            <h3 class="text-lg font-extrabold text-stone-900 dark:text-stone-100">More Services App Store</h3>
+                            <p class="text-xs text-stone-600 dark:text-stone-400">Install or remove printing applications for {{ $shop ? $shop->name : 'your shop' }}</p>
                         </div>
                     </div>
 
-                    <button wire:click="closeMoreServicesModal" class="size-8 rounded-full bg-stone-800 hover:bg-stone-700 text-stone-400 hover:text-white flex items-center justify-center transition-colors">
-                        <flux:icon name="x-mark" class="size-5" />
+                    <button type="button" wire:click="closeMoreServicesModal" aria-label="Close modal" class="size-9 rounded-xl border border-stone-200 dark:border-stone-800 bg-stone-50 dark:bg-stone-800 hover:bg-stone-100 dark:hover:bg-stone-700 text-stone-600 dark:text-stone-300 flex items-center justify-center transition-colors cursor-pointer">
+                        <flux:icon name="x-mark" class="size-4" />
                     </button>
                 </div>
 
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
                     @foreach ($catalog as $key => $service)
                         @php
                             $isInstalled = in_array($key, $activeServiceKeys, true);
                             $isPreinstalled = PrintServiceCatalog::isPreinstalled($key);
                         @endphp
-                        <div class="flex items-start justify-between p-4 rounded-2xl border border-stone-800 bg-stone-950/60 gap-3">
-                            <div class="flex items-start gap-3">
-                                <div class="size-11 rounded-2xl bg-gradient-to-br {{ $service['gradient'] }} flex shrink-0 items-center justify-center text-white shadow-md">
+                        <div class="flex items-start justify-between p-4 rounded-xl border border-stone-200 dark:border-stone-800 bg-stone-50 dark:bg-stone-950/60 gap-3">
+                            <div class="flex items-start gap-3 min-w-0">
+                                <div class="size-10 rounded-xl border {{ $service['badge_color'] }} flex shrink-0 items-center justify-center">
                                     <flux:icon name="{{ $service['icon'] }}" class="size-5" />
                                 </div>
-                                <div class="space-y-1">
-                                    <div class="flex items-center gap-2">
-                                        <h4 class="text-xs font-bold text-white">{{ $service['name'] }}</h4>
-                                        @if ($isPreinstalled)
-                                            <span class="px-1.5 py-0.5 rounded text-[9px] font-extrabold bg-violet-500/20 text-violet-300 border border-violet-500/30">Pre-installed</span>
-                                        @endif
-                                    </div>
-                                    <p class="text-[10px] text-stone-400 leading-relaxed">{{ $service['description'] }}</p>
+                                <div class="space-y-1 min-w-0">
+                                    <h4 class="text-xs font-bold text-stone-900 dark:text-stone-100">{{ $service['name'] }}</h4>
+                                    <p class="text-[11px] text-stone-600 dark:text-stone-400 leading-relaxed">{{ $service['description'] }}</p>
                                 </div>
                             </div>
 
                             @if ($isPreinstalled)
-                                <span class="shrink-0 px-3 py-1.5 rounded-xl text-xs font-bold bg-stone-900 border border-stone-800 text-stone-500 cursor-not-allowed select-none">
+                                <span class="shrink-0 px-3 py-1.5 rounded-lg text-xs font-semibold bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-700 text-stone-500 dark:text-stone-400 select-none">
                                     Pre-installed
                                 </span>
                             @else
                                 <button
+                                    type="button"
                                     wire:click="toggleServiceStatus('{{ $key }}')"
-                                    class="shrink-0 px-3 py-1.5 rounded-xl text-xs font-bold transition-all {{ $isInstalled ? 'bg-red-500/10 border border-red-500/30 text-red-400 hover:bg-red-500/20' : 'bg-amber-500 hover:bg-amber-400 text-stone-950 shadow-md shadow-amber-500/20' }}"
+                                    class="shrink-0 px-3 py-1.5 rounded-lg text-xs font-bold transition-colors cursor-pointer {{ $isInstalled ? 'bg-rose-50 border border-rose-200 text-rose-700 hover:bg-rose-100 dark:bg-rose-950/60 dark:border-rose-800 dark:text-rose-300' : 'bg-amber-500 hover:bg-amber-400 text-stone-950' }}"
                                 >
                                     {{ $isInstalled ? 'Remove' : 'Install' }}
                                 </button>
@@ -346,8 +346,8 @@ new class extends Component {
                     @endforeach
                 </div>
 
-                <div class="flex justify-end border-t border-stone-800 pt-4">
-                    <flux:button wire:click="closeMoreServicesModal" variant="primary" class="bg-amber-500 hover:bg-amber-400 text-stone-950 font-bold px-6">
+                <div class="flex justify-end border-t border-stone-200 dark:border-stone-800 pt-4">
+                    <flux:button wire:click="closeMoreServicesModal" variant="primary" class="!bg-amber-500 hover:!bg-amber-400 !text-stone-950 font-bold px-6">
                         Done Managing Services
                     </flux:button>
                 </div>

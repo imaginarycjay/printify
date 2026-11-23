@@ -522,16 +522,15 @@ class Order extends Model
     public function statusBadgeColor(): string
     {
         return match ($this->order_status) {
-            self::STATUS_PENDING_PAYMENT => 'bg-amber-500/15 text-amber-400 border-amber-500/30',
-            self::STATUS_ON_HOLD => 'bg-rose-500/15 text-rose-300 border-rose-500/30',
-            self::STATUS_IN_QUEUE => 'bg-blue-500/15 text-blue-400 border-blue-500/30',
-            self::STATUS_IN_PRODUCTION => 'bg-purple-500/15 text-purple-400 border-purple-500/30',
-            self::STATUS_QUALITY_CHECK => 'bg-cyan-500/15 text-cyan-400 border-cyan-500/30',
-            self::STATUS_PARTIALLY_READY => 'bg-teal-500/20 text-teal-300 border-teal-500/40',
-            self::STATUS_READY_FOR_PICKUP => 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40',
-            self::STATUS_COMPLETED => 'bg-emerald-500/15 text-emerald-400 border-emerald-500/30',
-            self::STATUS_CANCELLED => 'bg-red-500/15 text-red-400 border-red-500/30',
-            default => 'bg-stone-500/15 text-stone-400 border-stone-500/30',
+            self::STATUS_PENDING_PAYMENT => 'bg-amber-50 text-amber-800 border-amber-200 dark:bg-amber-950/60 dark:text-amber-300 dark:border-amber-800',
+            self::STATUS_ON_HOLD => 'bg-rose-50 text-rose-800 border-rose-200 dark:bg-rose-950/60 dark:text-rose-300 dark:border-rose-800',
+            self::STATUS_IN_QUEUE => 'bg-sky-50 text-sky-800 border-sky-200 dark:bg-sky-950/60 dark:text-sky-300 dark:border-sky-800',
+            self::STATUS_IN_PRODUCTION => 'bg-indigo-50 text-indigo-800 border-indigo-200 dark:bg-indigo-950/60 dark:text-indigo-300 dark:border-indigo-800',
+            self::STATUS_QUALITY_CHECK => 'bg-cyan-50 text-cyan-800 border-cyan-200 dark:bg-cyan-950/60 dark:text-cyan-300 dark:border-cyan-800',
+            self::STATUS_PARTIALLY_READY => 'bg-teal-50 text-teal-800 border-teal-200 dark:bg-teal-950/60 dark:text-teal-300 dark:border-teal-800',
+            self::STATUS_READY_FOR_PICKUP, self::STATUS_COMPLETED => 'bg-emerald-50 text-emerald-800 border-emerald-200 dark:bg-emerald-950/60 dark:text-emerald-300 dark:border-emerald-800',
+            self::STATUS_CANCELLED => 'bg-rose-50 text-rose-800 border-rose-200 dark:bg-rose-950/60 dark:text-rose-300 dark:border-rose-800',
+            default => 'bg-stone-100 text-stone-700 border-stone-200 dark:bg-stone-800 dark:text-stone-300 dark:border-stone-700',
         };
     }
 
@@ -556,12 +555,12 @@ class Order extends Model
     public function paymentStatusBadgeColor(): string
     {
         return match ($this->payment_status) {
-            self::PAYMENT_VERIFIED_PAID => 'bg-emerald-500/15 text-emerald-400 border-emerald-500/30',
-            self::PAYMENT_PARTIALLY_PAID => 'bg-cyan-500/15 text-cyan-400 border-cyan-500/30',
-            self::PAYMENT_PENDING_VERIFICATION => 'bg-amber-500/15 text-amber-400 border-amber-500/30',
-            self::PAYMENT_UNPAID => 'bg-orange-500/15 text-orange-400 border-orange-500/30',
-            self::PAYMENT_REJECTED => 'bg-red-500/15 text-red-400 border-red-500/30',
-            default => 'bg-stone-500/15 text-stone-400 border-stone-500/30',
+            self::PAYMENT_VERIFIED_PAID => 'bg-emerald-50 text-emerald-800 border-emerald-200 dark:bg-emerald-950/60 dark:text-emerald-300 dark:border-emerald-800',
+            self::PAYMENT_PARTIALLY_PAID => 'bg-sky-50 text-sky-800 border-sky-200 dark:bg-sky-950/60 dark:text-sky-300 dark:border-sky-800',
+            self::PAYMENT_PENDING_VERIFICATION => 'bg-amber-50 text-amber-800 border-amber-200 dark:bg-amber-950/60 dark:text-amber-300 dark:border-amber-800',
+            self::PAYMENT_UNPAID => 'bg-orange-50 text-orange-800 border-orange-200 dark:bg-orange-950/60 dark:text-orange-300 dark:border-orange-800',
+            self::PAYMENT_REJECTED => 'bg-rose-50 text-rose-800 border-rose-200 dark:bg-rose-950/60 dark:text-rose-300 dark:border-rose-800',
+            default => 'bg-stone-100 text-stone-700 border-stone-200 dark:bg-stone-800 dark:text-stone-300 dark:border-stone-700',
         };
     }
 }

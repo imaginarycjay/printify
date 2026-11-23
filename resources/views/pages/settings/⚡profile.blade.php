@@ -121,18 +121,18 @@ new #[Title('Profile settings')] class extends Component {
         <form wire:submit.prevent="updateProfileInformation" class="space-y-6">
 
             <!-- Profile Picture Avatar Section -->
-            <div class="space-y-3 p-4 rounded-2xl bg-stone-950 border border-stone-800">
-                <label class="text-xs font-bold text-stone-200 block">Profile Picture / Avatar</label>
+            <div class="pq-well space-y-3 p-4">
+                <label class="text-xs font-bold text-stone-800 dark:text-stone-200 block">Profile Picture / Avatar</label>
 
                 <div class="flex items-center gap-4">
                     <!-- Current Avatar Preview or Temp File Preview -->
                     <div class="relative shrink-0">
                         @if ($avatarUpload)
-                            <img src="{{ $avatarUpload->temporaryUrl() }}" class="size-16 rounded-full object-cover border-2 border-amber-500 shadow-md" />
+                            <img src="{{ $avatarUpload->temporaryUrl() }}" class="size-16 rounded-full object-cover border-2 border-amber-500 shadow-sm" />
                         @elseif (auth()->user()?->avatarUrl())
-                            <img src="{{ auth()->user()->avatarUrl() }}" class="size-16 rounded-full object-cover border-2 border-amber-500/50 shadow-md" />
+                            <img src="{{ auth()->user()->avatarUrl() }}" class="size-16 rounded-full object-cover border-2 border-amber-500/60 shadow-sm" />
                         @else
-                            <span class="size-16 rounded-full bg-gradient-to-br from-amber-400 to-amber-600 text-stone-950 text-xl font-extrabold flex items-center justify-center shadow-md">
+                            <span class="size-16 rounded-full bg-amber-500 text-stone-950 text-xl font-extrabold flex items-center justify-center shadow-sm">
                                 {{ auth()->user()?->initials() }}
                             </span>
                         @endif
@@ -140,63 +140,63 @@ new #[Title('Profile settings')] class extends Component {
 
                     <div class="space-y-2 flex-1">
                         <div class="flex flex-wrap items-center gap-2">
-                            <label class="px-3 py-1.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-stone-950 text-xs font-extrabold cursor-pointer transition-all inline-flex items-center gap-1.5 shadow-md">
+                            <label class="px-3 py-1.5 rounded-xl bg-amber-500 hover:bg-amber-600 text-stone-950 text-xs font-bold cursor-pointer transition-colors inline-flex items-center gap-1.5 shadow-sm">
                                 <flux:icon name="arrow-up-tray" class="size-3.5" />
                                 <span>Upload New Photo</span>
                                 <input type="file" wire:model="avatarUpload" accept="image/*" class="hidden" />
                             </label>
 
                             @if (auth()->user()?->avatar)
-                                <button type="button" wire:click="removeAvatar" class="px-3 py-1.5 rounded-xl bg-stone-900 border border-stone-800 text-red-400 hover:bg-red-500/10 text-xs font-bold transition-all">
+                                <button type="button" wire:click="removeAvatar" class="px-3 py-1.5 rounded-xl bg-white dark:bg-stone-900 border border-stone-300 dark:border-stone-800 text-red-700 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-500/10 text-xs font-bold transition-colors cursor-pointer">
                                     Remove Photo
                                 </button>
                             @endif
                         </div>
-                        <p class="text-[10px] text-stone-500">JPG, PNG, GIF up to 3MB</p>
+                        <p class="text-[10px] text-stone-500 dark:text-stone-400">JPG, PNG, GIF up to 3MB</p>
                     </div>
                 </div>
 
                 @error('avatarUpload')
-                    <p class="text-xs text-red-400 font-semibold">{{ $message }}</p>
+                    <p class="text-xs text-red-600 dark:text-red-400 font-semibold">{{ $message }}</p>
                 @enderror
             </div>
 
             <!-- Name Field -->
             <div class="space-y-1.5">
-                <label class="text-xs font-bold text-stone-300">Full Name</label>
+                <label class="text-xs font-bold text-stone-700 dark:text-stone-300">Full Name</label>
                 <input
                     wire:model="name"
                     type="text"
                     required
-                    class="w-full px-4 py-2.5 rounded-xl bg-stone-950 border border-stone-800 text-stone-100 text-sm focus:border-amber-500 focus:outline-none"
+                    class="w-full px-4 py-2.5 rounded-xl bg-white dark:bg-stone-950 border border-stone-300 dark:border-stone-800 text-stone-900 dark:text-stone-100 text-sm focus:border-amber-500 focus:outline-none"
                 />
                 @error('name')
-                    <p class="text-xs text-red-400 font-semibold">{{ $message }}</p>
+                    <p class="text-xs text-red-600 dark:text-red-400 font-semibold">{{ $message }}</p>
                 @enderror
             </div>
 
             <!-- Email Field -->
             <div class="space-y-1.5">
-                <label class="text-xs font-bold text-stone-300">Email Address</label>
+                <label class="text-xs font-bold text-stone-700 dark:text-stone-300">Email Address</label>
                 <input
                     wire:model="email"
                     type="email"
                     required
-                    class="w-full px-4 py-2.5 rounded-xl bg-stone-950 border border-stone-800 text-stone-100 text-sm focus:border-amber-500 focus:outline-none"
+                    class="w-full px-4 py-2.5 rounded-xl bg-white dark:bg-stone-950 border border-stone-300 dark:border-stone-800 text-stone-900 dark:text-stone-100 text-sm focus:border-amber-500 focus:outline-none"
                 />
                 @error('email')
-                    <p class="text-xs text-red-400 font-semibold">{{ $message }}</p>
+                    <p class="text-xs text-red-600 dark:text-red-400 font-semibold">{{ $message }}</p>
                 @enderror
 
                 @if ($this->hasUnverifiedEmail)
-                    <div class="p-3 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-300 text-xs space-y-1 mt-2">
+                    <div class="p-3 rounded-xl pq-badge-warning text-xs space-y-1 mt-2">
                         <p>{{ __('Your email address is unverified.') }}</p>
-                        <button type="button" wire:click.prevent="resendVerificationNotification" class="text-amber-400 font-bold underline">
+                        <button type="button" wire:click.prevent="resendVerificationNotification" class="font-bold underline cursor-pointer">
                             {{ __('Click here to re-send the verification email.') }}
                         </button>
 
                         @if (session('status') === 'verification-link-sent')
-                            <p class="text-emerald-400 font-bold mt-1">
+                            <p class="text-emerald-700 dark:text-emerald-400 font-bold mt-1">
                                 {{ __('A new verification link has been sent to your email address.') }}
                             </p>
                         @endif
@@ -204,15 +204,15 @@ new #[Title('Profile settings')] class extends Component {
                 @endif
             </div>
 
-            <div class="flex justify-end pt-2 border-t border-stone-800/80">
-                <button type="submit" class="px-6 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-stone-950 text-xs font-extrabold shadow-md transition-all">
+            <div class="flex justify-end pt-2 border-t border-stone-200 dark:border-stone-800">
+                <button type="submit" class="px-6 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-600 text-stone-950 text-xs font-bold shadow-sm transition-colors cursor-pointer">
                     Save Profile Changes
                 </button>
             </div>
         </form>
 
         @if ($this->showDeleteUser)
-            <div class="mt-10 border-t border-stone-800 pt-6">
+            <div class="mt-10 border-t border-stone-200 dark:border-stone-800 pt-6">
                 <livewire:pages::settings.delete-user-form />
             </div>
         @endif

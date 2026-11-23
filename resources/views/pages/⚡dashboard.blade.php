@@ -50,9 +50,9 @@ new #[Title('Dashboard')] class extends Component {
     }
 }; ?>
 
-<div class="min-h-screen w-full bg-stone-950 flex items-center justify-center">
-    <div class="flex items-center gap-2 text-stone-400 text-xs font-bold">
-        <flux:icon name="arrow-path" class="size-4 animate-spin text-amber-500" />
+<div class="min-h-screen w-full pq-page flex items-center justify-center">
+    <div class="flex items-center gap-2 text-stone-600 dark:text-stone-400 text-xs font-bold">
+        <flux:icon name="arrow-path" class="size-4 animate-spin text-amber-600 dark:text-amber-500" />
         <span>Redirecting to your workspace...</span>
     </div>
 </div>

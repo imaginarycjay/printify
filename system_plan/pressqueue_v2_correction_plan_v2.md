@@ -1,6 +1,6 @@
 # PressQueue v2 — System Correction Plan v2 (UI Overhaul, Universal Navigation, Pure Academic Diagrams & Curated Screenshots)
 
-> **Status:** Planning Baseline Approved (Option A) — Ready for User Review Before Starting `CR-1`
+> **Status:** `CR-1`, `CR-2`, and `CR-3` (`3A`–`3G`) Complete — Ready for `CR-4` (Batched Curated Screenshot Capture)
 > **Baseline Build:** `WP-0` through `WP-5` implemented and verified (`./vendor/bin/sail composer test`: `143` Pest tests passed, `0` PHPStan Level 7 errors, Pint clean).
 > **SDLC Alignment:** Strictly follows the **5-Phase Modified Waterfall Model** documented in Chapter 3 of `capstone_paper/outline_paper/papers/outline_capstone_v2.docx` (*Phase 4 Testing and Refinement* feedback loop into *Phase 2 Design* and *Phase 3 Implementation*, followed by *Phase 5 Deployment Planning and Readiness*). **Never use Agile/Sprint terminology.**
 > **Locked Constraints:** Do NOT break existing business logic, routes, pricing math, database schema, tenant isolation (`.ai/rules/pages.md`), or the **17 locked FR titles (`FR-01`–`FR-17`)**.
@@ -147,18 +147,24 @@ Every regenerated diagram in `capstone_paper/outline_paper/diagrams/` MUST obey 
   - Pure white `#ffffff` background, crisp dark-slate `#1e293b` strokes, clean sans-serif typography, orthogonal non-crossing connectors, zero label/border collisions, and `2x–3x` print-ready DPI.
   - Word Figure captions provide figure numbers and titles—never duplicate verbose slide titles inside the image.
 
-### Exact Diagram Inventory & Action List
+### Exact Diagram Inventory & Batched Execution Schedule (`3A`–`3G`, Review-Gated)
 
-| Diagram Asset | Current File | `CR-3` Action | Reference Benchmark (`outline_example_1.pdf`) |
-| :--- | :--- | :--- | :--- |
-| **Figure 1: Conceptual Framework (IPOO)** | `PressQueue_Conceptual_Framework_v2.png` | **Keep untouched** (already pure 4-box IPOO diagram). | Figure 3 |
-| **Figure 2: Modified Waterfall Model** | `PressQueue_Modified_Waterfall_v2.png` | **Keep untouched** (already pure 5-phase model + minimal arrow legend). | Figure 4 |
-| **Figure 3: Deployment Diagram** | `PressQueue_Deployment_Diagram_v4.png` | **Create NEW `PressQueue_Deployment_Diagram_v5.png`** (do not overwrite `v4`): strip the bottom-left `Scope Note / Fallback Summary` box, keeping pure UML 2.5 deployment nodes + minimal 2-line arrow legend only. | Figure 5 |
-| **ERD (18 Tables)** | `PressQueue_ERD_v2.png` | **Regenerate cleanly:** strip top banner, subtitle, pill badge, orange `Adviser ERD Audit` box, and footer bar. Pure dark-slate table headers (`PK/FK/UK`, field, type) + orthogonal Crow's Foot lines. | Figure 17 |
-| **4 Modular Use Case Diagrams** | `use_cases/PressQueue_UC-1..UC-4.png` | **Regenerate cleanly:** strip top banner, subtitle, pill badge, rule, and bottom legend bar. Pure stick figures + single boundary rectangle with simple title centered inside at top + white ovals with exact locked `FR-01`–`FR-17` titles. | Figures 18–23 |
-| **Class Diagram** | `PressQueue_Class_Diagram_v2.png` | **Regenerate cleanly:** strip top banner, subtitle, pill badge, and bottom legend. Pure UML 2.5 class boxes (`User` superclass at top with upward open-triangle generalization, domain classes, composition/association multiplicities). | Figure 24 |
-| **17 Swimlane Activity Diagrams** | `activity_diagrams/PressQueue_AD-01..AD-17.png` | **Regenerate cleanly:** strip top slide banner, pill badge, and bottom color-key bar. Single clean title bar inside the outer swimlane frame (exact locked `FR-01`–`FR-17` title), crisp actor swimlanes, white action nodes & diamonds, and **zero label overlaps** (fixing `[Customer]` collision on `AD-01` and verifying all 17). | Figures 25–35 |
-| **Modified Waterfall Gantt Chart** | `PressQueue_Gantt_Chart_v2.png` | **Regenerate cleanly:** strip slide banner, pill badge, and bottom prose box; replace `W1–W14` / `WP-1..WP-5` / `PHPStan` jargon with clean **5-Phase Modified Waterfall** academic milestones across **July 2026 – December 2026** (matching `outline_capstone_v1_FinalDraft`), with monthly columns and milestone diamonds. | Figure 36 |
+To ensure thorough visual review and prevent single-pass context bloat, `CR-3` regenerates all **25** target diagrams across **7 review-gated batches (`3A`–`3G`)** using a reusable Playwright + SVG rendering pipeline (`capstone_paper/outline_paper/scratch/diagram_gen/`) with automated DOM bounding-box collision checks. Every batch pauses for user visual inspection and approval before proceeding to the next batch.
+
+- **Untouched Assets (Do Not Overwrite):**
+  - **Figure 1: Conceptual Framework (IPOO)** — `PressQueue_Conceptual_Framework_v2.png` (already pure 4-box IPOO diagram; benchmark: `outline_example_1.pdf` Figure 3).
+  - **Figure 2: Modified Waterfall Model** — `PressQueue_Modified_Waterfall_v2.png` (already pure 5-phase model + minimal arrow legend; benchmark: `outline_example_1.pdf` Figure 4).
+  - **Figure 3 (Previous Version):** `PressQueue_Deployment_Diagram_v4.png` (preserved untouched alongside new `v5`).
+
+| Batch | Status | Diagrams Included (`capstone_paper/outline_paper/diagrams/`) | Count | `CR-3` Pure Academic Spec & Reference (`outline_example_1.pdf`) |
+| :---: | :---: | :--- | :---: | :--- |
+| **`3A`** | `[x]` | `PressQueue_Deployment_Diagram_v5.png` *(NEW)*, `PressQueue_Gantt_Chart_v2.png` | **2** | **Deployment v5** (Fig. 5): strip bottom-left `Scope Note / Fallback Summary` box, keep pure UML 2.5 nodes (`PostgreSQL 18 / MySQL 8.0+`) + minimal 2-line arrow legend. **Gantt Chart** (Fig. 36): strip banner/pill/prose & `W1–W14`/`WP-1..5`/`PHPStan` jargon; pure 5-Phase Modified Waterfall across **Jul 2026 – Dec 2026** with monthly columns, numbered sub-activities, milestone diamonds, dependency arrows, and compact bottom legend. |
+| **`3B`** | `[x]` | `use_cases/PressQueue_UC-1_Access_Governance_ShopConfig.png`, `UC-2_Marketplace_Ordering_Payment.png`, `UC-3_Prepress_Scheduling_Print_QA.png`, `UC-4_Inventory_Reports_Lifecycle.png` | **4** | **All 4 Modular Use Cases in 1 Batch** (Figs. 18–23): strip banner, subtitle, pill, rule, and bottom legend bar. Pure stick figures + single boundary rectangle titled centered inside top + white ovals using locked `FR-01`–`FR-17` titles verbatim + UML 2.5-compliant `«include»` (base → included) and `«extend»` (extension → base) arrow directions. |
+| **`3C`** | `[x]` | `PressQueue_ERD_v2.png`, `PressQueue_Class_Diagram_v2.png` | **2** | **ERD** (Fig. 17): strip banner, subtitle, pill, orange audit box, and footer; 18 live tables with dark-slate headers (`PK/FK/UK`, field, type) + orthogonal Crow's Foot routing. **Class Diagram** (Fig. 24): strip banner, subtitle, pill, and footer; pure 3-compartment UML 2.5 boxes, `User` superclass at top with upward open-triangle generalization, clean multiplicities & uncluttered service dependencies. |
+| **`3D`** | `[x]` | `activity_diagrams/PressQueue_AD-01.png` – `PressQueue_AD-05.png` (`UC-1` workflows: `FR-01`–`FR-05`) | **5** | **Pure Monochrome Academic Swimlanes** (Figs. 25–35): portrait-balanced frame, single centered title bar inside frame with verbatim locked FR title, crisp white action boxes & white decision diamonds, `#1e293b` strokes, gray merge bars, zero slide chrome/footer, zero label overlaps (fixing `[Customer]` collision on `AD-01`). |
+| **`3E`** | `[x]` | `activity_diagrams/PressQueue_AD-07.png` – `PressQueue_AD-10.png` (`UC-2` workflows: `FR-07`–`FR-10`) | **4** | Pure Monochrome Academic Swimlanes (`FR-07` Marketplace Workload, `FR-08` Multi-Item Order/Quote, `FR-09` 50%/100% Payment & Retry, `FR-10` Proof Audit, Counter Settlement & Receipt). |
+| **`3F`** | `[x]` | `activity_diagrams/PressQueue_AD-11.png` – `PressQueue_AD-14.png` (`UC-3` workflows: `FR-11`–`FR-14`) | **4** | Pure Monochrome Academic Swimlanes (`FR-11` Prepress & Cover-Only Shift, `FR-12` Pre-Print Spec Revisions & Manual Refunds, `FR-13` Multi-Printer Scheduling, Failover & Split Tracking, `FR-14` Direct Browser Print & Dual QA Spoilage). |
+| **`3G`** | `[x]` | `activity_diagrams/PressQueue_AD-06.png`, `PressQueue_AD-15.png` – `PressQueue_AD-17.png` (`UC-4` workflows: `FR-06`, `FR-15`–`FR-17`) | **4** | Pure Monochrome Academic Swimlanes (`FR-06` Raw Material Inventory & ROP, `FR-15` Concurrent Stock Reservation & Atomic BOM Deduction, `FR-16` 3 Standardized Printable/Exportable Reports, `FR-17` Automated File Retention, Audit Trail & Notifications). |
 
 ---
 

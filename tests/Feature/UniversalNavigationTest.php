@@ -183,3 +183,100 @@ test('standardized reports and receipts provide deterministic role-aware return 
         ->assertSee('Payments & Audit')
         ->assertSee(route('owner.analytics-hub', ['tab' => 'payments']), false);
 });
+
+test('owner, staff, and customer operational pages render universal contextual back links to exact parent routes', function () {
+    $owner = User::factory()->create(['role' => User::ROLE_BUSINESS_OWNER]);
+    $shop = PrintShop::create([
+        'user_id' => $owner->id,
+        'name' => 'Kabacan Academic Press',
+        'is_setup_completed' => true,
+        'approval_status' => PrintShop::STATUS_APPROVED,
+    ]);
+    $shop->services()->createMany([
+        ['service_key' => 'thesis_binding', 'is_active' => true],
+        ['service_key' => 'document_printing', 'is_active' => true],
+    ]);
+
+    $staff = User::factory()->create([
+        'role' => User::ROLE_PRODUCTION_STAFF,
+    ]);
+    $staff->forceFill(['staff_shop_id' => $shop->id])->save();
+    $customer = User::factory()->create(['role' => User::ROLE_CUSTOMER]);
+
+    $this->actingAs($owner)->get(route('owner.analytics-hub'))
+        ->assertOk()
+        ->assertSee('data-test="universal-back-link"', false)
+        ->assertSee('App Launcher')
+        ->assertSee(route('owner.dashboard'), false);
+
+    $this->actingAs($owner)->get(route('owner.inventory-hub'))
+        ->assertOk()
+        ->assertSee('data-test="universal-back-link"', false)
+        ->assertSee('App Launcher')
+        ->assertSee(route('owner.dashboard'), false);
+
+    $this->actingAs($owner)->get(route('owner.inventory-hub', ['from' => 'thesis-binding']))
+        ->assertOk()
+        ->assertSee('data-test="universal-back-link"', false)
+        ->assertSee('Thesis Binding')
+        ->assertSee(route('owner.thesis-binding'), false);
+
+    $this->actingAs($owner)->get(route('owner.inventory-hub', ['from' => 'document-printing']))
+        ->assertOk()
+        ->assertSee('data-test="universal-back-link"', false)
+        ->assertSee('Document Printing')
+        ->assertSee(route('owner.document-printing'), false);
+
+    $this->actingAs($owner)->get(route('owner.document-printing'))
+        ->assertOk()
+        ->assertSee('data-test="universal-back-link"', false)
+        ->assertSee('App Launcher')
+        ->assertSee(route('owner.dashboard'), false);
+
+    $this->actingAs($owner)->get(route('owner.thesis-binding'))
+        ->assertOk()
+        ->assertSee('data-test="universal-back-link"', false)
+        ->assertSee('App Launcher')
+        ->assertSee(route('owner.dashboard'), false);
+
+    $this->actingAs($owner)->get(route('staff.dashboard'))
+        ->assertRedirect(route('owner.dashboard'));
+
+    Livewire::actingAs($owner)->test('pages::staff.⚡staff-dashboard')
+        ->assertSeeHtml('data-test="universal-back-link"')
+        ->assertSeeHtml(route('owner.dashboard'));
+
+    $this->actingAs($staff)->get(route('staff.dashboard'))
+        ->assertOk()
+        ->assertDontSee('data-test="universal-back-link"', false);
+
+    foreach (['customer.shop.checkout', 'customer.shop.order-document', 'customer.shop.order-thesis'] as $routeName) {
+        $this->actingAs($customer)->get(route($routeName, $shop->id))
+            ->assertOk()
+            ->assertSee('data-test="universal-back-link"', false)
+            ->assertSee('Kabacan Academic Press')
+            ->assertSee(route('shops.show', $shop->id), false);
+    }
+});
+
+test('operational blade views contain zero UI emojis and blank layout omits forced dark class', function () {
+    $directory = new RecursiveDirectoryIterator(resource_path('views/pages'));
+    $iterator = new RecursiveIteratorIterator($directory);
+    $violations = [];
+
+    foreach ($iterator as $file) {
+        if (! $file instanceof SplFileInfo || ! $file->isFile() || ! str_ends_with($file->getFilename(), '.blade.php')) {
+            continue;
+        }
+
+        $contents = file_get_contents($file->getPathname()) ?: '';
+        if (preg_match('/[\x{1F300}-\x{1FAFF}\x{2600}-\x{27BF}]|✕|✓/u', $contents) === 1) {
+            $violations[] = $file->getPathname();
+        }
+    }
+
+    expect($violations)->toBe([]);
+
+    $blankLayout = file_get_contents(resource_path('views/layouts/blank.blade.php')) ?: '';
+    expect($blankLayout)->not->toContain('<html lang="{{ str_replace(\'_\', \'-\', app()->getLocale()) }}" class="dark">');
+});

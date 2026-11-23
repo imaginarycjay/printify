@@ -436,44 +436,34 @@ new #[Title('Order Document Printing')] class extends Component {
     }
 }; ?>
 
-<div class="min-h-screen w-full bg-stone-950 text-stone-100 font-sans antialiased relative selection:bg-blue-500 selection:text-white pb-24">
-    
-    <!-- Ambient Background Glows -->
-    <div class="absolute -top-32 left-1/4 size-[600px] rounded-full bg-blue-500/10 blur-[160px] pointer-events-none"></div>
-    <div class="absolute bottom-10 right-10 size-[500px] rounded-full bg-indigo-500/10 blur-[160px] pointer-events-none"></div>
-
+<div class="min-h-screen w-full pq-page relative pb-24">
     @php
         $shop = $this->selectedShop();
         $pricing = $this->calculatePricing();
     @endphp
 
     <!-- Top Header Navigation -->
-    <header class="w-full max-w-5xl mx-auto px-4 sm:px-6 py-4 flex items-center justify-between border-b border-stone-800/80 relative z-20">
-        <div class="flex items-center gap-3">
-            <a href="{{ route('shops.show', $this->shopId) }}" wire:navigate aria-label="Back to shop" class="flex size-11 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-blue-500 to-indigo-600 text-white font-bold shadow-md shadow-blue-500/20 hover:scale-105 transition-transform">
-                <flux:icon name="arrow-left" class="size-5" />
-            </a>
-            <div>
-                <div class="flex items-center gap-2">
-                    <h1 class="text-base font-extrabold text-white tracking-tight">Order Document Printing</h1>
-                    <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-blue-500/20 text-blue-400 border border-blue-500/30">
-                        Instant Quotation
-                    </span>
+    <header class="w-full pq-topbar sticky top-0 z-30">
+        <div class="max-w-5xl mx-auto px-4 sm:px-6 py-3.5 flex flex-wrap items-center justify-between gap-3">
+            <div class="flex items-center gap-3 min-w-0">
+                <x-app-back-link :href="route('shops.show', $this->shopId)" :label="$shop->name" :navigate="true" />
+                <div class="min-w-0">
+                    <h1 class="text-sm sm:text-base font-bold text-stone-900 dark:text-white tracking-tight truncate">Order Document Printing</h1>
+                    <p class="text-[11px] text-stone-600 dark:text-stone-400 truncate">{{ $shop ? $shop->name : 'PressQueue' }} &bull; High-Speed Document Xerox, Duplex &amp; Ring Binding</p>
                 </div>
-                <p class="text-[11px] text-stone-400">{{ $shop ? $shop->name : 'PressQueue' }} &bull; High-Speed Document Xerox, Duplex & Ring Binding</p>
             </div>
-        </div>
 
-        <!-- Step Indicator & Theme Toggle -->
-        <div class="flex items-center gap-4">
-            <div class="flex items-center gap-2">
-                <span class="size-7 rounded-full flex items-center justify-center text-xs font-black {{ $step >= 1 ? 'bg-blue-500 text-white' : 'bg-stone-800 text-stone-500' }}">1</span>
-                <span class="w-4 h-0.5 {{ $step >= 2 ? 'bg-blue-500' : 'bg-stone-800' }}"></span>
-                <span class="size-7 rounded-full flex items-center justify-center text-xs font-black {{ $step >= 2 ? 'bg-blue-500 text-white' : 'bg-stone-800 text-stone-500' }}">2</span>
-                <span class="w-4 h-0.5 {{ $step >= 3 ? 'bg-blue-500' : 'bg-stone-800' }}"></span>
-                <span class="size-7 rounded-full flex items-center justify-center text-xs font-black {{ $step >= 3 ? 'bg-blue-500 text-white' : 'bg-stone-800 text-stone-500' }}">3</span>
+            <!-- Step Indicator & Theme Toggle -->
+            <div class="flex items-center gap-3 shrink-0">
+                <div class="flex items-center gap-2">
+                    <span class="size-7 rounded-full flex items-center justify-center text-xs font-bold tabular-nums {{ $step >= 1 ? 'bg-blue-600 text-white' : 'bg-stone-200 dark:bg-stone-800 text-stone-500' }}">1</span>
+                    <span class="w-4 h-0.5 {{ $step >= 2 ? 'bg-blue-600' : 'bg-stone-200 dark:bg-stone-800' }}"></span>
+                    <span class="size-7 rounded-full flex items-center justify-center text-xs font-bold tabular-nums {{ $step >= 2 ? 'bg-blue-600 text-white' : 'bg-stone-200 dark:bg-stone-800 text-stone-500' }}">2</span>
+                    <span class="w-4 h-0.5 {{ $step >= 3 ? 'bg-blue-600' : 'bg-stone-200 dark:bg-stone-800' }}"></span>
+                    <span class="size-7 rounded-full flex items-center justify-center text-xs font-bold tabular-nums {{ $step >= 3 ? 'bg-blue-600 text-white' : 'bg-stone-200 dark:bg-stone-800 text-stone-500' }}">3</span>
+                </div>
+                <x-theme-toggle />
             </div>
-            <x-theme-toggle />
         </div>
     </header>
 
@@ -488,20 +478,20 @@ new #[Title('Order Document Printing')] class extends Component {
                 <div class="lg:col-span-2 space-y-6">
                     
                     <!-- 1. Document Upload Card -->
-                    <div class="p-6 rounded-3xl bg-stone-900/80 border border-stone-800/90 space-y-4 shadow-md backdrop-blur-sm">
+                    <div class="pq-card p-6 space-y-4">
                         <div class="flex items-center justify-between">
-                            <h3 class="text-sm font-black text-white uppercase tracking-wider flex items-center gap-2">
-                                <flux:icon name="cloud-arrow-up" class="size-4 text-blue-400" />
+                            <h3 class="text-sm font-bold text-stone-900 dark:text-white uppercase tracking-wider flex items-center gap-2">
+                                <flux:icon name="cloud-arrow-up" class="size-4 text-blue-600 dark:text-blue-400" />
                                 1. Upload File (PDF / Word)
                             </h3>
                             @if ($document_file)
-                                <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
+                                <span class="px-2 py-0.5 rounded text-[10px] font-bold pq-badge-success">
                                     File Attached
                                 </span>
                             @endif
                         </div>
 
-                        <div class="p-6 border-2 border-dashed border-stone-800 hover:border-blue-500/50 rounded-2xl text-center bg-stone-950/60 transition-colors">
+                        <div class="p-6 border-2 border-dashed border-stone-300 dark:border-stone-800 hover:border-blue-500/60 rounded-2xl text-center bg-stone-50 dark:bg-stone-950/60 transition-colors">
                             <input 
                                 type="file" 
                                 wire:model="document_file" 
@@ -510,16 +500,16 @@ new #[Title('Order Document Printing')] class extends Component {
                                 accept=".pdf,.doc,.docx,.ppt,.pptx"
                             />
                             <label for="doc_upload" class="cursor-pointer flex flex-col items-center justify-center space-y-2">
-                                <flux:icon name="document" class="size-8 text-blue-400" />
-                                <div class="text-xs">
-                                    <span class="font-bold text-blue-400 hover:underline">Click to browse file</span> or drag and drop
+                                <flux:icon name="document" class="size-8 text-blue-600 dark:text-blue-400" />
+                                <div class="text-xs text-stone-700 dark:text-stone-300">
+                                    <span class="font-bold text-blue-600 dark:text-blue-400 hover:underline">Click to browse file</span> or drag and drop
                                 </div>
-                                <p class="text-[10px] text-stone-500">PDF, DOCX, PPTX supported (Max 50MB)</p>
+                                <p class="text-[10px] text-stone-500 dark:text-stone-400">PDF, DOCX, PPTX supported (Max 50MB)</p>
                             </label>
 
                             @if ($document_name)
-                                <div class="mt-3 inline-flex items-center gap-2 px-3 py-1.5 rounded-xl bg-stone-900 border border-stone-700 text-xs font-bold text-stone-200">
-                                    <flux:icon name="check-circle" class="size-4 text-emerald-400" />
+                                <div class="mt-3 inline-flex items-center gap-2 px-3 py-1.5 rounded-xl bg-white dark:bg-stone-900 border border-stone-300 dark:border-stone-700 text-xs font-bold text-stone-800 dark:text-stone-200">
+                                    <flux:icon name="check-circle" class="size-4 text-emerald-600 dark:text-emerald-400" />
                                     <span>{{ $document_name }}</span>
                                 </div>
                             @endif
@@ -528,34 +518,34 @@ new #[Title('Order Document Printing')] class extends Component {
                         <!-- Manual/Confirmed Page Count -->
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
                             <div class="space-y-1.5">
-                                <label class="text-xs font-bold text-stone-300">Total Page Count</label>
+                                <label class="text-xs font-bold text-stone-700 dark:text-stone-300">Total Page Count</label>
                                 <input 
                                     wire:model.live.debounce.300ms="total_pages" 
                                     type="number" 
                                     min="1" 
-                                    class="w-full bg-stone-950 border border-stone-800 focus:border-blue-500 rounded-xl px-3 py-2 text-sm text-white font-mono font-bold outline-none"
+                                    class="w-full bg-white dark:bg-stone-950 border border-stone-300 dark:border-stone-800 focus:border-blue-600 dark:focus:border-blue-500 rounded-xl px-3 py-2 text-sm text-stone-900 dark:text-white font-mono font-bold outline-none tabular-nums"
                                 />
-                                <span class="text-[10px] text-stone-500">Total number of pages in the document</span>
+                                <span class="text-[10px] text-stone-500 dark:text-stone-400">Total number of pages in the document</span>
                             </div>
 
                             <div class="space-y-1.5">
-                                <label class="text-xs font-bold text-stone-300">Number of Copies</label>
+                                <label class="text-xs font-bold text-stone-700 dark:text-stone-300">Number of Copies</label>
                                 <div class="flex items-center gap-2">
                                     <button 
                                         type="button"
                                         wire:click="$set('copies_count', {{ max(1, $copies_count - 1) }})"
-                                        class="size-9 rounded-xl bg-stone-950 border border-stone-800 text-white font-bold hover:bg-stone-800"
+                                        class="size-9 rounded-xl bg-white dark:bg-stone-950 border border-stone-300 dark:border-stone-800 text-stone-800 dark:text-white font-bold hover:bg-stone-100 dark:hover:bg-stone-800 cursor-pointer"
                                     >-</button>
                                     <input 
                                         wire:model.live.debounce.300ms="copies_count" 
                                         type="number" 
                                         min="1" 
-                                        class="w-full text-center bg-stone-950 border border-stone-800 focus:border-blue-500 rounded-xl py-2 text-sm text-white font-mono font-bold outline-none"
+                                        class="w-full text-center bg-white dark:bg-stone-950 border border-stone-300 dark:border-stone-800 focus:border-blue-600 dark:focus:border-blue-500 rounded-xl py-2 text-sm text-stone-900 dark:text-white font-mono font-bold outline-none tabular-nums"
                                     />
                                     <button 
                                         type="button"
                                         wire:click="$set('copies_count', {{ $copies_count + 1 }})"
-                                        class="size-9 rounded-xl bg-stone-950 border border-stone-800 text-white font-bold hover:bg-stone-800"
+                                        class="size-9 rounded-xl bg-white dark:bg-stone-950 border border-stone-300 dark:border-stone-800 text-stone-800 dark:text-white font-bold hover:bg-stone-100 dark:hover:bg-stone-800 cursor-pointer"
                                     >+</button>
                                 </div>
                             </div>
@@ -563,73 +553,82 @@ new #[Title('Order Document Printing')] class extends Component {
                     </div>
 
                     <!-- 2. Color Mode & Page Breakdown -->
-                    <div class="p-6 rounded-3xl bg-stone-900/80 border border-stone-800/90 space-y-4 shadow-md backdrop-blur-sm">
-                        <h3 class="text-sm font-black text-white uppercase tracking-wider flex items-center gap-2">
-                            <flux:icon name="swatch" class="size-4 text-purple-400" />
-                            2. Color Mode & Page Breakdown
+                    <div class="pq-card p-6 space-y-4">
+                        <h3 class="text-sm font-bold text-stone-900 dark:text-white uppercase tracking-wider flex items-center gap-2">
+                            <flux:icon name="swatch" class="size-4 text-purple-600 dark:text-purple-400" />
+                            2. Color Mode &amp; Page Breakdown
                         </h3>
 
                         <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
                             <button 
                                 type="button"
                                 wire:click="$set('color_mode', 'bw')"
-                                class="p-3.5 rounded-2xl border text-left transition-all {{ $color_mode === 'bw' ? 'bg-blue-500/20 border-blue-500 text-white' : 'bg-stone-950 border-stone-800 text-stone-400 hover:text-stone-200' }}"
+                                class="p-3.5 rounded-2xl border text-left transition-colors cursor-pointer {{ $color_mode === 'bw' ? 'bg-blue-50 dark:bg-blue-500/20 border-blue-600 dark:border-blue-500 text-blue-950 dark:text-white' : 'bg-stone-50 dark:bg-stone-950 border-stone-200 dark:border-stone-800 text-stone-700 dark:text-stone-400 hover:bg-stone-100 dark:hover:text-stone-200' }}"
                             >
-                                <p class="font-bold text-xs">⚫ Pure B&W</p>
-                                <p class="text-[10px] text-stone-500 mt-1">All {{ $total_pages }} pages in monochrome (₱{{ number_format($pricing['bw_rate'], 2) }}/pg)</p>
+                                <p class="font-bold text-xs flex items-center gap-1.5">
+                                    <flux:icon name="adjustments-horizontal" class="size-3.5 text-stone-700 dark:text-stone-300" />
+                                    <span>Pure B&amp;W</span>
+                                </p>
+                                <p class="text-[10px] text-stone-500 dark:text-stone-400 mt-1 tabular-nums">All {{ $total_pages }} pages in monochrome (₱{{ number_format($pricing['bw_rate'], 2) }}/pg)</p>
                             </button>
 
                             <button 
                                 type="button"
                                 wire:click="$set('color_mode', 'color')"
-                                class="p-3.5 rounded-2xl border text-left transition-all {{ $color_mode === 'color' ? 'bg-blue-500/20 border-blue-500 text-white' : 'bg-stone-950 border-stone-800 text-stone-400 hover:text-stone-200' }}"
+                                class="p-3.5 rounded-2xl border text-left transition-colors cursor-pointer {{ $color_mode === 'color' ? 'bg-blue-50 dark:bg-blue-500/20 border-blue-600 dark:border-blue-500 text-blue-950 dark:text-white' : 'bg-stone-50 dark:bg-stone-950 border-stone-200 dark:border-stone-800 text-stone-700 dark:text-stone-400 hover:bg-stone-100 dark:hover:text-stone-200' }}"
                             >
-                                <p class="font-bold text-xs">🌈 Full Color</p>
-                                <p class="text-[10px] text-stone-500 mt-1">All {{ $total_pages }} pages in vibrant color (₱{{ number_format($pricing['color_rate'], 2) }}/pg)</p>
+                                <p class="font-bold text-xs flex items-center gap-1.5">
+                                    <flux:icon name="swatch" class="size-3.5 text-blue-600 dark:text-blue-400" />
+                                    <span>Full Color</span>
+                                </p>
+                                <p class="text-[10px] text-stone-500 dark:text-stone-400 mt-1 tabular-nums">All {{ $total_pages }} pages in vibrant color (₱{{ number_format($pricing['color_rate'], 2) }}/pg)</p>
                             </button>
 
                             <button 
                                 type="button"
                                 wire:click="$set('color_mode', 'mixed')"
-                                class="p-3.5 rounded-2xl border text-left transition-all {{ $color_mode === 'mixed' ? 'bg-blue-500/20 border-blue-500 text-white' : 'bg-stone-950 border-stone-800 text-stone-400 hover:text-stone-200' }}"
+                                class="p-3.5 rounded-2xl border text-left transition-colors cursor-pointer {{ $color_mode === 'mixed' ? 'bg-blue-50 dark:bg-blue-500/20 border-blue-600 dark:border-blue-500 text-blue-950 dark:text-white' : 'bg-stone-50 dark:bg-stone-950 border-stone-200 dark:border-stone-800 text-stone-700 dark:text-stone-400 hover:bg-stone-100 dark:hover:text-stone-200' }}"
                             >
-                                <p class="font-bold text-xs">🎨 Custom Mixed</p>
-                                <p class="text-[10px] text-stone-500 mt-1">Specific colored pages + rest B&W</p>
+                                <p class="font-bold text-xs flex items-center gap-1.5">
+                                    <flux:icon name="paint-brush" class="size-3.5 text-amber-600 dark:text-amber-400" />
+                                    <span>Custom Mixed</span>
+                                </p>
+                                <p class="text-[10px] text-stone-500 dark:text-stone-400 mt-1">Specific colored pages + rest B&amp;W</p>
                             </button>
                         </div>
 
                         @if ($color_mode === 'mixed')
-                            <div class="p-4 rounded-2xl bg-stone-950 border border-stone-800 space-y-2">
-                                <label class="text-xs font-bold text-stone-300">Enter Colored Page Numbers / Ranges</label>
+                            <div class="pq-well p-4 space-y-2">
+                                <label class="text-xs font-bold text-stone-700 dark:text-stone-300">Enter Colored Page Numbers / Ranges</label>
                                 <input 
                                     wire:model.live.debounce.300ms="custom_color_pages" 
                                     type="text" 
                                     placeholder="e.g. 1, 5, 10-15"
-                                    class="w-full bg-stone-900 border border-stone-800 focus:border-blue-500 rounded-xl px-3 py-2 text-xs text-white placeholder-stone-600 outline-none"
+                                    class="w-full bg-white dark:bg-stone-900 border border-stone-300 dark:border-stone-800 focus:border-blue-600 dark:focus:border-blue-500 rounded-xl px-3 py-2 text-xs text-stone-900 dark:text-white placeholder-stone-400 dark:placeholder-stone-600 outline-none"
                                 />
-                                <div class="flex items-center justify-between text-[11px] text-stone-400 font-medium">
-                                    <span>Calculated: <strong class="text-amber-400">{{ $color_pages_count }} Colored</strong> and <strong class="text-stone-200">{{ $bw_pages_count }} B&W</strong> pages</span>
+                                <div class="flex items-center justify-between text-[11px] text-stone-600 dark:text-stone-400 font-medium tabular-nums">
+                                    <span>Calculated: <strong class="text-amber-700 dark:text-amber-400">{{ $color_pages_count }} Colored</strong> and <strong class="text-stone-900 dark:text-stone-200">{{ $bw_pages_count }} B&amp;W</strong> pages</span>
                                 </div>
                             </div>
                         @endif
                     </div>
 
                     <!-- 3. Paper Size, Weight & Duplex -->
-                    <div class="p-6 rounded-3xl bg-stone-900/80 border border-stone-800/90 space-y-4 shadow-md backdrop-blur-sm">
-                        <h3 class="text-sm font-black text-white uppercase tracking-wider flex items-center gap-2">
-                            <flux:icon name="document-duplicate" class="size-4 text-emerald-400" />
-                            3. Paper Size, Weight & Sides
+                    <div class="pq-card p-6 space-y-4">
+                        <h3 class="text-sm font-bold text-stone-900 dark:text-white uppercase tracking-wider flex items-center gap-2">
+                            <flux:icon name="document-duplicate" class="size-4 text-emerald-600 dark:text-emerald-400" />
+                            3. Paper Size, Weight &amp; Sides
                         </h3>
 
                         <!-- Paper Size -->
                         <div class="space-y-1.5">
-                            <label class="text-xs font-bold text-stone-300">Paper Size</label>
+                            <label class="text-xs font-bold text-stone-700 dark:text-stone-300">Paper Size</label>
                             <div class="grid grid-cols-3 gap-2">
                                 @foreach (['Letter' => 'Short (8.5x11")', 'A4' => 'A4 (8.3x11.7")', 'Legal' => 'Long (8.5x13")'] as $val => $lbl)
                                     <button 
                                         type="button"
                                         wire:click="$set('paper_size', '{{ $val }}')"
-                                        class="py-2 px-3 rounded-xl border text-center transition-all text-xs font-bold {{ $paper_size === $val ? 'bg-blue-500/20 border-blue-500 text-white' : 'bg-stone-950 border-stone-800 text-stone-400' }}"
+                                        class="py-2 px-3 rounded-xl border text-center transition-colors text-xs font-bold cursor-pointer {{ $paper_size === $val ? 'bg-blue-50 dark:bg-blue-500/20 border-blue-600 dark:border-blue-500 text-blue-950 dark:text-white' : 'bg-stone-50 dark:bg-stone-950 border-stone-200 dark:border-stone-800 text-stone-600 dark:text-stone-400 hover:bg-stone-100 dark:hover:text-stone-200' }}"
                                     >
                                         {{ $lbl }}
                                     </button>
@@ -638,12 +637,13 @@ new #[Title('Order Document Printing')] class extends Component {
                         </div>
 
                         <!-- Print Sides (Simplex vs Duplex) -->
-                        <div class="space-y-1.5 pt-2 border-t border-stone-800/60">
-                            <div class="flex items-center justify-between">
-                                <label class="text-xs font-bold text-stone-300">Printing Sides</label>
+                        <div class="space-y-1.5 pt-2 border-t border-stone-200 dark:border-stone-800">
+                            <div class="flex items-center justify-between gap-2">
+                                <label class="text-xs font-bold text-stone-700 dark:text-stone-300">Printing Sides</label>
                                 @if ($print_sides === 'duplex')
-                                    <span class="text-[10px] font-bold text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/20">
-                                        🌱 Saves {{ ceil($total_pages / 2) }} paper sheets ({{ $duplex_discount_percent }}% OFF)
+                                    <span class="text-[10px] font-bold pq-badge-success px-2 py-0.5 rounded-full inline-flex items-center gap-1 tabular-nums">
+                                        <flux:icon name="sparkles" class="size-3" />
+                                        <span>Saves {{ ceil($total_pages / 2) }} paper sheets ({{ $duplex_discount_percent }}% OFF)</span>
                                     </span>
                                 @endif
                             </div>
@@ -651,45 +651,51 @@ new #[Title('Order Document Printing')] class extends Component {
                                 <button 
                                     type="button"
                                     wire:click="$set('print_sides', 'simplex')"
-                                    class="p-3 rounded-xl border text-left transition-all {{ $print_sides === 'simplex' ? 'bg-blue-500/20 border-blue-500 text-white' : 'bg-stone-950 border-stone-800 text-stone-400' }}"
+                                    class="p-3 rounded-xl border text-left transition-colors cursor-pointer {{ $print_sides === 'simplex' ? 'bg-blue-50 dark:bg-blue-500/20 border-blue-600 dark:border-blue-500 text-blue-950 dark:text-white' : 'bg-stone-50 dark:bg-stone-950 border-stone-200 dark:border-stone-800 text-stone-600 dark:text-stone-400 hover:bg-stone-100 dark:hover:text-stone-200' }}"
                                 >
-                                    <p class="font-bold text-xs">📄 Single-Sided (Simplex)</p>
-                                    <p class="text-[10px] text-stone-500 mt-0.5">1 page printed per sheet ({{ $total_pages }} sheets)</p>
+                                    <p class="font-bold text-xs flex items-center gap-1.5">
+                                        <flux:icon name="document" class="size-3.5" />
+                                        <span>Single-Sided (Simplex)</span>
+                                    </p>
+                                    <p class="text-[10px] text-stone-500 dark:text-stone-400 mt-0.5 tabular-nums">1 page printed per sheet ({{ $total_pages }} sheets)</p>
                                 </button>
 
                                 <button 
                                     type="button"
                                     wire:click="$set('print_sides', 'duplex')"
-                                    class="p-3 rounded-xl border text-left transition-all {{ $print_sides === 'duplex' ? 'bg-blue-500/20 border-blue-500 text-white' : 'bg-stone-950 border-stone-800 text-stone-400' }}"
+                                    class="p-3 rounded-xl border text-left transition-colors cursor-pointer {{ $print_sides === 'duplex' ? 'bg-blue-50 dark:bg-blue-500/20 border-blue-600 dark:border-blue-500 text-blue-950 dark:text-white' : 'bg-stone-50 dark:bg-stone-950 border-stone-200 dark:border-stone-800 text-stone-600 dark:text-stone-400 hover:bg-stone-100 dark:hover:text-stone-200' }}"
                                 >
-                                    <p class="font-bold text-xs">📑 Back-to-Back (Duplex)</p>
-                                    <p class="text-[10px] text-stone-500 mt-0.5">2 pages per sheet ({{ ceil($total_pages / 2) }} sheets only!)</p>
+                                    <p class="font-bold text-xs flex items-center gap-1.5">
+                                        <flux:icon name="document-duplicate" class="size-3.5" />
+                                        <span>Back-to-Back (Duplex)</span>
+                                    </p>
+                                    <p class="text-[10px] text-stone-500 dark:text-stone-400 mt-0.5 tabular-nums">2 pages per sheet ({{ ceil($total_pages / 2) }} sheets only)</p>
                                 </button>
                             </div>
                         </div>
 
                         <!-- Paper Stock Weight -->
-                        <div class="space-y-1.5 pt-2 border-t border-stone-800/60">
-                            <label class="text-xs font-bold text-stone-300">Paper Stock Weight</label>
+                        <div class="space-y-1.5 pt-2 border-t border-stone-200 dark:border-stone-800">
+                            <label class="text-xs font-bold text-stone-700 dark:text-stone-300">Paper Stock Weight</label>
                             <div class="grid grid-cols-3 gap-2">
                                 <button 
                                     type="button"
                                     wire:click="$set('paper_stock', '70gsm')"
-                                    class="py-2 px-3 rounded-xl border text-center transition-all text-xs font-bold {{ $paper_stock === '70gsm' ? 'bg-blue-500/20 border-blue-500 text-white' : 'bg-stone-950 border-stone-800 text-stone-400' }}"
+                                    class="py-2 px-3 rounded-xl border text-center transition-colors text-xs font-bold cursor-pointer {{ $paper_stock === '70gsm' ? 'bg-blue-50 dark:bg-blue-500/20 border-blue-600 dark:border-blue-500 text-blue-950 dark:text-white' : 'bg-stone-50 dark:bg-stone-950 border-stone-200 dark:border-stone-800 text-stone-600 dark:text-stone-400' }}"
                                 >
                                     70gsm (Standard)
                                 </button>
                                 <button 
                                     type="button"
                                     wire:click="$set('paper_stock', '80gsm')"
-                                    class="py-2 px-3 rounded-xl border text-center transition-all text-xs font-bold {{ $paper_stock === '80gsm' ? 'bg-blue-500/20 border-blue-500 text-white' : 'bg-stone-950 border-stone-800 text-stone-400' }}"
+                                    class="py-2 px-3 rounded-xl border text-center transition-colors text-xs font-bold cursor-pointer tabular-nums {{ $paper_stock === '80gsm' ? 'bg-blue-50 dark:bg-blue-500/20 border-blue-600 dark:border-blue-500 text-blue-950 dark:text-white' : 'bg-stone-50 dark:bg-stone-950 border-stone-200 dark:border-stone-800 text-stone-600 dark:text-stone-400' }}"
                                 >
                                     80gsm (+₱{{ number_format($paper_stock_80gsm_price, 2) }})
                                 </button>
                                 <button 
                                     type="button"
                                     wire:click="$set('paper_stock', '100gsm')"
-                                    class="py-2 px-3 rounded-xl border text-center transition-all text-xs font-bold {{ $paper_stock === '100gsm' ? 'bg-blue-500/20 border-blue-500 text-white' : 'bg-stone-950 border-stone-800 text-stone-400' }}"
+                                    class="py-2 px-3 rounded-xl border text-center transition-colors text-xs font-bold cursor-pointer tabular-nums {{ $paper_stock === '100gsm' ? 'bg-blue-50 dark:bg-blue-500/20 border-blue-600 dark:border-blue-500 text-blue-950 dark:text-white' : 'bg-stone-50 dark:bg-stone-950 border-stone-200 dark:border-stone-800 text-stone-600 dark:text-stone-400' }}"
                                 >
                                     100gsm (+₱{{ number_format($paper_stock_100gsm_price, 2) }})
                                 </button>
@@ -698,59 +704,71 @@ new #[Title('Order Document Printing')] class extends Component {
                     </div>
 
                     <!-- 4. Finishing & Binding Selection -->
-                    <div class="p-6 rounded-3xl bg-stone-900/80 border border-stone-800/90 space-y-4 shadow-md backdrop-blur-sm">
-                        <h3 class="text-sm font-black text-white uppercase tracking-wider flex items-center gap-2">
-                            <flux:icon name="sparkles" class="size-4 text-amber-400" />
-                            4. Finishing & Binding Services
+                    <div class="pq-card p-6 space-y-4">
+                        <h3 class="text-sm font-bold text-stone-900 dark:text-white uppercase tracking-wider flex items-center gap-2">
+                            <flux:icon name="sparkles" class="size-4 text-amber-600 dark:text-amber-400" />
+                            4. Finishing &amp; Binding Services
                         </h3>
 
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                             <button 
                                 type="button"
                                 wire:click="$set('finishing_type', 'loose')"
-                                class="p-3.5 rounded-2xl border text-left transition-all {{ $finishing_type === 'loose' ? 'bg-blue-500/20 border-blue-500 text-white' : 'bg-stone-950 border-stone-800 text-stone-400' }}"
+                                class="p-3.5 rounded-2xl border text-left transition-colors cursor-pointer {{ $finishing_type === 'loose' ? 'bg-blue-50 dark:bg-blue-500/20 border-blue-600 dark:border-blue-500 text-blue-950 dark:text-white' : 'bg-stone-50 dark:bg-stone-950 border-stone-200 dark:border-stone-800 text-stone-600 dark:text-stone-400 hover:bg-stone-100 dark:hover:text-stone-200' }}"
                             >
-                                <p class="font-bold text-xs">📄 Loose Sheets</p>
-                                <p class="text-[10px] text-stone-500 mt-0.5">No binding / Paper clipped (Free)</p>
+                                <p class="font-bold text-xs flex items-center gap-1.5">
+                                    <flux:icon name="document" class="size-3.5" />
+                                    <span>Loose Sheets</span>
+                                </p>
+                                <p class="text-[10px] text-stone-500 dark:text-stone-400 mt-0.5">No binding / Paper clipped (Free)</p>
                             </button>
 
                             <button 
                                 type="button"
                                 wire:click="$set('finishing_type', 'staple')"
-                                class="p-3.5 rounded-2xl border text-left transition-all {{ $finishing_type === 'staple' ? 'bg-blue-500/20 border-blue-500 text-white' : 'bg-stone-950 border-stone-800 text-stone-400' }}"
+                                class="p-3.5 rounded-2xl border text-left transition-colors cursor-pointer {{ $finishing_type === 'staple' ? 'bg-blue-50 dark:bg-blue-500/20 border-blue-600 dark:border-blue-500 text-blue-950 dark:text-white' : 'bg-stone-50 dark:bg-stone-950 border-stone-200 dark:border-stone-800 text-stone-600 dark:text-stone-400 hover:bg-stone-100 dark:hover:text-stone-200' }}"
                             >
-                                <p class="font-bold text-xs">📎 Corner Stapling (+₱{{ number_format($staple_price, 2) }})</p>
-                                <p class="text-[10px] text-stone-500 mt-0.5">Heavy-duty staple on upper-left</p>
+                                <p class="font-bold text-xs flex items-center gap-1.5 tabular-nums">
+                                    <flux:icon name="paper-clip" class="size-3.5" />
+                                    <span>Corner Stapling (+₱{{ number_format($staple_price, 2) }})</span>
+                                </p>
+                                <p class="text-[10px] text-stone-500 dark:text-stone-400 mt-0.5">Heavy-duty staple on upper-left</p>
                             </button>
 
                             <button 
                                 type="button"
                                 wire:click="$set('finishing_type', 'folder')"
-                                class="p-3.5 rounded-2xl border text-left transition-all {{ $finishing_type === 'folder' ? 'bg-blue-500/20 border-blue-500 text-white' : 'bg-stone-950 border-stone-800 text-stone-400' }}"
+                                class="p-3.5 rounded-2xl border text-left transition-colors cursor-pointer {{ $finishing_type === 'folder' ? 'bg-blue-50 dark:bg-blue-500/20 border-blue-600 dark:border-blue-500 text-blue-950 dark:text-white' : 'bg-stone-50 dark:bg-stone-950 border-stone-200 dark:border-stone-800 text-stone-600 dark:text-stone-400 hover:bg-stone-100 dark:hover:text-stone-200' }}"
                             >
-                                <p class="font-bold text-xs">📁 Sliding Folder & Fastener (+₱{{ number_format($folder_fastener_price, 2) }})</p>
-                                <p class="text-[10px] text-stone-500 mt-0.5">Clear sliding folder with plastic clip</p>
+                                <p class="font-bold text-xs flex items-center gap-1.5 tabular-nums">
+                                    <flux:icon name="folder" class="size-3.5" />
+                                    <span>Sliding Folder &amp; Fastener (+₱{{ number_format($folder_fastener_price, 2) }})</span>
+                                </p>
+                                <p class="text-[10px] text-stone-500 dark:text-stone-400 mt-0.5">Clear sliding folder with plastic clip</p>
                             </button>
 
                             <button 
                                 type="button"
                                 wire:click="$set('finishing_type', 'ring_bind')"
-                                class="p-3.5 rounded-2xl border text-left transition-all {{ $finishing_type === 'ring_bind' ? 'bg-blue-500/20 border-blue-500 text-white' : 'bg-stone-950 border-stone-800 text-stone-400' }}"
+                                class="p-3.5 rounded-2xl border text-left transition-colors cursor-pointer {{ $finishing_type === 'ring_bind' ? 'bg-blue-50 dark:bg-blue-500/20 border-blue-600 dark:border-blue-500 text-blue-950 dark:text-white' : 'bg-stone-50 dark:bg-stone-950 border-stone-200 dark:border-stone-800 text-stone-600 dark:text-stone-400 hover:bg-stone-100 dark:hover:text-stone-200' }}"
                             >
-                                <p class="font-bold text-xs">🌀 Plastic Ring Binding (+₱{{ number_format($ring_bind_base_price, 2) }})</p>
-                                <p class="text-[10px] text-stone-500 mt-0.5">PVC Clear front cover + Morocco back board</p>
+                                <p class="font-bold text-xs flex items-center gap-1.5 tabular-nums">
+                                    <flux:icon name="book-open" class="size-3.5" />
+                                    <span>Plastic Ring Binding (+₱{{ number_format($ring_bind_base_price, 2) }})</span>
+                                </p>
+                                <p class="text-[10px] text-stone-500 dark:text-stone-400 mt-0.5">PVC Clear front cover + Morocco back board</p>
                             </button>
                         </div>
 
                         @if ($finishing_type === 'ring_bind')
-                            <div class="p-4 rounded-2xl bg-stone-950 border border-stone-800 space-y-2">
-                                <label class="text-xs font-bold text-stone-300">Ring Binding Back Cover Color</label>
-                                <div class="flex items-center gap-2">
+                            <div class="pq-well p-4 space-y-2">
+                                <label class="text-xs font-bold text-stone-700 dark:text-stone-300">Ring Binding Back Cover Color</label>
+                                <div class="flex flex-wrap items-center gap-2">
                                     @foreach (['Blue', 'Black', 'Green', 'Maroon', 'Red'] as $color)
                                         <button 
                                             type="button"
                                             wire:click="$set('ring_back_cover_color', '{{ $color }}')"
-                                            class="px-3 py-1 rounded-lg text-xs font-bold border transition-all {{ $ring_back_cover_color === $color ? 'bg-blue-500 text-white border-blue-400' : 'bg-stone-900 text-stone-400 border-stone-800' }}"
+                                            class="px-3 py-1 rounded-lg text-xs font-bold border transition-colors cursor-pointer {{ $ring_back_cover_color === $color ? 'bg-blue-600 text-white border-blue-600' : 'bg-white dark:bg-stone-900 text-stone-600 dark:text-stone-400 border-stone-300 dark:border-stone-800' }}"
                                         >
                                             {{ $color }}
                                         </button>
@@ -763,33 +781,33 @@ new #[Title('Order Document Printing')] class extends Component {
 
                 <!-- Right 1 Col: Live Floating Quotation Card -->
                 <div class="space-y-6">
-                    <div class="p-6 rounded-3xl bg-stone-900/90 border border-stone-800/90 space-y-5 sticky top-20 shadow-xl backdrop-blur-md">
-                        <div class="border-b border-stone-800 pb-3">
-                            <span class="text-[10px] font-bold text-stone-500 uppercase tracking-wider block">Live Price Quotation</span>
-                            <h3 class="text-3xl font-black text-emerald-400 font-mono mt-1">
+                    <div class="pq-card p-6 space-y-5 sticky top-20">
+                        <div class="border-b border-stone-200 dark:border-stone-800 pb-3">
+                            <span class="text-[10px] font-bold text-stone-500 dark:text-stone-400 uppercase tracking-wider block">Live Price Quotation</span>
+                            <h3 class="text-3xl font-black text-emerald-700 dark:text-emerald-400 font-mono mt-1 tabular-nums">
                                 ₱{{ number_format($pricing['final_total'], 2) }}
                             </h3>
-                            <p class="text-xs text-stone-400 mt-0.5">
-                                For {{ $copies_count }} copy (₱{{ number_format($pricing['per_copy_total'], 2) }}/copy)
+                            <p class="text-xs text-stone-600 dark:text-stone-400 mt-0.5 tabular-nums">
+                                For {{ $copies_count }} {{ $copies_count === 1 ? 'copy' : 'copies' }} (₱{{ number_format($pricing['per_copy_total'], 2) }}/copy)
                             </p>
                         </div>
 
                         <!-- Itemized Breakdown -->
-                        <div class="space-y-2.5 text-xs text-stone-300">
+                        <div class="space-y-2.5 text-xs text-stone-700 dark:text-stone-300 tabular-nums">
                             <div class="flex items-center justify-between">
-                                <span class="text-stone-400">B&W Pages ({{ $bw_pages_count }} pgs):</span>
+                                <span class="text-stone-600 dark:text-stone-400">B&amp;W Pages ({{ $bw_pages_count }} pgs):</span>
                                 <span class="font-mono font-bold">₱{{ number_format($pricing['bw_subtotal'], 2) }}</span>
                             </div>
 
                             @if ($color_pages_count > 0)
-                                <div class="flex items-center justify-between text-amber-400">
+                                <div class="flex items-center justify-between text-amber-700 dark:text-amber-400">
                                     <span>Colored Pages ({{ $color_pages_count }} pgs):</span>
                                     <span class="font-mono font-bold">₱{{ number_format($pricing['color_subtotal'], 2) }}</span>
                                 </div>
                             @endif
 
                             @if ($pricing['duplex_discount'] > 0)
-                                <div class="flex items-center justify-between text-emerald-400">
+                                <div class="flex items-center justify-between text-emerald-700 dark:text-emerald-400">
                                     <span>Duplex Discount ({{ $duplex_discount_percent }}%):</span>
                                     <span class="font-mono font-bold">-₱{{ number_format($pricing['duplex_discount'], 2) }}</span>
                                 </div>
@@ -797,32 +815,35 @@ new #[Title('Order Document Printing')] class extends Component {
 
                             @if ($pricing['paper_stock_fee'] > 0)
                                 <div class="flex items-center justify-between">
-                                    <span class="text-stone-400">Paper Stock ({{ $paper_stock }}):</span>
+                                    <span class="text-stone-600 dark:text-stone-400">Paper Stock ({{ $paper_stock }}):</span>
                                     <span class="font-mono font-bold">+₱{{ number_format($pricing['paper_stock_fee'], 2) }}</span>
                                 </div>
                             @endif
 
                             @if ($pricing['finishing_fee'] > 0)
                                 <div class="flex items-center justify-between">
-                                    <span class="text-stone-400">Finishing ({{ ucfirst($finishing_type) }}):</span>
+                                    <span class="text-stone-600 dark:text-stone-400">Finishing ({{ ucfirst($finishing_type) }}):</span>
                                     <span class="font-mono font-bold">+₱{{ number_format($pricing['finishing_fee'], 2) }}</span>
                                 </div>
                             @endif
 
                             <!-- Physical Paper Summary -->
-                            <div class="pt-2 border-t border-stone-800 flex items-center justify-between text-[11px] text-stone-400">
+                            <div class="pt-2 border-t border-stone-200 dark:border-stone-800 flex items-center justify-between text-[11px] text-stone-600 dark:text-stone-400">
                                 <span>Physical Sheets Feed:</span>
-                                <span class="font-bold text-stone-200">{{ $pricing['total_physical_sheets'] }} sheets</span>
+                                <span class="font-bold text-stone-900 dark:text-stone-200">{{ $pricing['total_physical_sheets'] }} sheets</span>
                             </div>
 
                             <!-- Rush Order Option -->
-                            <div class="pt-2 border-t border-stone-800">
-                                <label class="flex items-center justify-between cursor-pointer p-2.5 rounded-xl bg-stone-950 border border-stone-800">
+                            <div class="pt-2 border-t border-stone-200 dark:border-stone-800">
+                                <label class="pq-well flex items-center justify-between cursor-pointer p-2.5">
                                     <div class="flex items-center gap-2">
-                                        <input type="checkbox" wire:model.live="is_rush" class="rounded bg-stone-800 border-stone-700 text-amber-500 focus:ring-0">
-                                        <span class="text-xs font-bold text-amber-400">⚡ Rush Order (+₱{{ number_format($rush_fee_amount, 2) }})</span>
+                                        <input type="checkbox" wire:model.live="is_rush" class="rounded bg-white dark:bg-stone-800 border-stone-300 dark:border-stone-700 text-amber-500 focus:ring-0">
+                                        <span class="text-xs font-bold text-amber-700 dark:text-amber-400 inline-flex items-center gap-1">
+                                            <flux:icon name="bolt" class="size-3.5" />
+                                            <span>Rush Order (+₱{{ number_format($rush_fee_amount, 2) }})</span>
+                                        </span>
                                     </div>
-                                    <span class="text-[10px] text-stone-500">Ready in 3h</span>
+                                    <span class="text-[10px] text-stone-500 dark:text-stone-400">Ready in 3h</span>
                                 </label>
                             </div>
                         </div>
@@ -831,7 +852,7 @@ new #[Title('Order Document Printing')] class extends Component {
                         <button 
                             type="button"
                             wire:click="proceedToCheckout"
-                            class="w-full py-3 rounded-2xl bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-400 hover:to-indigo-500 text-white text-xs font-black shadow-lg shadow-blue-500/20 transition-all cursor-pointer flex items-center justify-center gap-2"
+                            class="w-full py-3 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold shadow-sm transition-colors cursor-pointer flex items-center justify-center gap-2"
                         >
                             <span>Proceed to Checkout</span>
                             <flux:icon name="arrow-right" class="size-4" />
@@ -844,109 +865,113 @@ new #[Title('Order Document Printing')] class extends Component {
         <!-- STEP 2: CHECKOUT & PAYMENT -->
         @if ($step === 2)
             <div class="max-w-2xl mx-auto space-y-6">
-                <div class="p-6 rounded-3xl bg-stone-900/80 border border-stone-800/90 space-y-6 shadow-md backdrop-blur-sm">
-                    <div class="border-b border-stone-800/80 pb-3">
-                        <h3 class="text-base font-black text-white tracking-tight flex items-center gap-2">
-                            <flux:icon name="credit-card" class="size-5 text-blue-400" />
-                            Customer Information & Payment Method
+                <div class="pq-card p-6 space-y-6">
+                    <div class="border-b border-stone-200 dark:border-stone-800 pb-3">
+                        <h3 class="text-base font-bold text-stone-900 dark:text-white tracking-tight flex items-center gap-2">
+                            <flux:icon name="credit-card" class="size-5 text-blue-600 dark:text-blue-400" />
+                            Customer Information &amp; Payment Method
                         </h3>
-                        <p class="text-xs text-stone-400">Review your order summary of ₱{{ number_format($pricing['final_total'], 2) }} and select payment</p>
+                        <p class="text-xs text-stone-600 dark:text-stone-400 tabular-nums">Review your order summary of ₱{{ number_format($pricing['final_total'], 2) }} and select payment</p>
                     </div>
 
                     <div class="space-y-4">
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <div class="space-y-1.5">
-                                <label class="text-xs font-bold text-stone-300">Your Full Name</label>
+                                <label class="text-xs font-bold text-stone-700 dark:text-stone-300">Your Full Name</label>
                                 <input 
                                     wire:model="customer_name" 
                                     type="text" 
-                                    class="w-full bg-stone-950 border border-stone-800 focus:border-blue-500 rounded-xl px-3 py-2 text-xs text-white outline-none"
+                                    class="w-full bg-white dark:bg-stone-950 border border-stone-300 dark:border-stone-800 focus:border-blue-600 dark:focus:border-blue-500 rounded-xl px-3 py-2 text-xs text-stone-900 dark:text-white outline-none"
                                 />
                             </div>
 
                             <div class="space-y-1.5">
-                                <label class="text-xs font-bold text-stone-300">Email Address</label>
+                                <label class="text-xs font-bold text-stone-700 dark:text-stone-300">Email Address</label>
                                 <input 
                                     wire:model="customer_email" 
                                     type="email" 
-                                    class="w-full bg-stone-950 border border-stone-800 focus:border-blue-500 rounded-xl px-3 py-2 text-xs text-white outline-none"
+                                    class="w-full bg-white dark:bg-stone-950 border border-stone-300 dark:border-stone-800 focus:border-blue-600 dark:focus:border-blue-500 rounded-xl px-3 py-2 text-xs text-stone-900 dark:text-white outline-none"
                                 />
                             </div>
                         </div>
 
                         <!-- Payment Method -->
-                        <div class="space-y-2 pt-2 border-t border-stone-800/60">
-                            <label class="text-xs font-bold text-stone-300">Select Payment Method</label>
+                        <div class="space-y-2 pt-2 border-t border-stone-200 dark:border-stone-800">
+                            <label class="text-xs font-bold text-stone-700 dark:text-stone-300">Select Payment Method</label>
                             <div class="grid grid-cols-3 gap-3">
                                 <button 
                                     type="button"
                                     wire:click="$set('payment_method', 'gcash')"
-                                    class="p-3 rounded-xl border text-center transition-all text-xs font-bold {{ $payment_method === 'gcash' ? 'bg-blue-500/20 border-blue-500 text-white' : 'bg-stone-950 border-stone-800 text-stone-400' }}"
+                                    class="p-3 rounded-xl border text-center transition-colors text-xs font-bold cursor-pointer flex items-center justify-center gap-1.5 {{ $payment_method === 'gcash' ? 'bg-blue-50 dark:bg-blue-500/20 border-blue-600 dark:border-blue-500 text-blue-950 dark:text-white' : 'bg-stone-50 dark:bg-stone-950 border-stone-200 dark:border-stone-800 text-stone-600 dark:text-stone-400' }}"
                                 >
-                                    💙 GCash QR
+                                    <flux:icon name="qr-code" class="size-4 text-blue-600 dark:text-blue-400" />
+                                    <span>GCash QR</span>
                                 </button>
                                 <button 
                                     type="button"
                                     wire:click="$set('payment_method', 'maya')"
-                                    class="p-3 rounded-xl border text-center transition-all text-xs font-bold {{ $payment_method === 'maya' ? 'bg-blue-500/20 border-blue-500 text-white' : 'bg-stone-950 border-stone-800 text-stone-400' }}"
+                                    class="p-3 rounded-xl border text-center transition-colors text-xs font-bold cursor-pointer flex items-center justify-center gap-1.5 {{ $payment_method === 'maya' ? 'bg-blue-50 dark:bg-blue-500/20 border-blue-600 dark:border-blue-500 text-blue-950 dark:text-white' : 'bg-stone-50 dark:bg-stone-950 border-stone-200 dark:border-stone-800 text-stone-600 dark:text-stone-400' }}"
                                 >
-                                    💚 Maya QR
+                                    <flux:icon name="qr-code" class="size-4 text-emerald-600 dark:text-emerald-400" />
+                                    <span>Maya QR</span>
                                 </button>
                                 <button 
                                     type="button"
                                     wire:click="$set('payment_method', 'cash_counter')"
-                                    class="p-3 rounded-xl border text-center transition-all text-xs font-bold {{ $payment_method === 'cash_counter' ? 'bg-blue-500/20 border-blue-500 text-white' : 'bg-stone-950 border-stone-800 text-stone-400' }}"
+                                    class="p-3 rounded-xl border text-center transition-colors text-xs font-bold cursor-pointer flex items-center justify-center gap-1.5 {{ $payment_method === 'cash_counter' ? 'bg-blue-50 dark:bg-blue-500/20 border-blue-600 dark:border-blue-500 text-blue-950 dark:text-white' : 'bg-stone-50 dark:bg-stone-950 border-stone-200 dark:border-stone-800 text-stone-600 dark:text-stone-400' }}"
                                 >
-                                    💵 Cash on Counter
+                                    <flux:icon name="banknotes" class="size-4 text-amber-600 dark:text-amber-400" />
+                                    <span>Cash on Counter</span>
                                 </button>
                             </div>
                         </div>
 
                         @if ($payment_method !== 'cash_counter')
-                            <div class="p-4 rounded-2xl bg-stone-950 border border-stone-800 space-y-3 text-center">
-                                <span class="text-xs font-bold text-stone-300">Scan QR Code & Send ₱{{ number_format($pricing['final_total'], 2) }}</span>
-                                <div class="size-36 mx-auto bg-stone-900 border border-stone-700 rounded-2xl flex items-center justify-center font-mono text-[10px] text-stone-400">
+                            <div class="pq-well p-4 space-y-3 text-center">
+                                <span class="text-xs font-bold text-stone-800 dark:text-stone-300 tabular-nums">Scan QR Code &amp; Send ₱{{ number_format($pricing['final_total'], 2) }}</span>
+                                <div class="size-36 mx-auto bg-white dark:bg-stone-900 border border-stone-300 dark:border-stone-700 rounded-2xl flex items-center justify-center font-mono text-[10px] text-stone-500 dark:text-stone-400">
                                     [ QR Code Preview ]
                                 </div>
                                 <div class="space-y-1 text-left max-w-sm mx-auto">
-                                    <label class="text-[11px] font-bold text-stone-400">Payment Reference Number</label>
+                                    <label class="text-[11px] font-bold text-stone-600 dark:text-stone-400">Payment Reference Number</label>
                                     <input 
                                         wire:model="payment_reference_no" 
                                         type="text" 
                                         placeholder="e.g. 1002 9384 1928"
-                                        class="w-full bg-stone-900 border border-stone-800 focus:border-blue-500 rounded-xl px-3 py-1.5 text-xs text-white outline-none"
+                                        class="w-full bg-white dark:bg-stone-900 border border-stone-300 dark:border-stone-800 focus:border-blue-600 dark:focus:border-blue-500 rounded-xl px-3 py-1.5 text-xs text-stone-900 dark:text-white outline-none"
                                     />
                                 </div>
                             </div>
                         @endif
 
                         <div class="space-y-1.5">
-                            <label class="text-xs font-bold text-stone-300">Special Instructions for Staff (Optional)</label>
+                            <label class="text-xs font-bold text-stone-700 dark:text-stone-300">Special Instructions for Staff (Optional)</label>
                             <textarea 
                                 wire:model="special_instructions"
                                 rows="2"
                                 placeholder="e.g. Staple on top center, or specific ring binder color requests..."
-                                class="w-full bg-stone-950 border border-stone-800 focus:border-blue-500 rounded-xl p-3 text-xs text-white placeholder-stone-600 outline-none"
+                                class="w-full bg-white dark:bg-stone-950 border border-stone-300 dark:border-stone-800 focus:border-blue-600 dark:focus:border-blue-500 rounded-xl p-3 text-xs text-stone-900 dark:text-white placeholder-stone-400 dark:placeholder-stone-600 outline-none"
                             ></textarea>
                         </div>
                     </div>
 
-                    <div class="flex items-center justify-between pt-4 border-t border-stone-800">
+                    <div class="flex items-center justify-between pt-4 border-t border-stone-200 dark:border-stone-800">
                         <button 
                             type="button"
                             wire:click="$set('step', 1)"
-                            class="px-4 py-2 rounded-xl text-xs font-bold text-stone-400 hover:text-white"
+                            class="px-4 py-2 rounded-xl text-xs font-bold text-stone-600 dark:text-stone-400 hover:text-stone-900 dark:hover:text-white inline-flex items-center gap-1.5 cursor-pointer"
                         >
-                            &larr; Back to Config
+                            <flux:icon name="arrow-left" class="size-3.5" />
+                            <span>Back to Config</span>
                         </button>
 
                         <button 
                             type="button"
                             wire:click="submitOrder"
-                            class="px-6 py-2.5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-stone-950 text-xs font-black shadow-lg shadow-emerald-500/20 transition-all cursor-pointer flex items-center gap-2"
+                            class="px-6 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold shadow-sm transition-colors cursor-pointer flex items-center gap-2 tabular-nums"
                         >
                             <flux:icon name="check" class="size-4" />
-                            <span>Confirm & Place Order (₱{{ number_format($pricing['final_total'], 2) }})</span>
+                            <span>Confirm &amp; Place Order (₱{{ number_format($pricing['final_total'], 2) }})</span>
                         </button>
                     </div>
                 </div>
@@ -956,53 +981,53 @@ new #[Title('Order Document Printing')] class extends Component {
         <!-- STEP 3: ORDER CONFIRMATION & DIGITAL JOB TICKET -->
         @if ($step === 3 && $created_order)
             <div class="max-w-xl mx-auto space-y-6 text-center">
-                <div class="p-8 rounded-3xl bg-stone-900/80 border border-stone-800/90 space-y-6 shadow-xl backdrop-blur-sm">
-                    <div class="size-16 rounded-3xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 mx-auto flex items-center justify-center font-bold text-3xl">
-                        ✓
+                <div class="pq-card p-8 space-y-6">
+                    <div class="size-16 rounded-2xl pq-badge-success mx-auto flex items-center justify-center">
+                        <flux:icon name="check-badge" class="size-9" />
                     </div>
 
                     <div>
-                        <h2 class="text-2xl font-black text-white tracking-tight">Order Placed Successfully!</h2>
-                        <p class="text-xs text-stone-400 mt-1">Your document printing job is now in the shop production queue</p>
+                        <h2 class="text-2xl font-bold text-stone-900 dark:text-white tracking-tight">Order Placed Successfully!</h2>
+                        <p class="text-xs text-stone-600 dark:text-stone-400 mt-1">Your document printing job is now in the shop production queue</p>
                     </div>
 
                     <!-- Digital Order Ticket -->
-                    <div class="p-5 rounded-2xl bg-stone-950 border border-stone-800 text-left space-y-3">
-                        <div class="flex items-center justify-between border-b border-stone-800 pb-2">
-                            <span class="text-xs text-stone-400">Order Number</span>
-                            <span class="font-mono font-black text-white text-sm">{{ $created_order->order_number }}</span>
+                    <div class="pq-well p-5 text-left space-y-3">
+                        <div class="flex items-center justify-between border-b border-stone-200 dark:border-stone-800 pb-2">
+                            <span class="text-xs text-stone-600 dark:text-stone-400">Order Number</span>
+                            <span class="font-mono font-bold text-stone-900 dark:text-white text-sm">{{ $created_order->order_number }}</span>
                         </div>
 
                         <div class="flex items-center justify-between text-xs">
-                            <span class="text-stone-400">Service</span>
-                            <span class="font-bold text-blue-400">Document Printing</span>
+                            <span class="text-stone-600 dark:text-stone-400">Service</span>
+                            <span class="font-bold text-blue-700 dark:text-blue-400">Document Printing</span>
                         </div>
 
                         <div class="flex items-center justify-between text-xs">
-                            <span class="text-stone-400">Specifications</span>
-                            <span class="text-stone-200">{{ $paper_size }} &bull; {{ $paper_stock }} &bull; {{ ucfirst($print_sides) }}</span>
+                            <span class="text-stone-600 dark:text-stone-400">Specifications</span>
+                            <span class="text-stone-800 dark:text-stone-200 font-medium">{{ $paper_size }} &bull; {{ $paper_stock }} &bull; {{ ucfirst($print_sides) }}</span>
                         </div>
 
                         <div class="flex items-center justify-between text-xs">
-                            <span class="text-stone-400">Finishing</span>
-                            <span class="text-stone-200">{{ ucfirst($finishing_type) }}</span>
+                            <span class="text-stone-600 dark:text-stone-400">Finishing</span>
+                            <span class="text-stone-800 dark:text-stone-200 font-medium">{{ ucfirst($finishing_type) }}</span>
                         </div>
 
                         <div class="flex items-center justify-between text-xs">
-                            <span class="text-stone-400">Total Amount</span>
-                            <span class="font-mono font-black text-emerald-400 text-sm">₱{{ number_format($created_order->total_amount, 2) }}</span>
+                            <span class="text-stone-600 dark:text-stone-400">Total Amount</span>
+                            <span class="font-mono font-bold text-emerald-700 dark:text-emerald-400 text-sm tabular-nums">₱{{ number_format($created_order->total_amount, 2) }}</span>
                         </div>
 
-                        <div class="flex items-center justify-between text-xs pt-1 border-t border-stone-800">
-                            <span class="text-stone-400">Payment Status</span>
-                            <span class="px-2 py-0.5 rounded-full text-[10px] font-black border {{ $created_order->paymentStatusBadgeColor() }}">
+                        <div class="flex items-center justify-between text-xs pt-2 border-t border-stone-200 dark:border-stone-800">
+                            <span class="text-stone-600 dark:text-stone-400">Payment Status</span>
+                            <span class="px-2 py-0.5 rounded-full text-[10px] font-bold border {{ $created_order->paymentStatusBadgeColor() }}">
                                 {{ $created_order->paymentStatusLabel() }}
                             </span>
                         </div>
 
                         <div class="flex items-center justify-between text-xs">
-                            <span class="text-stone-400">Production Status</span>
-                            <span class="px-2 py-0.5 rounded-full text-[10px] font-black bg-blue-500/20 text-blue-400 border border-blue-500/30">
+                            <span class="text-stone-600 dark:text-stone-400">Production Status</span>
+                            <span class="px-2 py-0.5 rounded-full text-[10px] font-bold pq-badge-info">
                                 {{ $created_order->stageLabel() }}
                             </span>
                         </div>
@@ -1012,7 +1037,7 @@ new #[Title('Order Document Printing')] class extends Component {
                         <a 
                             href="{{ route('customer.dashboard') }}" 
                             wire:navigate
-                            class="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl bg-stone-950 hover:bg-stone-800 border border-stone-800 text-xs font-bold text-stone-200 transition-colors"
+                            class="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl bg-stone-900 dark:bg-stone-800 hover:bg-stone-800 dark:hover:bg-stone-700 text-xs font-bold text-white transition-colors"
                         >
                             <span>Back to Customer Dashboard</span>
                             <flux:icon name="arrow-right" class="size-4" />
